@@ -1,4 +1,4 @@
-### **HC-SR04 ultrasonic sensor**
+### HC-SR04 ultrasonic sensor
 
 The HC-SR04 ultrasonic sensor uses sonar to determine distance to an object like bats or dolphins do. It offers excellent non-contact range detection with high accuracy and stable readings in an easy-to-use package. From 2cm to 400 cm
 
@@ -13,7 +13,11 @@ The HC-SR04 ultrasonic sensor uses sonar to determine distance to an object like
 + Trigger Input Pulse width: 10uS
 + Dimension: 45mm x 20mm x 15mm
 
-#### Wiring:
+#### Pinout
+
+![alttex](img/pir2.jpg)
+
+#### Wiring
 ![alttext](img/sr041.jpg)
 
 ![alttext](img/hcsr04.png)

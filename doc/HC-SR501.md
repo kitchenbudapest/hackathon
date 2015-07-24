@@ -2,7 +2,7 @@
 
 PIR sensors allow you to sense motion, almost always used to detect whether a human has moved in or out of the sensors range.
 
-####Features:
+#### Features:
 
 + Output: Digital pulse high (3V) when triggered (motion detected) digital low when idle (no motion detected). Pulse lengths are determined by resistors and capacitors on the PCB and differ from sensor to sensor.
 + Sensitivity range: up to 20 feet (6 meters) 110 degrees x 70 degrees detection range
