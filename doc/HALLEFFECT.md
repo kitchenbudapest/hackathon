@@ -24,4 +24,4 @@ Frequently, a Hall sensor is combined with circuitry that allows the device to a
 
 
 
-###### Source: wikipedia.com, engineersgarage.com
+###### Source: wikipedia.org, engineersgarage.com

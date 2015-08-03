@@ -20,4 +20,4 @@ So, if you are connecting anything more than a small LED to the GPIO output, you
 
 ![alt text](img/laser.png)
 
-###### Source: wikipedia.com
+###### Source: wikipedia.org
