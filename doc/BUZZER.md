@@ -16,3 +16,5 @@ DC signal can not makes the Buzzer tweet. Must 2K ~ 5K square ave (PWM) to Drive
 #### Wiring
 
 ![alt text](img/buzzer.png)
+
+###### Source: wikipedia.com
