@@ -23,3 +23,5 @@ In order to detect which key is pressed from the matrix, we make row line low, a
 #### Wiring
 
 ![alt text](img/array3.png)
+
+###### Source: 8051projects.net
