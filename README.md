@@ -76,3 +76,36 @@ ETC:
 ```
 apt get install git tree clang
 ```
+- - -
+
+Install dependency `bcm2835`:
+
+```
+$ cd /tmp
+$ wget http://www.airspayce.com/mikem/bcm2835/bcm2835-1.45.tar.gz
+$ tar zxvf bcm2835-1.45.tar.gz
+$ cd bcm2835
+$ ./configure
+$ make
+$ sudo make check
+$ sudo make install
+```
+
+Enable Device Tree:
+
+```
+$ sudo raspi-config
+  |
+  +--> 8 Advanced Options
+  |    |
+  |    '--> A5 Device Tree
+  |         |
+  |         +--> Yes
+  |         |
+  |         '--> Ok
+  |
+  '--> Finish
+$ sudo reboot
+```
+
+

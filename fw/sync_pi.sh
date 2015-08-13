@@ -1,8 +1,10 @@
 #!/bin/bash
 
 # Colorful message formatting
+UPDATES="\033[1;33m==>\033[39m %s\033[0m\r";
 MESSAGE="\033[1;32m==>\033[39m %s\033[0m\n";
 PROBLEM="\033[1;31m==>\033[39m %s\033[0m\n";
+
 # Catch interruption signal
 trap '{ printf "\n$MESSAGE" "Exiting!"; exit; }' INT;
 
@@ -33,11 +35,11 @@ old_checksum="0";
 new_checksum="$(tar c $1 | md5sum)";
 
 # Enter "daemon" loop
-while [[ true ]];
+while true;
 do
     if [ "$old_checksum" != "$new_checksum" ];
     then
-        printf "$MESSAGE" "Synchronizing $1 to $2";
+        printf "$MESSAGE" "[$(date +%k:%M:%S)] Synchronizing $1 to $2";
         rsync --progress                 \
               --recursive                \
               --archive                  \
@@ -49,8 +51,11 @@ do
               $1                         \
               $2;
         old_checksum=$new_checksum;
-        printf "$MESSAGE" "Watching for changes...";
     fi;
+    # Update checksum
     new_checksum="$(tar c $1 | md5sum)";
+    # Feedback for the user
+    printf "$UPDATES" "[$(date +%k:%M:%S)] Looking for changes...";
+    # Pause
     $(sleep $interval);
 done;

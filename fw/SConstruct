@@ -43,7 +43,7 @@ LIBPATH = ['.',
            '/usr/local/lib']
 
 # Libraries
-LIBS = ['wiringPi']
+LIBS = ['bcm2835']
 
 # Add compiler specific flags to generic flags
 CCFLAGS.extend(GCCFLAGS if CC == 'gcc' else CLANGFLAGS if CC == 'clang' else [])
