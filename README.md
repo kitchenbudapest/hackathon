@@ -1,3 +1,32 @@
+
+> ***WARNING:*** Both the documentation and the framework itself is under heavy
+> development and in a very early stage. That means, this repo is full of
+> untested and unchecked drafts and notes and anything in it can change without
+> further notice. Therefore it comes with absolutely no warranty at all: if it
+> melts down you computer -- you cannot say we did not warn you :P Nonetheless,
+> feel free to browse or even contribute to it, now that you know what you are
+> dealing with ;)
+
+KIBU HACKATHON FRAMEWORK
+========================
+
+The purpose of this framework is to provide all the boilerplate you will need
+to build what you want in no time during our hackathon. Not to mention, this
+boilerplate is abstracted away from you at a super high level with its context-
+based, event driven model.
+
+Currenlty supported languages:
+
+- C (and therefore C++ as well)
+- Python
+- JavaScript
+
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+WIP: Random Stuffs
+------------------
+
 Raspberry Pi's default login data:
 
 ```
