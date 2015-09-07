@@ -3,7 +3,7 @@
 > development and in a very early stage. That means, this repo is full of
 > untested and unchecked drafts and notes and anything in it can change without
 > further notice. Therefore it comes with absolutely no warranty at all: if it
-> melts down you computer -- you cannot say we did not warn you :P Nonetheless,
+> melts down your computer -- you cannot say we did not warn you :P Nonetheless,
 > feel free to browse or even contribute to it, now that you know what you are
 > dealing with ;)
 
@@ -136,5 +136,3 @@ $ sudo raspi-config
   '--> Finish
 $ sudo reboot
 ```
-
-
