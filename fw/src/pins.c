@@ -1,11 +1,54 @@
 /* INFO **
 ** INFO */
 
+/* Include standard headers */
+#include <stdlib.h> /*
+    func  : malloc
+            free
+*/
+
+
+/* Include kibu headers */
+#include <kb/errors.h> /*
+    type  : kb_Error
+    const : kb_OKAY
+            kb_SELF_IS_NULL
+            kb_ARG2_IS_NULL
+            kb_ARG3_IS_NULL
+            kb_ALLOC_FAIL
+*/
+
+#include <kb/RPi2/pins.h> /*
+    type  : kb_rpi2_Pin_State
+            kb_rpi2_Pin_Id
+    const : kb_rpi2_Pin_LOW
+            kb_rpi2_Pin_HIGH
+*/
+
+#include <kb/RPi2/sensors.h> /*
+    type  : kb_rpi2_Sensor
+*/
+
+#include <kb/RPi2/events.h> /*
+    type  : kb_rpi2_Event
+*/
+
+#include <kb/RPi2/contexts.h> /*
+    type  : kb_rpi2_Context
+*/
+
+
+/*----------------------------------------------------------------------------*/
+#define kb_rpi2_CHECK_SELF_IS_NULL(S) \
+    if (!S)                           \
+        return kb_SELF_IS_NULL;
+
+
 /*----------------------------------------------------------------------------*/
 void
-kb_RPi2_print_pin_layout(void)
+kb_rpi2_print_pin_layout(void)
 {
-    static const char *const kb_RPi2_PIN_LAYOUT =
+    static const char *const kb_rpi2_PIN_LAYOUT =
         "           +-----+-----+\n"
         "         0 |     |     |  1\n"
         "           +-----+-----+\n"
@@ -49,132 +92,113 @@ kb_RPi2_print_pin_layout(void)
         "           +-----+-----+\n";
 
     /* Print ASCII layout */
-    puts(kb_RPi2_PIN_LAYOUT);
+    puts(kb_rpi2_PIN_LAYOUT);
 }
 
 
 /*----------------------------------------------------------------------------*/
-typedef enum
+kb_Error
+kb_rpi2_Pin_new(kb_rpi2_Pin   **self,
+                kb_rpi2_PinId   pin_id,
+                kb_rpi2_Sensor *sensor)
 {
-    kb_RPi2_OKAY,
-    kb_RPi2_FAIL,
+    /* If `self` is NULL */
+    kb_rpi2_CHECK_SELF_IS_NULL(self);
 
-    kb_RPi2_SELF_IS_NULL,
-    kb_RPi2_ARG1_IS_NULL,
-    kb_RPi2_ARG2_IS_NULL,
-    kb_RPi2_ARG3_IS_NULL,
-    kb_RPi2_ARG4_IS_NULL,
-    kb_RPi2_ARG5_IS_NULL,
+    /* Make `self` point to NULL */
+    *self = NULL;
 
-} kb_RPi2_Error;
+    /* If `sensor` is NULL */
+    if (!sensor)
+        return kb_ARG3_IS_NULL;
 
+    /* If `pin_id` is out of range */
+    if (pin_id < 0 ||
+        pin_id >= kb_rpi2_PIN_COUNT)
+            return kb_INVALID_PIN_ID;
 
-#define kb_RPi2_CHECK_SELF_IS_NULL(S) \
-    if (!S)                           \
-        return kb_RPi2_SELF_IS_NULL;
+    /* Create new Pin object */
+    kb_rpi2_Pin *pin;
+    if (!(pin = malloc(sizeof(kb_rpi2_Pin))))
+        return kb_ALLOC_FAIL;
 
+    /* Initialize Pin object */
+    pin->id      = pin_id;
 
-/*----------------------------------------------------------------------------*/
-typedef enum
-{
-    kb_RPi2_Pin_01,
-    kb_RPi2_Pin_02,
-    kb_RPi2_Pin_03,
-} kb_RPi2_Pin_Id;
+    /*
+     * TODO: Get initial state from bcm2835 (somehow..)
+     */
 
+    pin->state   = kb_rpi2_Pin_LOW;
 
-/*----------------------------------------------------------------------------*/
-typedef enum
-{
-    kb_RPi2_Pin_LOW  = 0,
-    kb_RPi2_Pin_HIGH = 1,
-} kb_RPi2_Pin_State;
-
-
-
-/*----------------------------------------------------------------------------*/
-typedef struct
-{
-    /* Static data */
-    kb_RPi2_Pin_Id    pin_id;
-    kb_RPi2_Sensor    sensor;
-    kb_RPi2_Pin_State state;
-
-    /* Available callbacks */
-    kb_RPi2_Error   (*on_high)(kb_RPi2_Pin*,
-                               kb_RPi2_Sensor*,
-                               kb_RPi2_Event*,
-                               kb_RPi2_Context*);
-    kb_RPi2_Error   (*on_low)(kb_RPi2_Pin*,
-                              kb_RPi2_Sensor*,
-                              kb_RPi2_Event*,
-                              kb_RPi2_Context*);
-} kb_RPi2_Pin;
-
-
-/*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-kb_RPi2_Error
-kb_RPi2_Pin_new(kb_RPi2_Pin    **self,
-                kb_RPi2_Pin_Id   pin_id,
-                kb_RPi2_Sensor  *sensor)
-{
-    /* If self is NULL */
-    kb_RPi2_CHECK_SELF_IS_NULL(self);
-
-    kb_RPi2_Pin *pin;
-
-    ...
-
-    pin->pin_id  = pin_id;
     pin->sensor  = sensor;
     pin->on_high = NULL;
     pin->on_low  = NULL;
 
+    /* Make `self` point to the new Pin object */
     *self = pin;
 
     /* If everything went fine */
-    return kb_RPi2_OKAY;
+    return kb_OKAY;
 }
 
 
 /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-kb_RPi2_Error
-kb_RPi2_Pin_del(kb_RPi2_Pin **self)
+kb_Error
+kb_rpi2_Pin_del(kb_rpi2_Pin **self)
 {
-    /* If self is NULL */
-    kb_RPi2_CHECK_SELF_IS_NULL(self);
+    /* If `self` is NULL */
+    kb_rpi2_CHECK_SELF_IS_NULL(self);
+
+    /* Unbind pin from sensor */
+    kb_rpi2_Sensor_unbind_pin((*self)->sensor);
+
+    /*
+     * TODO: Reset this pin via bcm2835
+     */
+
+    /* Deallocate Pin object */
+    free(*self);
+
+    /* Make `self` point to NULL */
+    *self = NULL;
 
     /* If everything went fine */
-    return kb_RPi2_OKAY;
+    return kb_OKAY;
 }
 
 
 /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-kb_RPi2_Error
-kb_RPi2_Pin_reset(kb_RPi2_Pin *self)
+kb_Error
+kb_rpi2_Pin_reset(kb_rpi2_Pin *self)
 {
-    /* If self is NULL */
-    kb_RPi2_CHECK_SELF_IS_NULL(self);
+    /* If `self` is NULL */
+    kb_rpi2_CHECK_SELF_IS_NULL(self);
+
+    /*
+     * TODO: Reset this pin via bcm2835
+     *       Reset self->state as well
+     */
 
     /* If everything went fine */
-    return kb_RPi2_OKAY;
+    return kb_OKAY;
 }
 
 
 /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-kb_RPi2_Error
-kb_RPi2_Pin_set_high(kb_RPi2_Pin *self)
+kb_Error
+kb_rpi2_Pin_set_high(kb_rpi2_Pin *self)
 {
-    /* If self is NULL */
-    kb_RPi2_CHECK_SELF_IS_NULL(self);
+    /* If `self` is NULL */
+    kb_rpi2_CHECK_SELF_IS_NULL(self);
 
     /* If a callback set to this pin */
     if (self->on_high)
     {
         /* Get `event` and `context` objects */
-        kb_RPi2_Event   *event;
-        kb_RPi2_Context *context;
-        kb_RPi2_Sensor_callback_args(self->sensor,
+        kb_rpi2_Event   *event;
+        kb_rpi2_Context *context;
+        kb_rpi2_Sensor_callback_args(self->sensor,
                                      &event,
                                      &context);
         /* Call callback */
@@ -185,31 +209,31 @@ kb_RPi2_Pin_set_high(kb_RPi2_Pin *self)
     }
 
     /* SWitch state */
-    self->state = kb_RPi2_Pin_HIGH;
+    self->state = kb_rpi2_Pin_HIGH;
 
     /*
      * TODO: Set this pin HIGH via bcm2835
      */
 
     /* If everything went fine */
-    return kb_RPi2_OKAY;
+    return kb_OKAY;
 }
 
 
 /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-kb_RPi2_Error
-kb_RPi2_Pin_set_low(kb_RPi2_Pin *self)
+kb_Error
+kb_rpi2_Pin_set_low(kb_rpi2_Pin *self)
 {
-    /* If self is NULL */
-    kb_RPi2_CHECK_SELF_IS_NULL(self);
+    /* If `self` is NULL */
+    kb_rpi2_CHECK_SELF_IS_NULL(self);
 
     /* If a callback set to this pin */
     if (self->on_low)
     {
         /* Get `event` and `context` objects */
-        kb_RPi2_Event   *event;
-        kb_RPi2_Context *context;
-        kb_RPi2_Sensor_callback_args(self->sensor,
+        kb_rpi2_Event   *event;
+        kb_rpi2_Context *context;
+        kb_rpi2_Sensor_callback_args(self->sensor,
                                      &event,
                                      &context);
         /* Call callback */
@@ -219,77 +243,101 @@ kb_RPi2_Pin_set_low(kb_RPi2_Pin *self)
                      context);
     }
 
-    /* SWitch state */
-    self->state = kb_RPi2_Pin_LOW;
+    /* Switch state */
+    self->state = kb_rpi2_Pin_LOW;
 
     /*
      * TODO: Set this pin LOW via bcm2835
      */
 
     /* If everything went fine */
-    return kb_RPi2_OKAY;
+    return kb_OKAY;
 }
 
 
 /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-kb_RPi2_Error
-kb_RPi2_Pin_bind_on_high(kb_RPi2_Pin    *self,
-                         kb_RPi2_Error (*on_high)(kb_RPi2_Pin*,
-                                                  kb_RPi2_Sensor*,
-                                                  kb_RPi2_Event*,
-                                                  kb_RPi2_Context*))
+kb_Error
+kb_rpi2_Pin_bind_on_high(kb_rpi2_Pin    *self,
+                         kb_Error (*on_high)(kb_rpi2_Pin*,
+                                             kb_rpi2_Sensor*,
+                                             kb_rpi2_Event*,
+                                             kb_rpi2_Context*))
 {
-    /* If self is NULL */
-    kb_RPi2_CHECK_SELF_IS_NULL(self);
+    /* If `self` is NULL */
+    kb_rpi2_CHECK_SELF_IS_NULL(self);
+
+    /* If `on_high` is NULL */
+    if (!on_high)
+        return kb_ARG2_IS_NULL;
+
+    /* Set callback function */
+    self->on_high = on_high;
 
     /* If everything went fine */
-    return kb_RPi2_OKAY;
+    return kb_OKAY;
 }
 
 
 /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-kb_RPi2_Error
-kb_RPi2_Pin_unbind_on_high(kb_RPi2_Pin    *self,
-                           kb_RPi2_Error (*on_high)(kb_RPi2_Pin*,
-                                                    kb_RPi2_Sensor*,
-                                                    kb_RPi2_Event*,
-                                                    kb_RPi2_Context*))
+kb_Error
+kb_rpi2_Pin_unbind_on_high(kb_rpi2_Pin *self)
 {
     /* If self is NULL */
-    kb_RPi2_CHECK_SELF_IS_NULL(self);
+    kb_rpi2_CHECK_SELF_IS_NULL(self);
+
+    /* Unset callback function */
+    self->on_high = NULL;
 
     /* If everything went fine */
-    return kb_RPi2_OKAY;
+    return kb_OKAY;
 }
 
 
 /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-kb_RPi2_Error
-kb_RPi2_Pin_bind_on_low(kb_RPi2_Pin    *self,
-                        kb_RPi2_Error (*on_low)(kb_RPi2_Pin*,
-                                                kb_RPi2_Sensor*,
-                                                kb_RPi2_Event*,
-                                                kb_RPi2_Context*))
+kb_Error
+kb_rpi2_Pin_bind_on_low(kb_rpi2_Pin    *self,
+                        kb_Error (*on_low)(kb_rpi2_Pin*,
+                                           kb_rpi2_Sensor*,
+                                           kb_rpi2_Event*,
+                                           kb_rpi2_Context*))
 {
-    /* If self is NULL */
-    kb_RPi2_CHECK_SELF_IS_NULL(self);
+    /* If `self` is NULL */
+    kb_rpi2_CHECK_SELF_IS_NULL(self);
+
+    /* If `on_low` is NULL */
+    if (!on_low)
+        return kb_ARG2_IS_NULL;
+
+    /* Set callback function */
+    self->on_low = on_low;
 
     /* If everything went fine */
-    return kb_RPi2_OKAY;
+    return kb_OKAY;
 }
 
 
 /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-kb_RPi2_Error
-kb_RPi2_Pin_unbind_on_low(kb_RPi2_Pin    *self,
-                          kb_RPi2_Error (*on_low)(kb_RPi2_Pin*,
-                                                  kb_RPi2_Sensor*,
-                                                  kb_RPi2_Event*,
-                                                  kb_RPi2_Context*))
+kb_Error
+kb_rpi2_Pin_unbind_on_low(kb_rpi2_Pin *self)
 {
     /* If self is NULL */
-    kb_RPi2_CHECK_SELF_IS_NULL(self);
+    kb_rpi2_CHECK_SELF_IS_NULL(self);
+
+    /* Unset callback function */
+    self->on_low = NULL;
 
     /* If everything went fine */
-    return kb_RPi2_OKAY;
+    return kb_OKAY;
+}
+
+
+/*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+kb_Error
+kb_rpi2_Pin_callback_args(kb_rpi2_Pin      *self,
+                          kb_rpi2_Sensor  **sensor,
+                          kb_rpi2_Event   **event,
+                          kb_rpi2_Context **context)
+{
+    *sensor = self->sensor;
+    return kb_rpi2_Event_callback_args(self->sensor, event, context);
 }
