@@ -21,15 +21,16 @@ typedef enum
 
 /*----------------------------------------------------------------------------*/
 #define kb_rpi2_SENSOR_MEMBERS()                                               \
+    size_t               id;                                                   \
     kb_rpi2_Event       *event;                                                \
     kb_rpi2_SensorState  state;                                                \
     kb_rpi2_PinArray    *pins;                                                 \
-    kb_Error           (*on_enable)(kb_rpi2_Sensor*,                           \
-                                    kb_rpi2_Event*,                            \
-                                    kb_rpi2_Context*);                         \
-    kb_Error           (*on_disable)(kb_rpi2_Sensor*,                          \
-                                     kb_rpi2_Event*,                           \
-                                     kb_rpi2_Context*);
+    kb_Error           (*on_enable)(kb_rpi2_Sensor  *const,                    \
+                                    kb_rpi2_Event   *const,                    \
+                                    kb_rpi2_Context *const);                   \
+    kb_Error           (*on_disable)(kb_rpi2_Sensor  *const,                   \
+                                     kb_rpi2_Event   *const,                   \
+                                     kb_rpi2_Context *const);
 
 
 
@@ -38,5 +39,6 @@ typedef struct
 {
     kb_rpi2_SENSOR_MEMBERS()
 } kb_rpi2_Sensor;
+
 
 #endif /* __KB_RPI2_SENSORS_H_24463479806314148__ */

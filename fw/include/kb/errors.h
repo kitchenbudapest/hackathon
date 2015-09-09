@@ -26,9 +26,13 @@ typedef enum
     /* Containers and collections related error signals */
     //kb_INDEX_OUT_OF_RANGE,
 
-    /* Device related error signals */
-    kb_PIN_ALREADY_USED,
+    /* Pin related error signals */
     kb_INVALID_PIN_ID,
+    kb_PIN_ALREADY_USED,
+    kb_PIN_DOES_NOT_EXIST,
+
+    /* Event related error signals */
+    kb_SENSOR_IS_NOT_IN_EVENT,
 
 } kb_Error;
 
