@@ -10,7 +10,7 @@ typedef struct
 
 /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 kb_Error
-kb_rpi2_Context_new(kb_rpi2_Context **self)
+kb_rpi2_Context_new(kb_rpi2_Context *const *self)
 {
     kb_rpi2_Context *context;
     if (!(context = malloc(sizeof(kb_rpi2_Context))))

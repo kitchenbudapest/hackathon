@@ -10,12 +10,12 @@ typedef struct
 {
     kb_rpi2_SENSOR_MEMBERS()
     kb_rpi2_PinId pin;
-    kb_Error (*on_on)(kb_rpi2_Sensor*,
-                      kb_rpi2_Event*,
-                      kb_rpi2_Context*);
-    kb_Error (*on_off)(kb_rpi2_Sensor*,
-                       kb_rpi2_Event*,
-                       kb_rpi2_Context*);
+    kb_Error (*on_on)(kb_rpi2_Sensor  *const,
+                      kb_rpi2_Event   *const,
+                      kb_rpi2_Context *const);
+    kb_Error (*on_off)(kb_rpi2_Sensor  *const,
+                       kb_rpi2_Event   *const,
+                       kb_rpi2_Context *const);
 } kb_rpi2_Sensor_LED;
 
 

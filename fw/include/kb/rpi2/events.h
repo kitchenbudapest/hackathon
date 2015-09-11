@@ -13,6 +13,7 @@ typedef struct
     kb_rpi2_Sensor  **const  sensors;
     size_t                   sensors_count;
     size_t                   sensors_limit;
+    size_t                   sensors_index;
 } kb_rpi2_Event;
 
 
@@ -43,6 +44,6 @@ kb_rpi2_Event_del(kb_rpi2_Event *const *self);
     kb_ALLOC_FAIL:
         if allocation of the new Pin object failed */
 kb_Error
-kb_rpi2_Event_use_pin(kb_rpi2_Event  *self,
-                      kb_rpi2_PinId   pin_id,
-                      kb_rpi2_Sensor *sensor);
+kb_rpi2_Event_use_pin(kb_rpi2_Event  *const self,
+                      kb_rpi2_PinId         pin_id,
+                      kb_rpi2_Sensor *const sensor);

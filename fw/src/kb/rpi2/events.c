@@ -81,9 +81,9 @@ kb_rpi2_Event_del(kb_rpi2_Event *const *self)
 
 /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 kb_Error
-kb_rpi2_Event_use_pin(kb_rpi2_Event  *self,
-                      kb_rpi2_PinId   pin_id,
-                      kb_rpi2_Sensor *sensor)
+kb_rpi2_Event_use_pin(kb_rpi2_Event  *const self,
+                      kb_rpi2_PinId         pin_id,
+                      kb_rpi2_Sensor *const sensor)
 {
     /* If `self` is NULL */
     kb_rpi2_CHECK_SELF_IS_NULL(self);
@@ -110,8 +110,8 @@ kb_rpi2_Event_use_pin(kb_rpi2_Event  *self,
 
 /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 kb_Error
-kb_rpi2_Event_drop_pin(kb_rpi2_Event *self,
-                       kb_rpi2_PinId  pin_id)
+kb_rpi2_Event_drop_pin(kb_rpi2_Event *const self,
+                       kb_rpi2_PinId        pin_id)
 {
     /* If `self` is NULL */
     kb_rpi2_CHECK_SELF_IS_NULL(self);
@@ -132,8 +132,8 @@ kb_rpi2_Event_drop_pin(kb_rpi2_Event *self,
 
 /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 kb_Error
-kb_rpi2_Event_set_pin_high(kb_rpi2_Event *self,
-                           kb_rpi2_PinId  pin_id)
+kb_rpi2_Event_set_pin_high(kb_rpi2_Event *const self,
+                           kb_rpi2_PinId        pin_id)
 {
     /* If `self` is NULL */
     kb_rpi2_CHECK_SELF_IS_NULL(self);
@@ -157,8 +157,8 @@ kb_rpi2_Event_set_pin_high(kb_rpi2_Event *self,
 
 /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 kb_Error
-kb_rpi2_Event_set_pin_low(kb_rpi2_Event *self,
-                          kb_rpi2_PinId  pin_id)
+kb_rpi2_Event_set_pin_low(kb_rpi2_Event *const self,
+                          kb_rpi2_PinId        pin_id)
 {
     /* If `self` is NULL */
     kb_rpi2_CHECK_SELF_IS_NULL(self);
@@ -182,8 +182,8 @@ kb_rpi2_Event_set_pin_low(kb_rpi2_Event *self,
 
 /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 kb_Error
-kb_rpi2_Event_bind_sensor(kb_rpi2_Event  *self,
-                          kb_rpi2_Sensor *sensor)
+kb_rpi2_Event_bind_sensor(kb_rpi2_Event  *const self,
+                          kb_rpi2_Sensor *const sensor)
 {
     /* If `self` is NULL */
     kb_rpi2_CHECK_SELF_IS_NULL(self);
@@ -214,8 +214,8 @@ kb_rpi2_Event_bind_sensor(kb_rpi2_Event  *self,
 
 /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 kb_Error
-kb_rpi2_Event_unbind_sensor(kb_rpi2_Event  *self,
-                            kb_rpi2_Sensor *sensor)
+kb_rpi2_Event_unbind_sensor(kb_rpi2_Event  *const self,
+                            kb_rpi2_Sensor *const sensor)
 {
     /* If everything went fine */
     return kb_OKAY;
