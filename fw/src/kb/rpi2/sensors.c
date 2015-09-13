@@ -1,18 +1,19 @@
 /* INFO **
 ** INFO */
 
+/*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 /* Include standard headers */
-#include <stdlib.h> /*
-    func  : malloc
-            free
-*/
+#include <stddef.h>
+/*  type  : size_t */
+#include <stdlib.h>
+/*  func  : malloc
+            free */
 
-
+/*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 /* Include kibu headers */
-#include <kb/errors.h> /*
-    type  : kb_Error
-    const : kb_OKAY
-*/
+#include <kb/errors.h>
+/*  type  : kb_Error
+    const : kb_OKAY */
 
 
 /*----------------------------------------------------------------------------*/

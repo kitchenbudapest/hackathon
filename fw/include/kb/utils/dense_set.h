@@ -74,7 +74,9 @@ kb_utils_DenseSet_del(kb_utils_DenseSet **const self);
     kb_SELF_IS_NULL:
         if first argument is a NULL pointer
     kb_ARG2_IS_NULL:
-        if second argument is a NULL pointer */
+        if second argument is a NULL pointer
+    kb_ALLOC_FAIL:
+        if allocation of internals failed */
 kb_Error
 kb_utils_DenseSet_push(kb_utils_DenseSet     *const self,
                        kb_utils_DenseSetItem *const item);

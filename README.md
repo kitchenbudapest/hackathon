@@ -142,7 +142,7 @@ $ sudo reboot
 Naming Conventions:
 -------------------
 
-- `kb_*`: package prefix = **Kitchen** **Budapest**
+- `kb_*`: package prefix = **K**itchen **B**udapest
 - `kb_x_y_*`: from y module from x module
 - `kb_x_y_AlphaBeta`: type
 - `kb_x_y_AlphaBeta_m`: method or property

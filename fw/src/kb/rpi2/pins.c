@@ -3,41 +3,31 @@
 
 /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 /* Include standard headers */
-#include <stdlib.h> /*
-    func  : malloc
-            free
-*/
+#include <stdlib.h>
+/*  func  : malloc
+            free */
 
 
 /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 /* Include kibu headers */
-#include <kb/errors.h> /*
-    type  : kb_Error
+#include <kb/errors.h>
+/*  type  : kb_Error
     const : kb_OKAY
             kb_SELF_IS_NULL
             kb_ARG2_IS_NULL
             kb_ARG3_IS_NULL
-            kb_ALLOC_FAIL
-*/
-
-#include <kb/rpi2/pins.h> /*
-    type  : kb_rpi2_Pin_State
+            kb_ALLOC_FAIL */
+#include <kb/rpi2/pins.h>
+/*  type  : kb_rpi2_Pin_State
             kb_rpi2_Pin_Id
     const : kb_rpi2_Pin_LOW
-            kb_rpi2_Pin_HIGH
-*/
-
-#include <kb/rpi2/sensors.h> /*
-    type  : kb_rpi2_Sensor
-*/
-
-#include <kb/rpi2/events.h> /*
-    type  : kb_rpi2_Event
-*/
-
-#include <kb/rpi2/contexts.h> /*
-    type  : kb_rpi2_Context
-*/
+            kb_rpi2_Pin_HIGH */
+#include <kb/rpi2/sensors.h>
+/*  type  : kb_rpi2_Sensor */
+#include <kb/rpi2/events.h>
+/*  type  : kb_rpi2_Event */
+#include <kb/rpi2/contexts.h>
+/*  type  : kb_rpi2_Context */
 
 
 /*----------------------------------------------------------------------------*/
@@ -58,9 +48,9 @@
         if allocation of the new Pin object failed */
 
 kb_Error
-kb_rpi2_Pin_new(kb_rpi2_Pin    *const *self,
+kb_rpi2_Pin_new(kb_rpi2_Pin    **const self,
                 kb_rpi2_PinId          pin_id,
-                kb_rpi2_Sensor *const  sensor)
+                kb_rpi2_Sensor  *const sensor)
 {
     /* If `self` is NULL */
     kb_rpi2_CHECK_SELF_IS_NULL(self);
@@ -288,10 +278,10 @@ kb_rpi2_Pin_unbind_on_low(kb_rpi2_Pin *const self)
 
 /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 kb_Error
-kb_rpi2_Pin_callback_args(kb_rpi2_Pin     *const  self,
-                          kb_rpi2_Sensor  *const *sensor,
-                          kb_rpi2_Event   *const *event,
-                          kb_rpi2_Context *const *context)
+kb_rpi2_Pin_callback_args(kb_rpi2_Pin      *const self,
+                          kb_rpi2_Sensor  **const sensor,
+                          kb_rpi2_Event   **const event,
+                          kb_rpi2_Context **const context)
 {
     /* If self is NULL */
     kb_rpi2_CHECK_SELF_IS_NULL(self);

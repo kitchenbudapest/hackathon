@@ -1,19 +1,19 @@
 /* INFO **
 ** INFO */
 
-#include <stdio.h> /*
-    func  : puts
-*/
+/*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+/* Include standard headers */
+#include <stdio.h>
+/*  func  : puts */
+#include <stdlib.h>
+/*  const : EXIT_SUCCESS */
 
-#include <stdlib.h> /*
-    const : EXIT_SUCCESS
-*/
-
-#include "kb/errors.h" /*
-    type  : kb_Error
-*/
-#include "kb/utils/dense_set.h" /*
-*/
+/*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+/* Include kibu headers */
+#include "kb/errors.h"
+/*  type  : kb_Error */
+#include "kb/utils/dense_set.h"
+/**/
 
 /*----------------------------------------------------------------------------*/
 typedef struct
