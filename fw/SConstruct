@@ -7,6 +7,9 @@ print '{:#^80}'.format(' SCONS BUILD ')
 # Import python modules
 from os.path import join
 
+# Import targets
+from scons_targets import dense_set
+
 # Essential variables
 input_dir  = 'src'
 output_dir = 'build'
@@ -22,6 +25,7 @@ CCFLAGS = ['v',
            'O3',
            'Wall',
            'Wextra',
+           # 'Weverything',
            'pedantic',
            'std=c99',]
 
@@ -33,17 +37,17 @@ CLANGFLAGS = ['fcolor-diagnostics',
 
 
 # C pre-processor path (include)
-CPPPATH = ['.',
+CPPPATH = ['include',
            '/usr/include/',
            '/usr/local/include']
 
 # Library path
-LIBPATH = ['.',
+LIBPATH = ['src',
            '/usr/lib',
            '/usr/local/lib']
 
 # Libraries
-LIBS = ['bcm2835']
+LIBS = []#['bcm2835']
 
 # Add compiler specific flags to generic flags
 CCFLAGS.extend(GCCFLAGS if CC == 'gcc' else CLANGFLAGS if CC == 'clang' else [])
@@ -56,23 +60,16 @@ def path_prefixer(files):
     return [join(output_dir, file) for file in files]
 
 
+# Create environment
+environment = Environment(CC      = CC,
+                          CCFLAGS = flag_prefixer(CCFLAGS),
+                          CPPPATH = CPPPATH,
+                          LIBPATH = LIBPATH,
+                          LIBS    = LIBS)
+
+# Specify output directory
+environment.VariantDir(variant_dir = output_dir,
+                       src_dir     = input_dir)
+
 # Builds
-def test_build():
-    # Create environment
-    environment = Environment(CC      = CC,
-                              CCFLAGS = flag_prefixer(CCFLAGS),
-                              CPPPATH = CPPPATH,
-                              LIBPATH = LIBPATH,
-                              LIBS    = LIBS)
-
-    # Specify output directory
-    environment.VariantDir(variant_dir = output_dir,
-                           src_dir     = input_dir)
-
-    # Create program
-    environment.Program(target = target,
-                        source = path_prefixer(source))
-
-
-# Create builds
-test_build()
+dense_set.build(environment, path_prefixer)

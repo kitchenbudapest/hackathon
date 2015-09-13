@@ -136,3 +136,31 @@ $ sudo raspi-config
   '--> Finish
 $ sudo reboot
 ```
+
+- - -
+
+Naming Conventions:
+-------------------
+
+- `kb_*`: package prefix = **Kitchen** **Budapest**
+- `kb_x_y_*`: from y module from x module
+- `kb_x_y_AlphaBeta`: type
+- `kb_x_y_AlphaBeta_m`: method or property
+- `kb_x_y_ALPHA_BETA`: constant
+- `KB_X_Y_ALPHA_BETA`: macro
+
+
+API functions and methods:
+--------------------------
+
+```
+Function:
+    <error> function ( <inputs>..., <outputs>... )
+Method:
+    <error> method ( <instance>, <inputs>..., <outputs>... )
+```
+
+- Error is `kb_Error` in this package;
+- Inputs can be pointers or values. If pointers they are almost always `const`s,
+  indicating they are read-only values;
+- Outputs are always pointers.

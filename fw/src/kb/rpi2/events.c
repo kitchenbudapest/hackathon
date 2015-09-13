@@ -3,10 +3,9 @@
 
 /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 /* Include kibu headers */
-#include <kb/rpi2/events.h> /*
-    macro : kb_rpi2_PIN_COUNT
-    type  : kb_rpi2_Event
-*/
+#include <kb/rpi2/events.h>
+/*  macro : kb_rpi2_PIN_COUNT
+    type  : kb_rpi2_Event */
 
 /*----------------------------------------------------------------------------*/
 #define INITIAL_SENSORS_LIMIT (size_t)32

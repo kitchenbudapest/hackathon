@@ -1,6 +1,9 @@
 *.pyc
 *.pyo
 
+.sconsign.dblite
+
+bins
 build
 __pycache__
 
