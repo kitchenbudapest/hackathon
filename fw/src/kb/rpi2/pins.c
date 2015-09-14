@@ -31,6 +31,51 @@
 
 
 /*----------------------------------------------------------------------------*/
+const char *const kb_rpi2_PIN_LAYOUT =
+    "           +-----+-----+\n"
+    "         0 |     |     |  1\n"
+    "           +-----+-----+\n"
+    "         2 |     |     |  3\n"
+    "           +-----+-----+\n"
+    "         4 |     |     |  5\n"
+    "+---+------+-----+-----+\n"
+    "| G |    6 |     |     |  7\n"
+    "| P |      +-----+-----+\n"
+    "| I |    8 |     |     |  9\n"
+    "| O |      +-----+-----+\n"
+    "+---+   10 |     |     | 11\n"
+    "           +-----+-----+\n"
+    "        12 |     |     | 13\n"
+    "           +-----+-----+\n"
+    "        14 |     |     | 15\n"
+    "           +-----+-----+\n"
+    "        16 |     |     | 17\n"
+    "           +-----+-----+\n"
+    "        18 |     |     | 19\n"
+    "           +-----+-----+\n"
+    "        20 |     |     | 21\n"
+    "           +-----+-----+\n"
+    "        22 |     |     | 23\n"
+    "           +-----+-----+\n"
+    "        24 |     |     | 25\n"
+    "           +-----+-----+\n"
+    "        26 |     |     | 27\n"
+    "           +-----+-----+\n"
+    "        28 |     |     | 29\n"
+    "           +-----+-----+\n"
+    "        30 |     |     | 31\n"
+    "           +-----+-----+\n"
+    "        32 |     |     | 33\n"
+    "           +-----+-----+\n"
+    "        34 |     |     | 35\n"
+    "           +-----+-----+\n"
+    "        36 |     |     | 37\n"
+    "           +-----+-----+\n"
+    "        38 |     |     | 39\n"
+    "           +-----+-----+\n";
+
+
+/*----------------------------------------------------------------------------*/
 #define kb_rpi2_CHECK_SELF_IS_NULL(S)                                          \
     if (!S)                                                                    \
         return kb_SELF_IS_NULL;
@@ -53,9 +98,10 @@ kb_rpi2_Pin_new(kb_rpi2_Pin    **const self,
                 kb_rpi2_Sensor  *const sensor)
 {
     /* If `self` is NULL */
-    kb_rpi2_CHECK_SELF_IS_NULL(self);
+    if (!self)
+        return kb_SELF_IS_NULL;
 
-    /* Make `self` point to NULL */
+    /* If something goes wrong make sure instance is NULL */
     *self = NULL;
 
     /* If `sensor` is NULL */
@@ -90,13 +136,25 @@ kb_rpi2_Pin_new(kb_rpi2_Pin    **const self,
 
 /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 kb_Error
-kb_rpi2_Pin_del(kb_rpi2_Pin *const *self)
+kb_rpi2_Pin_init(kb_rpi2_Pin *const self)
 {
-    /* If `self` is NULL */
-    kb_rpi2_CHECK_SELF_IS_NULL(self);
+    (void)self;
+
+    /* If everything went fine */
+    return kb_OKAY;
+}
+
+
+/*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+kb_Error
+kb_rpi2_Pin_del(kb_rpi2_Pin **const self)
+{
+    /* If `self` or instance is NULL */
+    if (!self || !*self)
+        return kb_SELF_IS_NULL;
 
     /* Unbind pin from sensor */
-    kb_rpi2_Sensor_unbind_pin((*self)->sensor);
+    kb_rpi2_Sensor_unbind_pin((*self)->sensor, *self);
 
     /*
      * TODO: Reset this pin via bcm2835
@@ -292,7 +350,7 @@ kb_rpi2_Pin_callback_args(kb_rpi2_Pin      *const self,
 
     /* Set callback arguments */
     *sensor = self->sensor;
-    switch (kb_rpi2_Event_callback_args(self->sensor, event, context))
+    switch (kb_rpi2_Sensor_callback_args(self->sensor, event, context))
     {
         /* If `event` is NULL */
         case kb_ARG2_IS_NULL:

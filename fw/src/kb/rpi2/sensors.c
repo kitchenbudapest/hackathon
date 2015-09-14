@@ -14,7 +14,7 @@
 #include <kb/errors.h>
 /*  type  : kb_Error
     const : kb_OKAY */
-#include <kb/types.h>
+#include <kb/rpi2/types.h>
 /*  type  : kb_rpi2_Sensor
             kb_rpi2_Event
             kb_rpi2_Context */
@@ -24,7 +24,8 @@
 kb_Error
 kb_rpi2_Sensor_new(kb_rpi2_Sensor **const self)
 {
-    (void)self;
+    /* If something goes wrong make sure instance is NULL */
+    *self = NULL;
 
     /* If everything went fine */
     return kb_OKAY;
@@ -52,7 +53,9 @@ kb_rpi2_Sensor_init(kb_rpi2_Sensor *const self,
 kb_Error
 kb_rpi2_Sensor_del(kb_rpi2_Sensor **const self)
 {
-    (void)self;
+    /* If `self` or instance is NULL */
+    if (!self || !*self)
+        return kb_SELF_IS_NULL;
 
     /* If everything went fine */
     return kb_OKAY;
@@ -75,4 +78,52 @@ kb_rpi2_Sensor_callback_args(kb_rpi2_Sensor   *const self,
     /* Set event and get context */
     // *event = self->event;
     // return kb_rpi2_Event_callback_args(self->event, context);
+}
+
+
+/*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+kb_Error
+kb_rpi2_Sensor_enable(kb_rpi2_Sensor *const self)
+{
+    (void)self;
+
+    /* If everything went fine */
+    return kb_OKAY;
+}
+
+
+/*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+kb_Error
+kb_rpi2_Sensor_disable(kb_rpi2_Sensor *const self)
+{
+    (void)self;
+
+    /* If everything went fine */
+    return kb_OKAY;
+}
+
+
+/*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+kb_Error
+kb_rpi2_Sensor_bind_pin(kb_rpi2_Sensor *const self,
+                        kb_rpi2_Pin    *const pin)
+{
+    (void)self;
+    (void)pin;
+
+    /* If everything went fine */
+    return kb_OKAY;
+}
+
+
+/*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+kb_Error
+kb_rpi2_Sensor_unbind_pin(kb_rpi2_Sensor *const self,
+                          kb_rpi2_Pin    *const pin)
+{
+    (void)self;
+    (void)pin;
+
+    /* If everything went fine */
+    return kb_OKAY;
 }

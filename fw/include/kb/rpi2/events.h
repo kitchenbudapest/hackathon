@@ -43,6 +43,17 @@ kb_rpi2_Event_del(kb_rpi2_Event **const self);
         if no error occured
     kb_SELF_IS_NULL:
         if first argument is a NULL pointer
+    kb_ARG2_IS_NULL:
+        if second argument is a NULL pointer */
+kb_Error
+kb_rpi2_Event_callback_args(kb_rpi2_Event    *const self,
+                            kb_rpi2_Context **const context);
+/*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+/* Returns:
+    kb_OKAY:
+        if no error occured
+    kb_SELF_IS_NULL:
+        if first argument is a NULL pointer
     kb_EVENT_NOT_BOUND_TO_CONTEXT:
         if event has not been bound to the given context */
 kb_Error
@@ -67,5 +78,32 @@ kb_Error
 kb_rpi2_Event_use_pin(kb_rpi2_Event  *const self,
                       kb_rpi2_PinId         pin_id,
                       kb_rpi2_Sensor *const sensor);
+/*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+kb_Error
+kb_rpi2_Event_drop_pin(kb_rpi2_Event *const self,
+                       kb_rpi2_PinId        pin_id);
+/*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+kb_Error
+kb_rpi2_Event_set_pin_high(kb_rpi2_Event *const self,
+                           kb_rpi2_PinId        pin_id);
+/*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+kb_Error
+kb_rpi2_Event_set_pin_low(kb_rpi2_Event *const self,
+                          kb_rpi2_PinId        pin_id);
+/*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+kb_Error
+kb_rpi2_Event_reset_all_pins(kb_rpi2_Event *const self);
+/*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+kb_Error
+kb_rpi2_Event_bind_sensor(kb_rpi2_Event  *const self,
+                          kb_rpi2_Sensor *const sensor);
+/*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+kb_Error
+kb_rpi2_Event_unbind_sensor(kb_rpi2_Event  *const self,
+                            kb_rpi2_Sensor *const sensor);
+/*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+kb_Error
+kb_rpi2_Event_disable_all_sensors(kb_rpi2_Event *const self);
+
 
 #endif /* __KB_RPI2_EVENTS_H_6909342993482931__ */

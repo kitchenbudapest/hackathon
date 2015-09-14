@@ -18,16 +18,24 @@
 #include <kb/utils/dense_set.h>
 /*  macro : KB_UTILS_DENSE_SET_ITEM_MEMBERS
     type  : kb_utils_DenseSet
+            kb_utils_DenseSetItem
+            kb_utils_DenseSetIter
     func  : kb_utils_DenseSet_new
             kb_utils_DenseSet_del
             kb_utils_DenseSet_push
-            kb_utils_DenseSet_pull */
+            kb_utils_DenseSet_pull
+            kb_utils_DenseSetIter_new
+            kb_utils_DenseSetIter_del
+            kb_utils_DenseSetIter_next */
 #include <kb/rpi2/contexts.h>
 /*  type  : kb_rpi2_Context
     func  : kb_rpi2_Context_activate_event */
 #include <kb/rpi2/events.h>
-/*  macro : KB_RPI2_PIN_COUNT
+/*  macro : KB_RPI2_PINS_COUNT
     type  : kb_rpi2_Event */
+#include <kb/rpi2/sensors.h>
+/*  type  : kb_rpi2_Sensor
+    func  : kb_rpi2_Sensor_disable */
 #include <kb/rpi2/pins.h>
 /*  type  : kb_rpi2_Pin
     func  : kb_rpi2_Pin_new
@@ -41,15 +49,9 @@
 
 
 /*----------------------------------------------------------------------------*/
-#define KB_RPI2_CHECK_SELF_IS_NULL(S)                                          \
-    if (!S)                                                                    \
-        return kb_SELF_IS_NULL;
-
-
-/*----------------------------------------------------------------------------*/
 #define KB_RPI2_CHECK_PIN_ID_IN_RANGE(P)                                       \
-    if (P < 0 &&                                                               \
-        P >= KB_RPI2_PIN_COUNT)                                                \
+    if ((size_t)P < (size_t)0 &&                                               \
+        (size_t)P >= KB_RPI2_PINS_COUNT)                                       \
         return kb_INVALID_PIN_ID;
 
 
@@ -58,10 +60,15 @@ kb_Error
 kb_rpi2_Event_new(kb_rpi2_Event   **const self,
                   kb_rpi2_Context  *const context)
 {
-    /* If any of the arguments is NULL */
+    /* If `self` is NULL */
     if (!self)
         return kb_SELF_IS_NULL;
-    else if (!context)
+
+    /* If something goes wrong make sure instance is NULL */
+    *self = NULL;
+
+    /* If `context` is NULL */
+    if (!context)
         return kb_ARG2_IS_NULL;
 
     /* Create new Event object */
@@ -69,16 +76,20 @@ kb_rpi2_Event_new(kb_rpi2_Event   **const self,
     if (!(event = malloc(sizeof(kb_rpi2_Event))))
         goto Self_Alloc_Failed;
 
+    /* Treat Event object as a DenseSetItem */
+    kb_utils_DenseSetItem_init((kb_utils_DenseSetItem *const)event);
+
     /* Create new DenseSet object */
     if (kb_utils_DenseSet_new(&(event->sensors), INITIAL_SENSORS_LIMIT))
         goto Sensors_Alloc_Failed;
 
     /* "Zero out" all Pin objects in the array */
-    for (size_t i=0; i<KB_RPI2_PIN_COUNT; i++)
+    for (size_t i=0; i<KB_RPI2_PINS_COUNT; i++)
         event->pins[i] = NULL;
 
     /* Set values */
     event->context = context;
+    kb_rpi2_Context_bind_event(context, event);
 
     /* Return new Event object */
     *self = event;
@@ -90,8 +101,18 @@ kb_rpi2_Event_new(kb_rpi2_Event   **const self,
     Sensors_Alloc_Failed:
         free(event);
     Self_Alloc_Failed:
-        *self = NULL;
         return kb_ALLOC_FAIL;
+}
+
+
+/*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+kb_Error
+kb_rpi2_Event_init(kb_rpi2_Event *const self)
+{
+    (void)self;
+
+    /* If everything went fine */
+    return kb_OKAY;
 }
 
 
@@ -99,16 +120,39 @@ kb_rpi2_Event_new(kb_rpi2_Event   **const self,
 kb_Error
 kb_rpi2_Event_del(kb_rpi2_Event **const self)
 {
-    /* If `self` is NULL */
-    if (!self)
+    /* If `self` or instance is NULL */
+    if (!self || !*self)
         return kb_SELF_IS_NULL;
 
     /* Delete all Pins objects in the array */
-    for (size_t i=0; i<KB_RPI2_PIN_COUNT; i++)
-        kb_rpi2_Pin_del(self->pins[i]);
+    kb_rpi2_Pin **pins = (*self)->pins;
+    for (size_t i=0; i<KB_RPI2_PINS_COUNT; i++)
+        kb_rpi2_Pin_del(pins + i);
 
     /* Delete DenseSet object */
     kb_utils_DenseSet_del(&(*self)->sensors);
+
+    /* Delete instance */
+    free(*self);
+
+    /* If everything went fine */
+    return kb_OKAY;
+}
+
+
+/*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+kb_Error
+kb_rpi2_Event_callback_args(kb_rpi2_Event    *const self,
+                            kb_rpi2_Context **const context)
+{
+    /* If any of the arguments is NULL */
+    if (!self)
+        return kb_SELF_IS_NULL;
+    else if (!context)
+        return kb_ARG2_IS_NULL;
+
+    /* Return context */
+    *context = self->context;
 
     /* If everything went fine */
     return kb_OKAY;
@@ -166,7 +210,8 @@ kb_rpi2_Event_drop_pin(kb_rpi2_Event *const self,
                        kb_rpi2_PinId        pin_id)
 {
     /* If `self` is NULL */
-    KB_RPI2_CHECK_SELF_IS_NULL(self);
+    if (!self)
+        return kb_SELF_IS_NULL;
 
     /* Check validity of `pin_id` */
     KB_RPI2_CHECK_PIN_ID_IN_RANGE(pin_id);
@@ -188,7 +233,8 @@ kb_rpi2_Event_set_pin_high(kb_rpi2_Event *const self,
                            kb_rpi2_PinId        pin_id)
 {
     /* If `self` is NULL */
-    KB_RPI2_CHECK_SELF_IS_NULL(self);
+    if (!self)
+        return kb_SELF_IS_NULL;
 
     /* Check validity of `pin_id` */
     KB_RPI2_CHECK_PIN_ID_IN_RANGE(pin_id);
@@ -213,7 +259,8 @@ kb_rpi2_Event_set_pin_low(kb_rpi2_Event *const self,
                           kb_rpi2_PinId        pin_id)
 {
     /* If `self` is NULL */
-    KB_RPI2_CHECK_SELF_IS_NULL(self);
+    if (!self)
+        return kb_SELF_IS_NULL;
 
     /* Check validity of `pin_id` */
     KB_RPI2_CHECK_PIN_ID_IN_RANGE(pin_id);
@@ -234,30 +281,15 @@ kb_rpi2_Event_set_pin_low(kb_rpi2_Event *const self,
 
 /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 kb_Error
-kb_rpi2_Event_bind_sensor(kb_rpi2_Event  *const self,
-                          kb_rpi2_Sensor *const sensor)
+kb_rpi2_Event_reset_all_pins(kb_rpi2_Event *const self)
 {
     /* If `self` is NULL */
-    KB_RPI2_CHECK_SELF_IS_NULL(self);
+    if (!self)
+        return kb_SELF_IS_NULL;
 
-    /* Resize collection if there is not enough space for one more sensor */
-    if (self->sensors_count + 1 >= self->sensors_limit)
-    {
-        /* Reallocate space for sensor */
-        kb_rpi2_Sensor **sensors;
-        if (!(sensors = realloc(sizeof(kb_rpi2_Sensor *)*(self->sensors_limit*2)))
-            return kb_ALLOC_FAIL;
-
-        /* Store new pointer */
-        self->sensors = sensors;
-        /* Update limit */
-        self->sensors_count *= 2;
-    }
-
-    /* Store sensor */
-    self->sensors[self->sensors_count] = sensor;
-    /* Set sensor id and increase sensor counter */
-    sensor->id = self->sensors_count++;
+    /* Iterate through all pins and reset all of them */
+    for (size_t i=0; i<KB_RPI2_PINS_COUNT; i++)
+        kb_rpi2_Pin_reset(self->pins[i]);
 
     /* If everything went fine */
     return kb_OKAY;
@@ -266,9 +298,63 @@ kb_rpi2_Event_bind_sensor(kb_rpi2_Event  *const self,
 
 /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 kb_Error
+kb_rpi2_Event_bind_sensor(kb_rpi2_Event  *const self,
+                          kb_rpi2_Sensor *const sensor)
+{
+    /* If `self` is NULL */
+    if (!self)
+        return kb_SELF_IS_NULL;
+
+    /* Store sensor and propagate errors */
+    return kb_utils_DenseSet_push(self->sensors,
+                                  (kb_utils_DenseSetItem *const)sensor);
+}
+
+
+/*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+kb_Error
 kb_rpi2_Event_unbind_sensor(kb_rpi2_Event  *const self,
                             kb_rpi2_Sensor *const sensor)
 {
+    /* If `self` is NULL */
+    if (!self)
+        return kb_SELF_IS_NULL;
+
+    /* Remove sensor and propagate errors */
+    return kb_utils_DenseSet_pull(self->sensors,
+                                  (kb_utils_DenseSetItem *const)sensor);
+}
+
+
+/*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+kb_Error
+kb_rpi2_Event_disable_all_sensors(kb_rpi2_Event *const self)
+{
+    /* Local variables */
+    kb_Error               error;
+    kb_utils_DenseSetIter *iter;
+    kb_utils_DenseSetItem *sensor;
+
+    /* If `self` is NULL */
+    if (!self)
+        return kb_SELF_IS_NULL;
+
+    /* Create new Iterator object */
+    if ((error = kb_utils_DenseSetIter_new(&iter, self->sensors)))
+        return error;
+
+    /* Iterate through all bound sensors */
+    kb_utils_DenseSetIter_next(iter, &sensor);
+    while (sensor)
+    {
+        /* Disable each sensor */
+        kb_rpi2_Sensor_disable((kb_rpi2_Sensor *const)sensor);
+        kb_utils_DenseSetIter_next(iter, &sensor);
+    }
+
+    /* Delete Iterator object */
+    kb_utils_DenseSetIter_del(&iter);
+
     /* If everything went fine */
     return kb_OKAY;
 }

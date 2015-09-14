@@ -58,12 +58,12 @@ typedef struct kb_rpi2_context
 
 
 /*----------------------------------------------------------------------------*/
-#define KB_RPI2_PIN_COUNT 40
+#define KB_RPI2_PINS_COUNT (size_t)40
 #define KB_RPI2_EVENT_MEMBERS()                                                \
     KB_UTILS_DENSE_SET_ITEM_MEMBERS()                                          \
-    struct kb_rpi2_context  *context;                                          \
-    struct kb_rpi2_pin     **pins[KB_RPI2_PIN_COUNT];                          \
-    kb_utils_DenseSet       *sensors;
+    struct kb_rpi2_context *context;                                           \
+    kb_utils_DenseSet      *sensors;                                           \
+    struct kb_rpi2_pin     *pins[KB_RPI2_PINS_COUNT];
 /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 typedef struct kb_rpi2_event
 {

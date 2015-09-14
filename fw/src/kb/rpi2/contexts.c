@@ -50,6 +50,9 @@ kb_rpi2_Context_new(kb_rpi2_Context **const self)
     if (!self)
         return kb_SELF_IS_NULL;
 
+    /* If something goes wrong make sure instance is NULL */
+    *self = NULL;
+
     /* Create new Context object */
     kb_rpi2_Context *context;
     if (!(context = malloc(sizeof(kb_rpi2_Context))))
@@ -71,6 +74,9 @@ kb_rpi2_Context_new(kb_rpi2_Context **const self)
     context->on_activate    = NULL;
     context->on_exit        = NULL;
 
+    /* Return new instance */
+    *self = context;
+
     /* If everything went fine */
     return kb_OKAY;
 
@@ -78,8 +84,18 @@ kb_rpi2_Context_new(kb_rpi2_Context **const self)
     Sensors_Alloc_Failed:
         free(context);
     Self_Alloc_Failed:
-        *self = NULL;
         return kb_ALLOC_FAIL;
+}
+
+
+/*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+kb_Error
+kb_rpi2_Context_init(kb_rpi2_Context *const self)
+{
+    (void)self;
+
+    /* If everything went fine */
+    return kb_OKAY;
 }
 
 
@@ -87,8 +103,8 @@ kb_rpi2_Context_new(kb_rpi2_Context **const self)
 kb_Error
 kb_rpi2_Context_del(kb_rpi2_Context **const self)
 {
-    /* If `self` is NULL */
-    if (!self)
+    /* If `self` or instance is NULL */
+    if (!self || !*self)
         return kb_SELF_IS_NULL;
 
     /* Delete DenseSet object */
@@ -169,9 +185,30 @@ kb_rpi2_Context_start(kb_rpi2_Context *const self)
     /* If `self` is NULL */
     if (!self)
         return kb_SELF_IS_NULL;
-    /* If there is no active event */
+    /* If there is no active current event */
     else if (!self->curr_active)
-        return kb_NO_EVENT_ACTIVATED;
+    {
+        /*
+         * TODO: This is awful and redundant, make it pretty!
+         *       Decide wether the first activation needs to call on_activate
+         *       or not. If not, remove the callback calling
+         */
+        /* If there is no scheduled active event */
+        if (!(self->curr_active = self->next_active))
+            return kb_NO_EVENT_ACTIVATED;
+        /* If there is scheduled active event */
+        else
+        {
+            /* If there is an `on_activate` callback, call it */
+            if (self->on_activate)
+                if ((error = self->on_activate(self,
+                                               NULL,
+                                               self->next_active)))
+                    return error;
+            /* Clear schedule */
+            self->next_active = NULL;
+        }
+    }
 
     /* If there is an `on_start` callback, call it */
     if (self->on_start)
@@ -209,10 +246,10 @@ kb_rpi2_Context_start(kb_rpi2_Context *const self)
                     return error;
 
             /* Reset all pins for current event */
-            kb_rpi2_Event_reset_pins(self->curr_active);
+            kb_rpi2_Event_reset_all_pins(self->curr_active);
 
             /* Disable all sensors for current event */
-            kb_rpi2_Event_disable_all(self->curr_active);
+            kb_rpi2_Event_disable_all_sensors(self->curr_active);
 
             /* Actiavte next event, clear schedule */
             self->curr_active = self->next_active;

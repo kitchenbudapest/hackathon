@@ -11,8 +11,9 @@
 #include <kb/errors.h>
 /*  type  : kb_Error
     const : kb_OKAY */
-#include <kb/RPi2/types.h>
-/*  type  : kb_rpi2_Sensor
+#include <kb/rpi2/types.h>
+/*  type  : kb_rpi2_Pin
+            kb_rpi2_Sensor
             kb_rpi2_Event
             kb_rpi2_Context */
 
@@ -33,6 +34,20 @@ kb_Error
 kb_rpi2_Sensor_callback_args(kb_rpi2_Sensor   *const self,
                              kb_rpi2_Event   **const event,
                              kb_rpi2_Context **const context);
+/*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+kb_Error
+kb_rpi2_Sensor_enable(kb_rpi2_Sensor *const self);
+/*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+kb_Error
+kb_rpi2_Sensor_disable(kb_rpi2_Sensor *const self);
+/*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+kb_Error
+kb_rpi2_Sensor_bind_pin(kb_rpi2_Sensor *const self,
+                        kb_rpi2_Pin    *const pin);
+/*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+kb_Error
+kb_rpi2_Sensor_unbind_pin(kb_rpi2_Sensor *const self,
+                          kb_rpi2_Pin    *const pin);
 
 
 #endif /* __KB_RPI2_SENSORS_H_24463479806314148__ */

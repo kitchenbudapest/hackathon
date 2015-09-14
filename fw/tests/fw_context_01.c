@@ -21,7 +21,7 @@
             kb_rpi2_Context_bind_on_cycle_end
             kb_rpi2_Context_bind_on_exit
             kb_rpi2_Context_start
-            kb_rpi2_Context_exit */
+            kb_rpi2_Context_stop */
 #include <kb/rpi2/events.h>
 /*  type  : kb_rpi2_Event
     func  : kb_rpi2_Event_new
@@ -34,8 +34,9 @@ kb_Error
 on_cycle_end(kb_rpi2_Context *const context,
              kb_rpi2_Event   *const event)
 {
+    (void)event;
     puts("Context.on_cycle_end()");
-    kb_rpi2_Context_exit(context);
+    kb_rpi2_Context_stop(context);
     return kb_OKAY;
 }
 
@@ -45,6 +46,7 @@ kb_Error
 on_cycle_begin(kb_rpi2_Context *const context,
                kb_rpi2_Event   *const event)
 {
+    (void)event;
     puts("Context.on_cycle_begin()");
     kb_rpi2_Context_bind_on_cycle_end(context, on_cycle_end);
     return kb_OKAY;
@@ -53,12 +55,12 @@ on_cycle_begin(kb_rpi2_Context *const context,
 
 /*----------------------------------------------------------------------------*/
 kb_Error
-on_exit(kb_rpi2_Context *const context,
+on_stop(kb_rpi2_Context *const context,
         kb_rpi2_Event   *const event)
 {
-    puts("Context.on_exit()");
-    kb_rpi2_Event_del(&event);
-    kb_rpi2_Context_del(&context);
+    (void)context;
+    (void)event;
+    puts("Context.on_stop()");
     return kb_OKAY;
 }
 
@@ -83,12 +85,17 @@ main(void)
     }
 
     kb_rpi2_Context_bind_on_cycle_begin(context, on_cycle_begin);
-    kb_rpi2_Context_bind_on_exit(context, on_exit);
+    kb_rpi2_Context_bind_on_stop(context, on_stop);
 
     /* Enter event loop */
     kb_rpi2_Event_activate(event);
     kb_rpi2_Context_start(context);
 
+    /* Clean up */
+    kb_rpi2_Event_del(&event);
+    kb_rpi2_Context_del(&context);
+
     /* Should not reach this point */
-    return EXIT_FAILURE;
+    puts("Exiting now...");
+    return EXIT_SUCCESS;
 }

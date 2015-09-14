@@ -53,6 +53,15 @@ typedef struct
     kb_OKAY:
         if no error occured
     kb_SELF_IS_NULL:
+        if first argument is a NULL pointer */
+kb_Error
+kb_utils_DenseSetItem_init(kb_utils_DenseSetItem *const self);
+
+/*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+/* Returns:
+    kb_OKAY:
+        if no error occured
+    kb_SELF_IS_NULL:
         if first argument is a NULL pointer
     kb_ALLOC_FAIL:
         if allocation of internals failed */

@@ -33,6 +33,22 @@
 
 /*----------------------------------------------------------------------------*/
 kb_Error
+kb_utils_DenseSetItem_init(kb_utils_DenseSetItem *const self)
+{
+    /* If `self` is NULL */
+    if (!self)
+        return kb_SELF_IS_NULL;
+
+    /* Set values */
+    self->id = (size_t)0;
+
+    /* If everything went fine */
+    return kb_OKAY;
+}
+
+
+/*----------------------------------------------------------------------------*/
+kb_Error
 kb_utils_DenseSet_new(kb_utils_DenseSet **const self,
                       size_t                    limit)
 {
@@ -43,6 +59,9 @@ kb_utils_DenseSet_new(kb_utils_DenseSet **const self,
     /* If `self` is NULL */
     if (!self)
         return kb_SELF_IS_NULL;
+
+    /* If something goes wrong make sure instance is NULL */
+    *self = NULL;
 
     /* Create new Set object */
     if (!(dense_set = malloc(sizeof(kb_utils_DenseSet))))
@@ -68,7 +87,6 @@ kb_utils_DenseSet_new(kb_utils_DenseSet **const self,
     Item_Alloc_Failed:
         free(dense_set);
     Self_Alloc_Failed:
-        *self = NULL;
         return kb_ALLOC_FAIL;
 }
 
@@ -77,8 +95,8 @@ kb_utils_DenseSet_new(kb_utils_DenseSet **const self,
 kb_Error
 kb_utils_DenseSet_del(kb_utils_DenseSet **const self)
 {
-    /* If `self` is NULL */
-    if (!self)
+    /* If `self` or instance is NULL */
+    if (!self || !*self)
         return kb_SELF_IS_NULL;
 
     /* Deallocate objects */
