@@ -5,29 +5,15 @@
 #ifndef __KB_RPI2_EVENTS_H_6909342993482931__
 #define __KB_RPI2_EVENTS_H_6909342993482931__
 
+
+/*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 /* Include kibu headers */
 #include <kb/utils/dense_set.h>
 /*  type  : kb_utils_DenseSet
     macro : KB_UTILS_DENSE_SET_ITEM_MEMBERS */
-
-
-/*----------------------------------------------------------------------------*/
-#define KB_RPI2_PIN_COUNT 40
-
-
-/*----------------------------------------------------------------------------*/
-#define KB_RPI2_EVENT_MEMBERS()                                                \
-    KB_UTILS_DENSE_SET_ITEM_MEMBERS()                                          \
-    kb_rpi2_Context    *context;                                               \
-    kb_rpi2_Pin       **pins[KB_RPI2_PIN_COUNT];                               \
-    kb_utils_DenseSet  *sensors;
-
-
-/*----------------------------------------------------------------------------*/
-typedef struct
-{
-    KB_RPI2_EVENT_MEMBERS()
-} kb_rpi2_Event;
+#include <kb/rpi2/types.h>
+/*  type  : kb_rpi2_Context
+            kb_rpi2_Event */
 
 
 /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
@@ -51,6 +37,16 @@ kb_rpi2_Event_new(kb_rpi2_Event   **const self,
         if first argument is a NULL pointer */
 kb_Error
 kb_rpi2_Event_del(kb_rpi2_Event **const self);
+/*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+/* Returns:
+    kb_OKAY:
+        if no error occured
+    kb_SELF_IS_NULL:
+        if first argument is a NULL pointer
+    kb_EVENT_NOT_BOUND_TO_CONTEXT:
+        if event has not been bound to the given context */
+kb_Error
+kb_rpi2_Event_activate(kb_rpi2_Event *const self);
 /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 /* Returns:
     kb_OKAY:

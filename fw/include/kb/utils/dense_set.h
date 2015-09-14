@@ -101,7 +101,7 @@ kb_utils_DenseSet_pull(kb_utils_DenseSet     *const self,
         if first argument is a NULL pointer
     kb_ARG2_IS_NULL:
         if second argument is a NULL pointer
-    kb_ARG2_IS_NULL:
+    kb_ARG3_IS_NULL:
         if third argument is a NULL pointer */
 kb_Error
 kb_utils_DenseSet_has(kb_utils_DenseSet     *const  self,

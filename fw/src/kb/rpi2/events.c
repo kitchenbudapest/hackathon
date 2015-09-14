@@ -12,14 +12,29 @@
 /* Include kibu headers */
 #include <kb/errors.h>
 /*  type  : kb_Error
-    const : kb_SELF_IS_NULL
+    const : kb_OKAY
+            kb_SELF_IS_NULL
             kb_ARG2_IS_NULL */
 #include <kb/utils/dense_set.h>
 /*  macro : KB_UTILS_DENSE_SET_ITEM_MEMBERS
-    type  : kb_utils_DenseSet */
+    type  : kb_utils_DenseSet
+    func  : kb_utils_DenseSet_new
+            kb_utils_DenseSet_del
+            kb_utils_DenseSet_push
+            kb_utils_DenseSet_pull */
+#include <kb/rpi2/contexts.h>
+/*  type  : kb_rpi2_Context
+    func  : kb_rpi2_Context_activate_event */
 #include <kb/rpi2/events.h>
 /*  macro : KB_RPI2_PIN_COUNT
     type  : kb_rpi2_Event */
+#include <kb/rpi2/pins.h>
+/*  type  : kb_rpi2_Pin
+    func  : kb_rpi2_Pin_new
+            kb_rpi2_Pin_del
+            kb_rpi2_Pin_set_high
+            kb_rpi2_Pin_set_low */
+
 
 /*----------------------------------------------------------------------------*/
 #define INITIAL_SENSORS_LIMIT (size_t)32
@@ -36,15 +51,6 @@
     if (P < 0 &&                                                               \
         P >= KB_RPI2_PIN_COUNT)                                                \
         return kb_INVALID_PIN_ID;
-
-
-/*----------------------------------------------------------------------------*/
-typedef struct
-{
-
-    kb_rpi2_Sensor *sensor;
-} SensorItem;
-
 
 
 /*----------------------------------------------------------------------------*/
@@ -71,6 +77,12 @@ kb_rpi2_Event_new(kb_rpi2_Event   **const self,
     for (size_t i=0; i<KB_RPI2_PIN_COUNT; i++)
         event->pins[i] = NULL;
 
+    /* Set values */
+    event->context = context;
+
+    /* Return new Event object */
+    *self = event;
+
     /* If everything went fine */
     return kb_OKAY;
 
@@ -96,10 +108,23 @@ kb_rpi2_Event_del(kb_rpi2_Event **const self)
         kb_rpi2_Pin_del(self->pins[i]);
 
     /* Delete DenseSet object */
-    kb_utils_DenseSet_del((*self)->sensors);
+    kb_utils_DenseSet_del(&(*self)->sensors);
 
     /* If everything went fine */
     return kb_OKAY;
+}
+
+
+/*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+kb_Error
+kb_rpi2_Event_activate(kb_rpi2_Event *const self)
+{
+    /* If `self` is NULL */
+    if (!self)
+        return kb_SELF_IS_NULL;
+
+    /* Propagate other errors */
+    return kb_rpi2_Context_activate_event(self->context, self);
 }
 
 

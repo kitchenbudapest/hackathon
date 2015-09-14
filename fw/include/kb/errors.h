@@ -37,6 +37,10 @@ typedef enum
     /* Event related error signals */
     kb_SENSOR_IS_NOT_IN_EVENT,
 
+    /* Context related error signals */
+    kb_NO_EVENT_ACTIVATED,
+    kb_EVENT_NOT_BOUND_TO_CONTEXT,
+
 } kb_Error;
 
 #endif /* __KB_ERROR_H_8506093783091019__ */

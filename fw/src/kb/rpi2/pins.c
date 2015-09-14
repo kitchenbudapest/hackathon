@@ -18,8 +18,8 @@
             kb_ARG3_IS_NULL
             kb_ALLOC_FAIL */
 #include <kb/rpi2/pins.h>
-/*  type  : kb_rpi2_Pin_State
-            kb_rpi2_Pin_Id
+/*  type  : kb_rpi2_PinState
+            kb_rpi2_PinId
     const : kb_rpi2_Pin_LOW
             kb_rpi2_Pin_HIGH */
 #include <kb/rpi2/sensors.h>

@@ -11,36 +11,28 @@
 #include <kb/errors.h>
 /*  type  : kb_Error
     const : kb_OKAY */
-
-
-/*----------------------------------------------------------------------------*/
-typedef enum
-{
-    kb_rpi2_Sensor_ENABLED,
-    kb_rpi2_Sensor_DISABLED,
-} kb_rpi2_SensorState;
-
+#include <kb/RPi2/types.h>
+/*  type  : kb_rpi2_Sensor
+            kb_rpi2_Event
+            kb_rpi2_Context */
 
 /*----------------------------------------------------------------------------*/
-#define KB_RPI2_SENSOR_MEMBERS()                                               \
-    KB_UTILS_DENSE_SET_ITEM_MEMBERS()                                          \
-    kb_rpi2_Event       *event;                                                \
-    kb_rpi2_SensorState  state;                                                \
-    kb_rpi2_PinArray    *pins;                                                 \
-    kb_Error           (*on_enable)(kb_rpi2_Sensor  *const,                    \
-                                    kb_rpi2_Event   *const,                    \
-                                    kb_rpi2_Context *const);                   \
-    kb_Error           (*on_disable)(kb_rpi2_Sensor  *const,                   \
-                                     kb_rpi2_Event   *const,                   \
-                                     kb_rpi2_Context *const);
-
-
-
-/*----------------------------------------------------------------------------*/
-typedef struct
-{
-    KB_RPI2_SENSOR_MEMBERS()
-} kb_rpi2_Sensor;
+kb_Error
+kb_rpi2_Sensor_new(kb_rpi2_Sensor **const self);
+/*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+kb_Error
+kb_rpi2_Sensor_init(kb_rpi2_Sensor *const self,
+                    kb_rpi2_Event  *const event,
+                    size_t         *const pin_id_count,
+                    kb_rpi2_PinId  *const pin_ids);
+/*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+kb_Error
+kb_rpi2_Sensor_del(kb_rpi2_Sensor **const self);
+/*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+kb_Error
+kb_rpi2_Sensor_callback_args(kb_rpi2_Sensor   *const self,
+                             kb_rpi2_Event   **const event,
+                             kb_rpi2_Context **const context);
 
 
 #endif /* __KB_RPI2_SENSORS_H_24463479806314148__ */

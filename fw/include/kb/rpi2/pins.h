@@ -10,12 +10,11 @@
 /* Include kibu headers */
 #include <kb/errors.h>
 /*  type  : kb_Error */
-#include <kb/RPi2/sensors.h>
-/*  type  : kb_rpi2_Sensor */
-#include <kb/RPi2/events.h>
-/*  type  : kb_rpi2_Event */
-#include <kb/RPi2/contexts.h>
-/*  type  : kb_rpi2_Context */
+#include <kb/rpi2/types.h>
+/*  type  : kb_rpi2_Pin
+            kb_rpi2_Sensor
+            kb_rpi2_Event
+            kb_rpi2_Context */
 
 
 /*----------------------------------------------------------------------------*/
@@ -64,49 +63,6 @@ const char *const kb_rpi2_PIN_LAYOUT =
 
 
 /*----------------------------------------------------------------------------*/
-typedef enum
-{
-    kb_rpi2_Pin_LOW,
-    kb_rpi2_Pin_HIGH,
-} kb_rpi2_PinState;
-
-
-/*----------------------------------------------------------------------------*/
-typedef enum
-{
-    kb_rpi2_PIN1,
-    kb_rpi2_PIN2,
-    kb_rpi2_PIN3,
-    kb_rpi2_PIN4,
-    kb_rpi2_PIN5,
-    kb_rpi2_PIN6,
-    kb_rpi2_PIN7,
-    kb_rpi2_PIN8,
-    kb_rpi2_PIN9,
-} kb_rpi2_PinId;
-
-
-/*----------------------------------------------------------------------------*/
-typedef struct
-{
-    /* Static data */
-    kb_rpi2_PinId    id;
-    kb_rpi2_PinState state;
-    kb_rpi2_Sensor   sensor;
-
-    /* Available callbacks */
-    kb_Error       (*on_high)(kb_rpi2_Pin     *const,
-                              kb_rpi2_Sensor  *const,
-                              kb_rpi2_Event   *const,
-                              kb_rpi2_Context *const);
-    kb_Error       (*on_low)(kb_rpi2_Pin     *const,
-                             kb_rpi2_Sensor  *const,
-                             kb_rpi2_Event   *const,
-                             kb_rpi2_Context *const);
-} kb_rpi2_Pin;
-
-
-/*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 /* Returns:
     kb_OKAY:
         if no error occured
