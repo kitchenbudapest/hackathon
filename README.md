@@ -164,3 +164,83 @@ Method:
 - Inputs can be pointers or values. If pointers they are almost always `const`s,
   indicating they are read-only values;
 - Outputs are always pointers.
+
+Inheritance by compositing:
+---------------------------
+
+Almost all types in this framework offers a "members" macro, in case of
+compositing a *parent-struct-like* object. These *inheritable* objects also
+offers a `new`, `ini` *(initialization)*, `fin` *(finalization)* and `del`
+methods. The first and the last one are used for constructing and destructing
+the *raw* types, while the `ini` and `fin` methods should be used to set up or
+destroy the inherited types.
+
+***Example:***
+
+```C
+
+/*----- Type offered by the framework ----------------------------------------*/
+#define T_MEMBERS() \
+    int id;         \
+    int value;
+
+typedef struct
+{
+    T_MEMBERS()
+} T;
+
+Error
+T_ini(T *const self)
+{
+    if (!self)
+        return SELF_IS_NULL;
+
+    self->id    = 0;
+    self->value = -1;
+
+    return OKAY;
+}
+
+Error
+T_new(T **const self)
+{
+    T *t;
+    if (!(t = malloc(sizeof(T))))
+        return ALLOC_FAIL;
+
+    T_ini(t);
+
+    *self = t;
+    return OKAY;
+}
+
+
+/*----- User wrapped type ----------------------------------------------------*/
+typedef struct
+{
+    T_MEMBERS()
+    char name[32];
+} MyT;
+
+Error
+MyT_new(MyT **const self)
+{
+    if (!self)
+        return SELF_IS_NULL;
+
+    *self = NULL;
+
+    MyT *t;
+    if (!(t = malloc(sizeof(MyT))))
+        return ALLOC_FAIL;
+
+    Error e;
+    if ((e = T_ini((T *const)t)))
+        return e;
+
+    strncpy(t->name, "<MyT>", (size_t)32);
+
+    *self = MyT;
+    return OKAY;
+}
+```

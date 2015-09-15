@@ -74,42 +74,67 @@ kb_rpi2_Event_new(kb_rpi2_Event   **const self,
     /* Create new Event object */
     kb_rpi2_Event *event;
     if (!(event = malloc(sizeof(kb_rpi2_Event))))
-        goto Self_Alloc_Failed;
-
-    /* Treat Event object as a DenseSetItem */
-    kb_utils_DenseSetItem_init((kb_utils_DenseSetItem *const)event);
-
-    /* Create new DenseSet object */
-    if (kb_utils_DenseSet_new(&(event->sensors), INITIAL_SENSORS_LIMIT))
-        goto Sensors_Alloc_Failed;
-
-    /* "Zero out" all Pin objects in the array */
-    for (size_t i=0; i<KB_RPI2_PINS_COUNT; i++)
-        event->pins[i] = NULL;
-
-    /* Set values */
-    event->context = context;
-    kb_rpi2_Context_bind_event(context, event);
-
-    /* Return new Event object */
-    *self = event;
-
-    /* If everything went fine */
-    return kb_OKAY;
-
-    /* If there was an error */
-    Sensors_Alloc_Failed:
-        free(event);
-    Self_Alloc_Failed:
         return kb_ALLOC_FAIL;
+
+    /* Initialize new Event object */
+    if (kb_rpi2_Event_ini(event, context))
+    {
+        free(event);
+        return kb_ALLOC_FAIL;
+    }
+
+    /* If everything went fine, return values */
+    *self = event;
+    return kb_OKAY;
 }
 
 
 /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 kb_Error
-kb_rpi2_Event_init(kb_rpi2_Event *const self)
+kb_rpi2_Event_ini(kb_rpi2_Event   *const self,
+                  kb_rpi2_Context *const context)
 {
-    (void)self;
+    /* If any of the arguments is NULL */
+    if (!self)
+        return kb_SELF_IS_NULL;
+    else if (!context)
+        return kb_ARG2_IS_NULL;
+
+    /* Treat Event object as a DenseSetItem */
+    kb_utils_DenseSetItem_ini((kb_utils_DenseSetItem *const)self);
+
+    /* Create new DenseSet object */
+    if (kb_utils_DenseSet_new(&(self->sensors), INITIAL_SENSORS_LIMIT))
+        return kb_ALLOC_FAIL;
+
+    /* "Zero out" all Pin objects in the array */
+    for (size_t i=0; i<KB_RPI2_PINS_COUNT; i++)
+        self->pins[i] = NULL;
+
+    /* Set values */
+    self->context = context;
+    kb_rpi2_Context_bind_event(context, self);
+
+    /* If everything went fine */
+    return kb_OKAY;
+}
+
+
+/*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+kb_Error
+kb_rpi2_Event_fin(kb_rpi2_Event *const self)
+{
+    /* If `self` is NULL */
+    if (!self)
+        return kb_SELF_IS_NULL;
+
+    /* Delete all Pins objects in the array */
+    kb_rpi2_Pin **pins = self->pins;
+    for (size_t i=0; i<KB_RPI2_PINS_COUNT; i++)
+        kb_rpi2_Pin_del(pins + i);
+
+    /* Delete DenseSet object */
+    kb_utils_DenseSet_del(&(self->sensors));
 
     /* If everything went fine */
     return kb_OKAY;
@@ -124,16 +149,12 @@ kb_rpi2_Event_del(kb_rpi2_Event **const self)
     if (!self || !*self)
         return kb_SELF_IS_NULL;
 
-    /* Delete all Pins objects in the array */
-    kb_rpi2_Pin **pins = (*self)->pins;
-    for (size_t i=0; i<KB_RPI2_PINS_COUNT; i++)
-        kb_rpi2_Pin_del(pins + i);
+    /* Finalize instance */
+    kb_rpi2_Event_fin(*self);
 
-    /* Delete DenseSet object */
-    kb_utils_DenseSet_del(&(*self)->sensors);
-
-    /* Delete instance */
+    /* Deallocate instance and redirect self */
     free(*self);
+    *self = NULL;
 
     /* If everything went fine */
     return kb_OKAY;

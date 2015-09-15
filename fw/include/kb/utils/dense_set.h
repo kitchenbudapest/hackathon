@@ -55,7 +55,7 @@ typedef struct
     kb_SELF_IS_NULL:
         if first argument is a NULL pointer */
 kb_Error
-kb_utils_DenseSetItem_init(kb_utils_DenseSetItem *const self);
+kb_utils_DenseSetItem_ini(kb_utils_DenseSetItem *const self);
 
 /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 /* Returns:

@@ -56,43 +56,60 @@ kb_rpi2_Context_new(kb_rpi2_Context **const self)
     /* Create new Context object */
     kb_rpi2_Context *context;
     if (!(context = malloc(sizeof(kb_rpi2_Context))))
-        goto Self_Alloc_Failed;
-
-    /* Create new DenseSet object */
-    if (kb_utils_DenseSet_new(&(context->events), INITIAL_CONTEXT_LIMIT))
-        goto Sensors_Alloc_Failed;
-
-    /* Set members */
-    context->curr_active    = NULL;
-    context->next_active    = NULL;
-    context->looping        = false;
-    context->exiting        = false;
-    context->on_start       = NULL;
-    context->on_stop        = NULL;
-    context->on_cycle_begin = NULL;
-    context->on_cycle_end   = NULL;
-    context->on_activate    = NULL;
-    context->on_exit        = NULL;
-
-    /* Return new instance */
-    *self = context;
-
-    /* If everything went fine */
-    return kb_OKAY;
-
-    /* If there was a problem */
-    Sensors_Alloc_Failed:
-        free(context);
-    Self_Alloc_Failed:
         return kb_ALLOC_FAIL;
+
+    /* Initialize new Context object */
+    if (kb_rpi2_Context_ini(context))
+    {
+        free(context);
+        return kb_ALLOC_FAIL;
+    }
+
+    /* If everything went fine, return values */
+    *self = context;
+    return kb_OKAY;
 }
 
 
 /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 kb_Error
-kb_rpi2_Context_init(kb_rpi2_Context *const self)
+kb_rpi2_Context_ini(kb_rpi2_Context *const self)
 {
-    (void)self;
+    /* If `self` is NULL */
+    if (!self)
+        return kb_SELF_IS_NULL;
+
+    /* Create new DenseSet object */
+    if (kb_utils_DenseSet_new(&(self->events), INITIAL_CONTEXT_LIMIT))
+        return kb_ALLOC_FAIL;
+
+    /* Set members */
+    self->curr_active    = NULL;
+    self->next_active    = NULL;
+    self->looping        = false;
+    self->exiting        = false;
+    self->on_start       = NULL;
+    self->on_stop        = NULL;
+    self->on_cycle_begin = NULL;
+    self->on_cycle_end   = NULL;
+    self->on_activate    = NULL;
+    self->on_exit        = NULL;
+
+    /* If everything went fine */
+    return kb_OKAY;
+}
+
+
+/*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+kb_Error
+kb_rpi2_Context_fin(kb_rpi2_Context *const self)
+{
+    /* If `self` is NULL */
+    if (!self)
+        return kb_SELF_IS_NULL;
+
+    /* Delete DenseSet object */
+    kb_utils_DenseSet_del(&(self->events));
 
     /* If everything went fine */
     return kb_OKAY;
@@ -107,10 +124,10 @@ kb_rpi2_Context_del(kb_rpi2_Context **const self)
     if (!self || !*self)
         return kb_SELF_IS_NULL;
 
-    /* Delete DenseSet object */
-    kb_utils_DenseSet_del(&(*self)->events);
+    /* Finalize instance */
+    kb_rpi2_Context_fin(*self);
 
-    /* Delete Context object */
+    /* Deallocate instance and redirect self */
     free(*self);
     *self = NULL;
 

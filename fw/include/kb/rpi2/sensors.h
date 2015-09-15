@@ -22,10 +22,13 @@ kb_Error
 kb_rpi2_Sensor_new(kb_rpi2_Sensor **const self);
 /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 kb_Error
-kb_rpi2_Sensor_init(kb_rpi2_Sensor *const self,
-                    kb_rpi2_Event  *const event,
-                    size_t         *const pin_id_count,
-                    kb_rpi2_PinId  *const pin_ids);
+kb_rpi2_Sensor_ini(kb_rpi2_Sensor *const self,
+                   kb_rpi2_Event  *const event,
+                   size_t         *const pin_id_count,
+                   kb_rpi2_PinId  *const pin_ids);
+/*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+kb_Error
+kb_rpi2_Sensor_fin(kb_rpi2_Sensor *const self);
 /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 kb_Error
 kb_rpi2_Sensor_del(kb_rpi2_Sensor **const self);

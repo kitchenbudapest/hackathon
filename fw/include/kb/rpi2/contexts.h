@@ -30,6 +30,24 @@ kb_rpi2_Context_new(kb_rpi2_Context **const self);
     kb_OKAY:
         if no error occured
     kb_SELF_IS_NULL:
+        if first argument is a NULL pointer
+    kb_ALLOC_FAIL:
+        if allocation of internals failed */
+kb_Error
+kb_rpi2_Context_ini(kb_rpi2_Context *const self);
+/*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+/* Returns:
+    kb_OKAY:
+        if no error occured
+    kb_SELF_IS_NULL:
+        if first argument is a NULL pointer */
+kb_Error
+kb_rpi2_Context_fin(kb_rpi2_Context *const self);
+/*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+/* Returns:
+    kb_OKAY:
+        if no error occured
+    kb_SELF_IS_NULL:
         if first argument is a NULL pointer */
 kb_Error
 kb_rpi2_Context_del(kb_rpi2_Context **const self);

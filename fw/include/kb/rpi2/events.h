@@ -34,6 +34,27 @@ kb_rpi2_Event_new(kb_rpi2_Event   **const self,
     kb_OKAY:
         if no error occured
     kb_SELF_IS_NULL:
+        if first argument is a NULL pointer
+    kb_ARG2_IS_NULL:
+        if second argument is a NULL pointer
+    kb_ALLOC_FAIL:
+        if allocation of internals failed */
+kb_Error
+kb_rpi2_Event_ini(kb_rpi2_Event   *const self,
+                  kb_rpi2_Context *const context);
+/*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+/* Returns:
+    kb_OKAY:
+        if no error occured
+    kb_SELF_IS_NULL:
+        if first argument is a NULL pointer */
+kb_Error
+kb_rpi2_Event_fin(kb_rpi2_Event *const self);
+/*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+/* Returns:
+    kb_OKAY:
+        if no error occured
+    kb_SELF_IS_NULL:
         if first argument is a NULL pointer */
 kb_Error
 kb_rpi2_Event_del(kb_rpi2_Event **const self);

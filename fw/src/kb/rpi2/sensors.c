@@ -22,10 +22,20 @@
 
 /*----------------------------------------------------------------------------*/
 kb_Error
-kb_rpi2_Sensor_new(kb_rpi2_Sensor **const self)
+kb_rpi2_Sensor_new(kb_rpi2_Sensor **const self,
+                   kb_rpi2_Event  *const event,
+                   size_t         *const pin_id_count,
+                   kb_rpi2_PinId  *const pin_ids)
 {
+    (void)self;
+    (void)event;
+    (void)pin_id_count;
+    (void)pin_ids;
+
     /* If something goes wrong make sure instance is NULL */
     *self = NULL;
+
+    // kb_rpi2_Sensor_ini(sensor, event, pin_id_count, pin_ids);
 
     /* If everything went fine */
     return kb_OKAY;
@@ -34,15 +44,26 @@ kb_rpi2_Sensor_new(kb_rpi2_Sensor **const self)
 
 /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 kb_Error
-kb_rpi2_Sensor_init(kb_rpi2_Sensor *const self,
-                    kb_rpi2_Event  *const event,
-                    size_t         *const pin_id_count,
-                    kb_rpi2_PinId  *const pin_ids)
+kb_rpi2_Sensor_ini(kb_rpi2_Sensor *const self,
+                   kb_rpi2_Event  *const event,
+                   size_t         *const pin_id_count,
+                   kb_rpi2_PinId  *const pin_ids)
 {
     (void)self;
     (void)event;
     (void)pin_id_count;
     (void)pin_ids;
+
+    /* If everything went fine */
+    return kb_OKAY;
+}
+
+
+/*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+kb_Error
+kb_rpi2_Sensor_fin(kb_rpi2_Sensor *const self)
+{
+    (void)self;
 
     /* If everything went fine */
     return kb_OKAY;
@@ -120,6 +141,23 @@ kb_rpi2_Sensor_bind_pin(kb_rpi2_Sensor *const self,
 kb_Error
 kb_rpi2_Sensor_unbind_pin(kb_rpi2_Sensor *const self,
                           kb_rpi2_Pin    *const pin)
+{
+    (void)self;
+    (void)pin;
+
+    /* If everything went fine */
+    return kb_OKAY;
+}
+
+
+/*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+kb_Error
+kb_rpi2_Sensor_bind_on_pin_high(kb_rpi2_Sensor *const self,
+                                kb_rpi2_Pin    *const pin,
+                                kb_Error      (*on_high)(kb_rpi2_Pin     *const,
+                                                         kb_rpi2_Sensor  *const,
+                                                         kb_rpi2_Event   *const,
+                                                         kb_rpi2_Context *const))
 {
     (void)self;
     (void)pin;

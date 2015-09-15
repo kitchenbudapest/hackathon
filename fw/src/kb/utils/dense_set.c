@@ -33,7 +33,7 @@
 
 /*----------------------------------------------------------------------------*/
 kb_Error
-kb_utils_DenseSetItem_init(kb_utils_DenseSetItem *const self)
+kb_utils_DenseSetItem_ini(kb_utils_DenseSetItem *const self)
 {
     /* If `self` is NULL */
     if (!self)
@@ -89,6 +89,10 @@ kb_utils_DenseSet_new(kb_utils_DenseSet **const self,
     Self_Alloc_Failed:
         return kb_ALLOC_FAIL;
 }
+
+
+/* TODO: **Make DenseSet inheritable**
+         Add *_ini and *_fin methods to DenseSet */
 
 
 /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
