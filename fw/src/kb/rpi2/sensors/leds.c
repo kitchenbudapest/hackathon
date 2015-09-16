@@ -103,7 +103,7 @@ kb_rpi2_sensors_LED_on(kb_rpi2_sensors_LED *const self)
     kb_rpi2_Pin *pin;
     kb_Error     error;
     if ((error = kb_rpi2_Sensor_get_pin((kb_rpi2_Sensor *const)self,
-                                        PIN1,
+                                        (size_t)PIN1,
                                         &pin)))
         return error;
 
@@ -141,7 +141,7 @@ kb_rpi2_sensors_LED_off(kb_rpi2_sensors_LED *const self)
     kb_rpi2_Pin *pin;
     kb_Error     error;
     if ((error = kb_rpi2_Sensor_get_pin((kb_rpi2_Sensor *const)self,
-                                        PIN1,
+                                        (size_t)PIN1,
                                         &pin)))
         return error;
 

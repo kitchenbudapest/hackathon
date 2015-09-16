@@ -250,53 +250,24 @@ kb_rpi2_Event_drop_pin(kb_rpi2_Event *const self,
 
 /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 kb_Error
-kb_rpi2_Event_set_pin_high(kb_rpi2_Event *const self,
-                           kb_rpi2_PinId        pin_id)
+kb_rpi2_Event_get_pin(kb_rpi2_Event  *const self,
+                      kb_rpi2_PinId         pin_id,
+                      kb_rpi2_Pin   **const pin)
 {
-    /* If `self` is NULL */
+    /* If any of the arguments is NULL */
     if (!self)
         return kb_SELF_IS_NULL;
+    else if (!pin)
+        return kb_ARG3_IS_NULL;
 
     /* Check validity of `pin_id` */
     KB_RPI2_CHECK_PIN_ID_IN_RANGE(pin_id);
 
-    /* Set pin to HIGH */
-    switch (kb_rpi2_Pin_set_high(self->pins[pin_id]))
-    {
-        /* If pin is not used */
-        case kb_SELF_IS_NULL:
-            return kb_PIN_DOES_NOT_EXIST;
+    /* Redirect pointer to a Pin object */
+    *pin = self->pins[pin_id];
 
-        /* If everything went fine */
-        default:
-            return kb_OKAY;
-    }
-}
-
-
-/*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-kb_Error
-kb_rpi2_Event_set_pin_low(kb_rpi2_Event *const self,
-                          kb_rpi2_PinId        pin_id)
-{
-    /* If `self` is NULL */
-    if (!self)
-        return kb_SELF_IS_NULL;
-
-    /* Check validity of `pin_id` */
-    KB_RPI2_CHECK_PIN_ID_IN_RANGE(pin_id);
-
-    /* Set pin to LOW */
-    switch (kb_rpi2_Pin_set_low(self->pins[pin_id]))
-    {
-        /* If pin is not used */
-        case kb_SELF_IS_NULL:
-            return kb_PIN_DOES_NOT_EXIST;
-
-        /* If everything went fine */
-        default:
-            return kb_OKAY;
-    }
+    /* If everything went fine */
+    return kb_OKAY;
 }
 
 

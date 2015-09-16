@@ -33,6 +33,10 @@ typedef enum
     kb_INVALID_PIN_ID,
     kb_PIN_ALREADY_USED,
     kb_PIN_DOES_NOT_EXIST,
+    kb_TOO_MANY_PINS_USED,
+
+    /* Sensor related error signals */
+    kb_PIN_INDEX_IS_OUT_OF_RANGE,
 
     /* Event related error signals */
     kb_SENSOR_IS_NOT_IN_EVENT,

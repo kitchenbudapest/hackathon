@@ -105,12 +105,9 @@ kb_rpi2_Event_drop_pin(kb_rpi2_Event *const self,
                        kb_rpi2_PinId        pin_id);
 /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 kb_Error
-kb_rpi2_Event_set_pin_high(kb_rpi2_Event *const self,
-                           kb_rpi2_PinId        pin_id);
-/*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-kb_Error
-kb_rpi2_Event_set_pin_low(kb_rpi2_Event *const self,
-                          kb_rpi2_PinId        pin_id);
+kb_rpi2_Event_get_pin(kb_rpi2_Event  *const self,
+                      kb_rpi2_PinId         pin_id,
+                      kb_rpi2_Pin   **const pin);
 /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 kb_Error
 kb_rpi2_Event_reset_all_pins(kb_rpi2_Event *const self);

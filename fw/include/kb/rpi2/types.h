@@ -15,6 +15,10 @@
 /*  type  : kb_Error */
 #include <kb/utils/dense_set.h>
 /*  type  : kb_utils_DenseSet */
+#include <kb/rpi2/enums.h>
+/*  type  : kb_rpi2_PinState
+            kb_rpi2_PinId
+            kb_rpi2_SensorState */
 
 
 /*----------------------------------------------------------------------------*/
@@ -63,7 +67,7 @@ typedef struct kb_rpi2_context
     KB_UTILS_DENSE_SET_ITEM_MEMBERS()                                          \
     struct kb_rpi2_context *context;                                           \
     kb_utils_DenseSet      *sensors;                                           \
-    struct kb_rpi2_pin     *pins[KB_RPI2_PINS_COUNT];
+    struct kb_rpi2_pin     *pins[KB_RPI2_PINS_COUNT];                          \
 /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 typedef struct kb_rpi2_event
 {
@@ -73,15 +77,11 @@ typedef struct kb_rpi2_event
 
 
 /*----------------------------------------------------------------------------*/
-typedef enum
-{
-    kb_rpi2_Sensor_ENABLED,
-    kb_rpi2_Sensor_DISABLED,
-} kb_rpi2_SensorState;
-/*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 #define KB_RPI2_SENSOR_MEMBERS()                                               \
     KB_UTILS_DENSE_SET_ITEM_MEMBERS()                                          \
     struct kb_rpi2_event  *event;                                              \
+    kb_rpi2_PinId         *pin_ids;                                            \
+    size_t                 pin_ids_count;                                      \
     kb_rpi2_SensorState    state;                                              \
     kb_Error             (*on_enable)(struct kb_rpi2_sensor  *const,           \
                                       struct kb_rpi2_event   *const,           \
@@ -98,25 +98,6 @@ typedef struct kb_rpi2_sensor
 
 
 /*----------------------------------------------------------------------------*/
-typedef enum
-{
-    kb_rpi2_Pin_LOW,
-    kb_rpi2_Pin_HIGH,
-} kb_rpi2_PinState;
-/*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-typedef enum
-{
-    kb_rpi2_PIN1,
-    kb_rpi2_PIN2,
-    kb_rpi2_PIN3,
-    kb_rpi2_PIN4,
-    kb_rpi2_PIN5,
-    kb_rpi2_PIN6,
-    kb_rpi2_PIN7,
-    kb_rpi2_PIN8,
-    kb_rpi2_PIN9,
-} kb_rpi2_PinId;
-/*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 #define KB_RPI2_PIN_MEMBERS()                                                  \
     /* Static data */                                                          \
     kb_rpi2_PinId           id;                                                \
