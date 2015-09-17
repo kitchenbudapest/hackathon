@@ -1,0 +1,80 @@
+## INFO ##
+## INFO ##
+
+# Indicate the beginning of building
+print '{:#^80}'.format(' SCONS BUILD ')
+
+# Import python modules
+from os.path import join
+
+# Essential variables
+all_warn   = False
+input_dir  = '.'
+output_dir = 'build'
+target     = 'main'
+source     = ('main.c',
+              'type.c',
+              'js_type.c',
+              join('external', 'src', 'v7.c'))
+
+# C compiler
+CC = 'clang'
+
+# C compiler flags
+CCFLAGS = ['v',
+           'g',
+           'O3',
+           'Wall',
+           'Wextra',
+           'pedantic',
+           'std=c99',]
+
+# GCC specific c compiler flags
+GCCFLAGS = ['fdiagnostics-color=always']
+# CLANG specific  compiler flags
+CLANGFLAGS = ['fcolor-diagnostics',
+              'fmacro-backtrace-limit=0']
+if all_warn:
+    CLANGFLAGS.append('Weverything')
+
+
+# C pre-processor path (include)
+CPPPATH = ['.',
+           'include',
+           '/usr/include/',
+           '/usr/local/include']
+
+# Library path
+LIBPATH = ['.',
+           'src',
+           '/usr/lib',
+           '/usr/local/lib']
+
+# Libraries
+LIBS = ['m']
+
+# Add compiler specific flags to generic flags
+CCFLAGS.extend(GCCFLAGS if CC == 'gcc' else CLANGFLAGS if CC == 'clang' else [])
+
+# Helper functions
+def flag_prefixer(flags):
+    return ['-' + flag for flag in flags]
+
+def path_prefixer(files):
+    return [join(output_dir, file) for file in files]
+
+
+# Create environment
+environment = Environment(CC      = CC,
+                          CCFLAGS = flag_prefixer(CCFLAGS),
+                          CPPPATH = CPPPATH,
+                          LIBPATH = LIBPATH,
+                          LIBS    = LIBS)
+
+# Specify output directory
+environment.VariantDir(variant_dir = output_dir,
+                       src_dir     = input_dir)
+
+# Builds
+environment.Program(target = target,
+                    source = path_prefixer(source))

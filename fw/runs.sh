@@ -22,7 +22,7 @@ else
     decorate;
     commands="reset && scons &&";
     # If testing
-    if [ "$1" == "-t" ];
+    if [ "$1" == "-t" ] || [ "$1" == "--test" ];
     then
         # If second argument is missing
         if [ -z "$2" ];
@@ -30,9 +30,13 @@ else
             printf "Missing executable (second argument)\n";
         # If there is a second argument
         else
-            printf "==> $commands valgrind ./$2\n";
+            printf "==> $commands valgrind --track-origins=yes"
+            printf                       " --leak-check=full"
+            printf                       " ./$2\n";
             decorate;
-            valgrind ./$2;
+            valgrind --track-origins=yes \
+                     --leak-check=full   \
+                     ./$2;
         fi;
     # If running
     else
