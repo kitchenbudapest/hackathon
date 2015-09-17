@@ -1,0 +1,150 @@
+## INFO ##
+## INFO ##
+
+# Indicate the beginning of building
+print '{:#^80}'.format(' SCONS BUILD ')
+
+# Import python modules
+from sys       import argv
+from itertools import chain
+from os        import getcwd, chdir
+from os.path   import join, abspath
+
+
+#------------------------------------------------------------------------------#
+# If developer mode passed ($ scons devel=yes)
+DEVEL = ARGUMENTS.get('devel', False)
+
+
+
+# Set global variables
+#------------------------------------------------------------------------------#
+# C compiler
+CC = 'clang'
+
+# C compiler (generic) flags
+CCFLAGS = ['v',
+           'g',
+           'O3',
+           'Wall',
+           'Wextra',
+           'pedantic',
+           'std=c99',]
+
+# GCC specific c compiler flags
+GCCFLAGS = ['fdiagnostics-color=always']
+GCCFLAGS_DEVEL = []
+
+# CLANG specific  compiler flags
+CLANGFLAGS = ['fcolor-diagnostics',
+              'fmacro-backtrace-limit=0']
+CLANGFLAGS_DEVEL = ['Weverything']
+
+
+
+# Set flags based on the above variables
+#------------------------------------------------------------------------------#
+if CC == 'clang':
+    if DEVEL:
+        CLANGFLAGS.extend(CLANGFLAGS_DEVEL)
+    flags = CLANGFLAGS
+elif CC == 'gcc':
+    if DEVEL:
+        GCCFLAGS.extend(GCCFLAGS_DEVEL)
+    flags = GCCFLAGS
+else:
+    raise ValueError('CC is not supported: {}'.format(CC))
+
+# Finalize flags
+CCFLAGS = ['-' + flag for flag in chain(CCFLAGS, flags)]
+
+
+# Helper functions
+#------------------------------------------------------------------------------#
+def path_prefixer(folder, files):
+    return [join(folder, file) for file in files]
+
+
+
+# Target: building duktape as a library
+#------------------------------------------------------------------------------#
+def duktape():
+    # Output and inputs
+    INPUT_DIR  = join('duktape-1.3.0', 'src')
+    OUTPUT_DIR = join('build', 'duktape')
+    TARGET     = 'duktape'
+    SOURCE     = ['duktape.c']
+
+    # C pre-processor path (include)
+    CPPPATH = [INPUT_DIR]
+    # Library path
+    LIBPATH = [INPUT_DIR,
+               '/usr/lib',
+               '/usr/local/lib']
+    # Libraries
+    LIBS    = ['m']
+
+    # Create environment
+    environment = Environment(CC      = CC,
+                              CCFLAGS = CCFLAGS,
+                              CPPPATH = CPPPATH,
+                              LIBPATH = LIBPATH,
+                              LIBS    = LIBS)
+
+    # Specify output directory
+    environment.VariantDir(variant_dir = OUTPUT_DIR,
+                           src_dir     = INPUT_DIR)
+
+    # Build
+    environment.SharedLibrary(target = TARGET,
+                              source = path_prefixer(OUTPUT_DIR, SOURCE))
+
+    # Name this build
+    environment.Alias('duktape')
+
+
+
+# Target: building javascript wrapper
+#------------------------------------------------------------------------------#
+def wrapper():
+    # Output and inputs
+    INPUT_DIR  = join('duktape-1.3.0', 'src')
+    OUTPUT_DIR = join('build', 'kbjs')
+    TARGET     = 'kbjs'
+    SOURCE     = ['kbjs.c']
+
+    # C pre-processor path (include)
+    CPPPATH = ['.',
+               '/usr/include',
+               '/usr/local/include']
+    # Library path
+    LIBPATH = ['.',
+               '/usr/lib',
+               '/usr/local/lib']
+    # Libraries
+    LIBS    = ['duktape']
+
+    # Create environment
+    environment = Environment(CC      = CC,
+                              CCFLAGS = CCFLAGS,
+                              CPPPATH = CPPPATH,
+                              LIBPATH = LIBPATH,
+                              LIBS    = LIBS)
+
+    # Specify output directory
+    environment.VariantDir(variant_dir = OUTPUT_DIR,
+                           src_dir     = INPUT_DIR)
+
+    # Build (and set it as the defaulkt target
+    Default(environment.Program(target = TARGET,
+                                source = path_prefixer(OUTPUT_DIR, SOURCE)))
+
+    # Name this build
+    environment.Alias('kbjs')
+
+
+
+#------------------------------------------------------------------------------#
+# Create build options
+duktape()
+wrapper()

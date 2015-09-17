@@ -6,6 +6,7 @@
 
 bins
 build
+duktape-*
 __pycache__
 
 README.html

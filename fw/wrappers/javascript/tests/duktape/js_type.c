@@ -65,7 +65,7 @@ js_T_new(duk_context *context)
             duk_push_pointer(context, (void *)t);
             duk_put_prop_string(context, -2, INSTANCE_PTR);
 
-            duk_push_c_function(context, js_T_del, 0);
+            duk_push_c_function(context, js_T_del, 1);
             duk_set_finalizer(context, -2);
             return 1;
     }
@@ -78,13 +78,7 @@ js_T_del(duk_context *context)
 {
     puts("==> T: del()");
 
-    duk_get_prop_string(context, 0, INSTANCE_PTR);
-
-    /*
-     * <<<<<<<<<<<< For some reason, the rest of this function is not called!
-     *              Check the return values/errors of the duk_* functions!
-     */
-
+    duk_get_prop_string(context, -1, INSTANCE_PTR);
     T *t = duk_to_pointer(context, -1);
 
     printf("  -> (del) Accessed instance_ptr: %p\n", t);

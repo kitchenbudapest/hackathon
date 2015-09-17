@@ -14,8 +14,7 @@ output_dir = 'build'
 target     = 'main'
 source     = ('main.c',
               'type.c',
-              'js_type.c',
-              'duktape.c')
+              'js_type.c')
 
 # C compiler
 CC = 'clang'
@@ -49,7 +48,7 @@ LIBPATH = ['.',
            '/usr/local/lib']
 
 # Libraries
-LIBS = ['m']
+LIBS = ['m', 'duktape']
 
 # Add compiler specific flags to generic flags
 CCFLAGS.extend(GCCFLAGS if CC == 'gcc' else CLANGFLAGS if CC == 'clang' else [])
