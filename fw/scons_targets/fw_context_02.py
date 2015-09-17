@@ -6,6 +6,7 @@ from os.path import join
 
 target = join('tests', 'bins', 'fw_context_02')
 source = (join('tests', 'fw_context_02.c'),
+          join('kb', 'errors.c'),
           join('kb', 'utils', 'dense_set.c'),
           join('kb', 'rpi2', 'contexts.c'),
           join('kb', 'rpi2', 'events.c'),

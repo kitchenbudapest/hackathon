@@ -77,10 +77,11 @@ kb_rpi2_Event_new(kb_rpi2_Event   **const self,
         return kb_ALLOC_FAIL;
 
     /* Initialize new Event object */
-    if (kb_rpi2_Event_ini(event, context))
+    kb_Error error;
+    if ((error = kb_rpi2_Event_ini(event, context)))
     {
         free(event);
-        return kb_ALLOC_FAIL;
+        return error;
     }
 
     /* If everything went fine, return values */
@@ -217,7 +218,8 @@ kb_rpi2_Event_use_pin(kb_rpi2_Event  *const self,
         return kb_PIN_ALREADY_USED;
 
     /* Store `sensor` */
-    if (kb_utils_DenseSet_push(self->sensors, (kb_utils_DenseSetItem *const)sensor))
+    if (kb_utils_DenseSet_push(self->sensors,
+                               (kb_utils_DenseSetItem *const)sensor))
         return kb_ALLOC_FAIL;
 
     /* Create new Pin object */

@@ -19,12 +19,15 @@
 
 /*----------------------------------------------------------------------------*/
 kb_Error
-kb_rpi2_Sensor_new(kb_rpi2_Sensor **const self);
+kb_rpi2_Sensor_new(kb_rpi2_Sensor **const self,
+                   kb_rpi2_Event   *const event,
+                   size_t                 pin_ids_count,
+                   kb_rpi2_PinId   *const pin_ids);
 /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 kb_Error
 kb_rpi2_Sensor_ini(kb_rpi2_Sensor *const self,
                    kb_rpi2_Event  *const event,
-                   size_t         *const pin_ids_count,
+                   size_t                pin_ids_count,
                    kb_rpi2_PinId  *const pin_ids);
 /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 kb_Error
@@ -45,12 +48,27 @@ kb_Error
 kb_rpi2_Sensor_disable(kb_rpi2_Sensor *const self);
 /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 kb_Error
-kb_rpi2_Sensor_bind_pin(kb_rpi2_Sensor *const self,
-                        kb_rpi2_Pin    *const pin);
+kb_rpi2_Sensor_bind_on_enable(kb_rpi2_Sensor *const   self,
+                              kb_Error (*on_enable)(kb_rpi2_Sensor  *const,
+                                                    kb_rpi2_Event   *const,
+                                                    kb_rpi2_Context *const));
 /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 kb_Error
-kb_rpi2_Sensor_unbind_pin(kb_rpi2_Sensor *const self,
-                          kb_rpi2_Pin    *const pin);
+kb_rpi2_Sensor_unbind_on_enable(kb_rpi2_Sensor *const self);
+/*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+kb_Error
+kb_rpi2_Sensor_bind_on_disable(kb_rpi2_Sensor *const   self,
+                              kb_Error (*on_disable)(kb_rpi2_Sensor *const,
+                                                    kb_rpi2_Event   *const,
+                                                    kb_rpi2_Context *const));
+/*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+kb_Error
+kb_rpi2_Sensor_unbind_on_disable(kb_rpi2_Sensor *const self);
+/*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+kb_Error
+kb_rpi2_Sensor_get_pin(kb_rpi2_Sensor  *const self,
+                       size_t                 pin_index,
+                       kb_rpi2_Pin    **const pin);
 
 
 #endif /* __KB_RPI2_SENSORS_H_24463479806314148__ */

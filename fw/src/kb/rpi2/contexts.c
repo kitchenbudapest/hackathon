@@ -59,10 +59,11 @@ kb_rpi2_Context_new(kb_rpi2_Context **const self)
         return kb_ALLOC_FAIL;
 
     /* Initialize new Context object */
-    if (kb_rpi2_Context_ini(context))
+    kb_Error error;
+    if ((error = kb_rpi2_Context_ini(context)))
     {
         free(context);
-        return kb_ALLOC_FAIL;
+        return error;
     }
 
     /* If everything went fine, return values */

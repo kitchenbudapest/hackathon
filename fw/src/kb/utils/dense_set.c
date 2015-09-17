@@ -137,7 +137,8 @@ kb_utils_DenseSet_push(kb_utils_DenseSet     *const self,
     if ((self->count + 1) >= self->limit)
     {
         /* Resize memory chunk */
-        if (!(items = realloc(self->items, sizeof(kb_utils_DenseSetItem *)*self->limit*2)))
+        if (!(items = realloc(self->items,
+                              sizeof(kb_utils_DenseSetItem *)*self->limit*2)))
             return kb_ALLOC_FAIL;
 
         /* Zero-out newly allocated space */

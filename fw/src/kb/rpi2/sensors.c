@@ -14,13 +14,17 @@
 #include <kb/errors.h>
 /*  type  : kb_Error
     const : kb_OKAY */
+#include <kb/utils/dense_set.h>
+/*  type  : kb_utils_DenseSetItem
+    func  : kb_utils_DenseSetItem_ini */
 #include <kb/rpi2/types.h>
-/*  type  : kb_rpi2_Sensor
-            kb_rpi2_Event
+/*  type  : kb_rpi2_Event
             kb_rpi2_Context */
 #include <kb/rpi2/events.h>
 /*  macro : KB_RPI2_PINS_COUNT
     type  : kb_rpi2_Event */
+#include <kb/rpi2/sensors.h>
+/*  type  : kb_rpi2_Sensor */
 
 
 /*----------------------------------------------------------------------------*/
@@ -51,7 +55,10 @@ kb_rpi2_Sensor_new(kb_rpi2_Sensor **const self,
     /* Initialize new instance */
     kb_Error error;
     if ((error = kb_rpi2_Sensor_ini(sensor, event, pin_ids_count, pin_ids)))
+    {
+        free(sensor);
         return error;
+    }
 
     /* If everything went fine */
     *self = sensor;
@@ -82,6 +89,16 @@ kb_rpi2_Sensor_ini(kb_rpi2_Sensor *const self,
     if (!(self->pin_ids = malloc(sizeof(kb_rpi2_PinId)*pin_ids_count)))
         return kb_ALLOC_FAIL;
 
+    /* Initialize instance as DenseSetItem */
+    kb_utils_DenseSetItem_ini((kb_utils_DenseSetItem *const)self);
+
+    /* Store static data */
+    self->pin_ids_count = pin_ids_count;
+    self->event         = event;
+    self->state         = kb_rpi2_Sensor_DISABLED;
+    self->on_enable     = NULL;
+    self->on_disable    = NULL;
+
     /* Store `pin_id`s and "reserve" pins */
     kb_Error error;
     for (size_t i=0; i<pin_ids_count; i++)
@@ -90,13 +107,6 @@ kb_rpi2_Sensor_ini(kb_rpi2_Sensor *const self,
         if ((error = kb_rpi2_Event_use_pin(event, pin_ids[i], self)))
             return error;
     }
-
-    /* Store static data */
-    self->pin_ids_count = pin_ids_count;
-    self->event         = event;
-    self->state         = kb_rpi2_Sensor_DISABLED;
-    self->on_enable     = NULL;
-    self->on_disable    = NULL;
 
     /* Make the connection */
     kb_rpi2_Event_bind_sensor(event, self);
@@ -181,7 +191,7 @@ kb_rpi2_Sensor_enable(kb_rpi2_Sensor *const self)
     switch (self->state)
     {
         /* If sensor is disabled */
-        case kb_rpi2_Sensor_DISABLED;
+        case kb_rpi2_Sensor_DISABLED:
             /* Enable sensor */
             self->state = kb_rpi2_Sensor_ENABLED;
             /* If there is an `on_enable` callback, call it */
@@ -215,7 +225,7 @@ kb_rpi2_Sensor_disable(kb_rpi2_Sensor *const self)
     switch (self->state)
     {
         /* If sensor is disabled */
-        case kb_rpi2_Sensor_ENABLED;
+        case kb_rpi2_Sensor_ENABLED:
             /* Enable sensor */
             self->state = kb_rpi2_Sensor_DISABLED;
             /* If there is an `on_disable` callback, call it */
@@ -239,6 +249,76 @@ kb_rpi2_Sensor_disable(kb_rpi2_Sensor *const self)
 
 /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 kb_Error
+kb_rpi2_Sensor_bind_on_enable(kb_rpi2_Sensor *const   self,
+                              kb_Error (*on_enable)(kb_rpi2_Sensor  *const,
+                                                    kb_rpi2_Event   *const,
+                                                    kb_rpi2_Context *const))
+{
+    /* If `self` is NULL */
+    if (!self)
+        return kb_SELF_IS_NULL;
+
+    /* Set callback */
+    self->on_enable = on_enable;
+
+    /* If everything went fine */
+    return kb_OKAY;
+}
+
+
+/*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+kb_Error
+kb_rpi2_Sensor_unbind_on_enable(kb_rpi2_Sensor *const self)
+{
+    /* If `self` is NULL */
+    if (!self)
+        return kb_SELF_IS_NULL;
+
+    /* Unset callback */
+    self->on_enable = NULL;
+
+    /* If everything went fine */
+    return kb_OKAY;
+}
+
+
+/*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+kb_Error
+kb_rpi2_Sensor_bind_on_disable(kb_rpi2_Sensor *const   self,
+                              kb_Error (*on_disable)(kb_rpi2_Sensor *const,
+                                                    kb_rpi2_Event   *const,
+                                                    kb_rpi2_Context *const))
+{
+    /* If `self` is NULL */
+    if (!self)
+        return kb_SELF_IS_NULL;
+
+    /* Set callback */
+    self->on_disable = on_disable;
+
+    /* If everything went fine */
+    return kb_OKAY;
+}
+
+
+/*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+kb_Error
+kb_rpi2_Sensor_unbind_on_disable(kb_rpi2_Sensor *const self)
+{
+    /* If `self` is NULL */
+    if (!self)
+        return kb_SELF_IS_NULL;
+
+    /* Unset callback */
+    self->on_disable = NULL;
+
+    /* If everything went fine */
+    return kb_OKAY;
+}
+
+
+/*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+kb_Error
 kb_rpi2_Sensor_get_pin(kb_rpi2_Sensor  *const self,
                        size_t                 pin_index,
                        kb_rpi2_Pin    **const pin)
@@ -252,5 +332,5 @@ kb_rpi2_Sensor_get_pin(kb_rpi2_Sensor  *const self,
     if (pin_index >= self->pin_ids_count)
         return kb_PIN_INDEX_IS_OUT_OF_RANGE;
 
-    return kb_rpi2_Event_get_pin(self->event, self, self->pin_ids[pin_index])
+    return kb_rpi2_Event_get_pin(self->event, self->pin_ids[pin_index], pin);
 }

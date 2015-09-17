@@ -1,6 +1,33 @@
 /* INFO **
 ** INFO */
 
+/*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+/* Include standard headers */
+#include <stdlib.h>
+/*  func  : malloc
+            free */
+
+/*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+/* Include kibu headers */
+#include <kb/errors.h>
+/*  type  : kb_Error
+    const : kb_OKAY
+            kb_SELF_IS_NULL
+            kb_ARG2_IS_NULL
+            kb_ALLOC_FAIL */
+#include <kb/rpi2/sensors.h>
+/*  type  : kb_rpi2_Sensor
+            kb_rpi2_Sensor_ini
+            kb_rpi2_Sensor_fin
+            kb_rpi2_Sensor_get_pin */
+#include <kb/rpi2/pins.h>
+/*  type  : kb_rpi2_Pin
+    func  : kb_rpi2_Pin_set_high
+            kb_rpi2_Pin_set_low */
+#include <kb/rpi2/sensors/leds.h>
+/*  type  : kb_rpi2_sensors_LED */
+
+
 /*----------------------------------------------------------------------------*/
 /* Index shortcuts */
 enum pin_indices
@@ -32,7 +59,12 @@ kb_rpi2_sensors_LED_new(kb_rpi2_sensors_LED **const self,
         return kb_ALLOC_FAIL;
 
     /* Initialize instance */
-    kb_rpi2_sensors_LED_ini(led, event, pin_id);
+    kb_Error error;
+    if ((error = kb_rpi2_sensors_LED_ini(led, event, pin_id)))
+    {
+        free(led);
+        return error;
+    }
 
     /* If everything went fine, return values */
     *self = led;
@@ -54,15 +86,19 @@ kb_rpi2_sensors_LED_ini(kb_rpi2_sensors_LED *const self,
 
     /* Initialize instance as Sensor */
     kb_Error error;
-    if (error = kb_rpi2_Sensor_ini((kb_rpi2_Sensor *const)self,
-                                   event,
-                                   (size_t)1,
-                                   &pin_id))
+    if ((error = kb_rpi2_Sensor_ini((kb_rpi2_Sensor *const)self,
+                                    event,
+                                    (size_t)1,
+                                    &pin_id)))
         return error;
 
     /* Initialize data */
     self->on_on  = NULL;
     self->on_off = NULL;
+
+    /*
+     * TODO: set PIN1 to output and LOW
+     */
 
     /* If everything went fine */
     return kb_OKAY;
@@ -73,8 +109,8 @@ kb_rpi2_sensors_LED_ini(kb_rpi2_sensors_LED *const self,
 kb_Error
 kb_rpi2_sensors_LED_fin(kb_rpi2_sensors_LED *const self)
 {
-    /* If everything went fine */
-    return kb_OKAY;
+    /* Finalize instance as Sensor */
+    return kb_rpi2_Sensor_fin((kb_rpi2_Sensor *const)self);
 }
 
 
@@ -85,6 +121,15 @@ kb_rpi2_sensors_LED_del(kb_rpi2_sensors_LED **const self)
     /* If `self` or instance is NULL */
     if (!self || !*self)
         return kb_SELF_IS_NULL;
+
+    /* Finalize instance */
+    kb_Error error;
+    if ((error = kb_rpi2_sensors_LED_fin(*self)))
+        return error;
+
+    /* Deallocate instance */
+    free(*self);
+    *self = NULL;
 
     /* If everything went fine */
     return kb_OKAY;
@@ -161,6 +206,76 @@ kb_rpi2_sensors_LED_off(kb_rpi2_sensors_LED *const self)
         /* Call callback */
         self->on_off(self, event, context);
     }
+
+    /* If everything went fine */
+    return kb_OKAY;
+}
+
+
+/*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+kb_Error
+kb_rpi2_sensors_LED_bind_on_on(kb_rpi2_sensors_LED *const self,
+                               kb_Error (*on_on)(kb_rpi2_sensors_LED *const,
+                                                 kb_rpi2_Event       *const,
+                                                 kb_rpi2_Context     *const))
+{
+    /* If `self` is NULL */
+    if (!self)
+        return kb_SELF_IS_NULL;
+
+    /* Set callback */
+    self->on_on = on_on;
+
+    /* If everything went fine */
+    return kb_OKAY;
+}
+
+
+/*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+kb_Error
+kb_rpi2_sensors_LED_unbind_on_on(kb_rpi2_sensors_LED *const self)
+{
+    /* If `self` is NULL */
+    if (!self)
+        return kb_SELF_IS_NULL;
+
+    /* Unset callback */
+    self->on_on = NULL;
+
+    /* If everything went fine */
+    return kb_OKAY;
+}
+
+
+/*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+kb_Error
+kb_rpi2_sensors_LED_bind_on_off(kb_rpi2_sensors_LED *const self,
+                                kb_Error (*on_off)(kb_rpi2_sensors_LED *const,
+                                                   kb_rpi2_Event       *const,
+                                                   kb_rpi2_Context     *const))
+{
+    /* If `self` is NULL */
+    if (!self)
+        return kb_SELF_IS_NULL;
+
+    /* Set callback */
+    self->on_off = on_off;
+
+    /* If everything went fine */
+    return kb_OKAY;
+}
+
+
+/*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+kb_Error
+kb_rpi2_sensors_LED_unbind_on_off(kb_rpi2_sensors_LED *const self)
+{
+    /* If `self` is NULL */
+    if (!self)
+        return kb_SELF_IS_NULL;
+
+    /* Unset callback */
+    self->on_off = NULL;
 
     /* If everything went fine */
     return kb_OKAY;

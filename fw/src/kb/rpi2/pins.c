@@ -114,7 +114,12 @@ kb_rpi2_Pin_new(kb_rpi2_Pin    **const self,
         return kb_ALLOC_FAIL;
 
     /* Initialize new Pin object */
-    kb_rpi2_Pin_ini(pin, pin_id, sensor);
+    kb_Error error;
+    if ((error = kb_rpi2_Pin_ini(pin, pin_id, sensor)))
+    {
+        free(pin);
+        return error;
+    }
 
     /* If everything went fine, return values */
     *self = pin;
@@ -155,11 +160,9 @@ kb_rpi2_Pin_ini(kb_rpi2_Pin    *const self,
 kb_Error
 kb_rpi2_Pin_fin(kb_rpi2_Pin *const self)
 {
+    /* If `self` is NULL */
     if (!self)
         return kb_SELF_IS_NULL;
-
-    /* Unbind pin from sensor */
-    kb_rpi2_Sensor_unbind_pin(self->sensor, self);
 
     /*
      * TODO: Reset this pin via bcm2835

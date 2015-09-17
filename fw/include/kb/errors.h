@@ -5,6 +5,7 @@
 #ifndef __KB_ERROR_H_8506093783091019__
 #define __KB_ERROR_H_8506093783091019__
 
+
 /*----------------------------------------------------------------------------*/
 typedef enum
 {
@@ -22,9 +23,6 @@ typedef enum
 
     /* Memory management related error signals */
     kb_ALLOC_FAIL,
-
-    /* Containers and collections related error signals */
-    //kb_INDEX_OUT_OF_RANGE,
 
     /* Utility related error signals */
     kb_ITEM_NOT_IN_CONTAINER,
@@ -46,5 +44,11 @@ typedef enum
     kb_EVENT_NOT_BOUND_TO_CONTEXT,
 
 } kb_Error;
+
+
+/*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+const char *
+kb_Error_str(kb_Error error);
+
 
 #endif /* __KB_ERROR_H_8506093783091019__ */
