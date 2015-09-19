@@ -2,8 +2,8 @@
 ** INFO */
 
 /* Header guard */
-#ifndef __KB_RPI2_EVENTS_H_6909342993482931__
-#define __KB_RPI2_EVENTS_H_6909342993482931__
+#ifndef KB_RPI2_EVENTS_H_6909342993482931
+#define KB_RPI2_EVENTS_H_6909342993482931 1
 
 
 /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
@@ -96,9 +96,11 @@ kb_rpi2_Event_activate(kb_rpi2_Event *const self);
     kb_ALLOC_FAIL:
         if allocation of the new Pin object failed */
 kb_Error
-kb_rpi2_Event_use_pin(kb_rpi2_Event  *const self,
-                      kb_rpi2_PinId         pin_id,
-                      kb_rpi2_Sensor *const sensor);
+kb_rpi2_Event_use_pin(kb_rpi2_Event    *const self,
+                      kb_rpi2_PinId           pin_id,
+                      kb_rpi2_PinRole         pin_role,
+                      kb_rpi2_PinState        pin_state,
+                      kb_rpi2_Sensor   *const sensor);
 /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 kb_Error
 kb_rpi2_Event_drop_pin(kb_rpi2_Event *const self,
@@ -108,6 +110,9 @@ kb_Error
 kb_rpi2_Event_get_pin(kb_rpi2_Event  *const self,
                       kb_rpi2_PinId         pin_id,
                       kb_rpi2_Pin   **const pin);
+/*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+kb_Error
+kb_rpi2_Event_listen_all_pins(kb_rpi2_Event *const self);
 /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 kb_Error
 kb_rpi2_Event_reset_all_pins(kb_rpi2_Event *const self);
@@ -121,7 +126,10 @@ kb_rpi2_Event_unbind_sensor(kb_rpi2_Event  *const self,
                             kb_rpi2_Sensor *const sensor);
 /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 kb_Error
+kb_rpi2_Event_enable_all_sensors(kb_rpi2_Event *const self);
+/*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+kb_Error
 kb_rpi2_Event_disable_all_sensors(kb_rpi2_Event *const self);
 
 
-#endif /* __KB_RPI2_EVENTS_H_6909342993482931__ */
+#endif /* KB_RPI2_EVENTS_H_6909342993482931 */

@@ -25,15 +25,21 @@
             kb_EVENT_NOT_BOUND_TO_CONTEXT */
 #include <kb/utils/dense_set.h>
 /*  type  : kb_utils_DenseSet
+            kb_utils_DenseSetIter
+            kb_utils_DenseSetItem
     func  : kb_utils_DenseSet_new
             kb_utils_DenseSet_del
             kb_utils_DenseSet_has
             kb_utils_DenseSet_push
-            kb_utils_DenseSet_pull */
+            kb_utils_DenseSet_pull
+            kb_utils_DenseSetIter_new
+            kb_utils_DenseSetIter_del
+            kb_utils_DenseSetIter_next */
 #include <kb/rpi2/events.h>
 /*  type  : kb_rpi2_Event
     func  : kb_rpi2_Event_reset_pins
-            kb_rpi2_Event_disable_all */
+            kb_rpi2_Event_disable_all
+            kb_rpi2_Event_listen_all_pins */
 #include <kb/rpi2/contexts.h>
 /*  type  : kb_rpi2_Context */
 
@@ -85,10 +91,10 @@ kb_rpi2_Context_ini(kb_rpi2_Context *const self)
         return kb_ALLOC_FAIL;
 
     /* Set members */
-    self->curr_active    = NULL;
-    self->next_active    = NULL;
     self->looping        = false;
     self->exiting        = false;
+    self->curr_active    = NULL;
+    self->next_active    = NULL;
     self->on_start       = NULL;
     self->on_stop        = NULL;
     self->on_cycle_begin = NULL;
@@ -109,8 +115,19 @@ kb_rpi2_Context_fin(kb_rpi2_Context *const self)
     if (!self)
         return kb_SELF_IS_NULL;
 
-    /* Delete DenseSet object */
-    kb_utils_DenseSet_del(&(self->events));
+    /* Create an iterator to go through all
+       Event objects bound to this Context */
+    kb_Error error;
+    kb_utils_DenseSetIter  iter;
+    kb_utils_DenseSetItem *item;
+    if ((error = kb_utils_DenseSetIter_ini(&iter, self->events)))
+        return error;
+
+    /* Reset all pins used by all Events */
+    for (kb_utils_DenseSetIter_next(&iter, &item);
+         item;
+         kb_utils_DenseSetIter_next(&iter, &item))
+            kb_rpi2_Event_reset_all_pins((kb_rpi2_Event *const)item);
 
     /* If everything went fine */
     return kb_OKAY;
@@ -206,11 +223,6 @@ kb_rpi2_Context_start(kb_rpi2_Context *const self)
     /* If there is no active current event */
     else if (!self->curr_active)
     {
-        /*
-         * TODO: This is awful and redundant, make it pretty!
-         *       Decide wether the first activation needs to call on_activate
-         *       or not. If not, remove the callback calling
-         */
         /* If there is no scheduled active event */
         if (!(self->curr_active = self->next_active))
             return kb_NO_EVENT_ACTIVATED;
@@ -221,8 +233,12 @@ kb_rpi2_Context_start(kb_rpi2_Context *const self)
             if (self->on_activate)
                 if ((error = self->on_activate(self,
                                                NULL,
-                                               self->next_active)))
+                                               self->curr_active)))
                     return error;
+
+            /* Enable all sensors for next event */
+            kb_rpi2_Event_enable_all_sensors(self->curr_active);
+
             /* Clear schedule */
             self->next_active = NULL;
         }
@@ -236,6 +252,10 @@ kb_rpi2_Context_start(kb_rpi2_Context *const self)
     /* Start looping */
     self->looping = true;
 
+    /* Iterator related variables */
+    kb_utils_DenseSetIter  iter;
+    kb_utils_DenseSetItem *item;
+
     /* Enter main loop */
     while (self->looping)
     {
@@ -244,9 +264,8 @@ kb_rpi2_Context_start(kb_rpi2_Context *const self)
             if ((error = self->on_cycle_begin(self, self->curr_active)))
                 return error;
 
-        /*
-         * TODO: for pin in events: if pin.signaled: pin.on_signal()
-         */
+        /* Get signals from pins */
+        kb_rpi2_Event_listen_all_pins(self->curr_active);
 
         /* If there is an `on_cycle_end` callback, call it */
         if (self->on_cycle_end)
@@ -268,6 +287,9 @@ kb_rpi2_Context_start(kb_rpi2_Context *const self)
 
             /* Disable all sensors for current event */
             kb_rpi2_Event_disable_all_sensors(self->curr_active);
+
+            /* Enable all sensors for next event */
+            kb_rpi2_Event_enable_all_sensors(self->next_active);
 
             /* Actiavte next event, clear schedule */
             self->curr_active = self->next_active;

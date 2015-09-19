@@ -2,8 +2,8 @@
 ** INFO */
 
 /* Header guard */
-#ifndef __KB_RPI2_PINS_H_15777440527397069__
-#define __KB_RPI2_PINS_H_15777440527397069__
+#ifndef KB_RPI2_PINS_H_15777440527397069
+#define KB_RPI2_PINS_H_15777440527397069 1
 
 
 /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
@@ -18,7 +18,7 @@
 
 
 /*----------------------------------------------------------------------------*/
-const char *const kb_rpi2_PIN_LAYOUT;
+extern const char *const kb_rpi2_PIN_LAYOUT;
 
 
 /*----------------------------------------------------------------------------*/
@@ -32,9 +32,11 @@ const char *const kb_rpi2_PIN_LAYOUT;
     kb_ALLOC_FAIL:
         if allocation of the new Pin object failed */
 kb_Error
-kb_rpi2_Pin_new(kb_rpi2_Pin    **const self,
-                kb_rpi2_PinId          pin_id,
-                kb_rpi2_Sensor  *const sensor);
+kb_rpi2_Pin_new(kb_rpi2_Pin      **const self,
+                kb_rpi2_PinId            pin_id,
+                kb_rpi2_PinRole          pin_role,
+                kb_rpi2_PinState         pin_state,
+                kb_rpi2_Sensor    *const sensor);
 /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 /* Returns:
     kb_OKAY:
@@ -46,9 +48,11 @@ kb_rpi2_Pin_new(kb_rpi2_Pin    **const self,
     kb_ALLOC_FAIL:
         if allocation of the new Pin object failed */
 kb_Error
-kb_rpi2_Pin_ini(kb_rpi2_Pin    *const self,
-                kb_rpi2_PinId         pin_id,
-                kb_rpi2_Sensor *const sensor);
+kb_rpi2_Pin_ini(kb_rpi2_Pin      *const self,
+                kb_rpi2_PinId           pin_id,
+                kb_rpi2_PinRole         pin_role,
+                kb_rpi2_PinState        pin_state,
+                kb_rpi2_Sensor   *const sensor);
 /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 /* Returns:
     kb_OKAY:
@@ -90,6 +94,9 @@ kb_rpi2_Pin_callback_args(kb_rpi2_Pin      *const  self,
         if first argument is a NULL pointer */
 kb_Error
 kb_rpi2_Pin_reset(kb_rpi2_Pin *const self);
+/*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+kb_Error
+kb_rpi2_Pin_listen(kb_rpi2_Pin *const self);
 /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 /* Returns:
     kb_OKAY:
@@ -152,4 +159,4 @@ kb_Error
 kb_rpi2_Pin_unbind_on_low(kb_rpi2_Pin *const self);
 
 
-#endif /* __KB_RPI2_PINS_H_15777440527397069__ */
+#endif /* KB_RPI2_PINS_H_15777440527397069 */

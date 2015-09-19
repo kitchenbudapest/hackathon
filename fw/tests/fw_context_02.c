@@ -8,7 +8,8 @@
     const : stdout */
 #include <stdlib.h>
 /*  const : EXIT_SUCCESS
-            EXIT_FAILURE */
+            EXIT_FAILURE
+    func  : exit */
 
 /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 /* Include kibu headers */
@@ -16,6 +17,9 @@
 /*  type  : kb_Error
     const : kb_OKAY
     func  : kb_Error_str */
+#define KB_ERROR_TESTING 1
+#include <kb/utils/error_testing.h>
+/*  macro : KB_ERROR_TRY */
 #include <kb/rpi2/enums.h>
 /*  const : kb_rpi2_PIN1
             kb_rpi2_PIN2
@@ -51,26 +55,6 @@
             kb_rpi2_sensors_FourKeys_del
             kb_rpi2_sensors_FourKeys_bind_on_key_4 */
 
-/*----------------------------------------------------------------------------*/
-#define STRINGIFY_(V) #V
-#define STRINGIFY(V)  STRINGIFY_(V)
-#define TRY(F)                                                                 \
-    do                                                                         \
-    {                                                                          \
-        if ((error = F))                                                       \
-        {                                                                      \
-            fputs("In file: ", stdout);                                        \
-            fputs(__FILE__, stdout);                                           \
-            fputs(", at line: ", stdout);                                      \
-            puts(STRINGIFY(__LINE__));                                         \
-            puts("==> " #F);                                                   \
-            fputs("==> Returned: ", stdout);                                   \
-            puts(kb_Error_str(error));                                         \
-            return EXIT_FAILURE;                                               \
-        }                                                                      \
-    }                                                                          \
-    while (0)
-
 
 /*----------------------------------------------------------------------------*/
 kb_Error
@@ -79,7 +63,7 @@ on_cycle_end(kb_rpi2_Context *const context,
 {
     (void)event;
     puts("Context.on_cycle_end()");
-    kb_rpi2_Context_stop(context);
+    KB_ERROR_TRY(kb_rpi2_Context_stop(context));
     return kb_OKAY;
 }
 
@@ -91,7 +75,7 @@ on_cycle_begin(kb_rpi2_Context *const context,
 {
     (void)event;
     puts("Context.on_cycle_begin()");
-    kb_rpi2_Context_bind_on_cycle_end(context, on_cycle_end);
+    KB_ERROR_TRY(kb_rpi2_Context_bind_on_cycle_end(context, on_cycle_end));
     return kb_OKAY;
 }
 
@@ -154,44 +138,46 @@ on_on(kb_rpi2_sensors_LED *const led,
 int
 main(void)
 {
-    kb_Error                  error;
     kb_rpi2_Context          *context;
     kb_rpi2_Event            *event;
     kb_rpi2_sensors_LED      *led;
     kb_rpi2_sensors_FourKeys *four_keys;
 
+    puts(">>> Starting...");
+
     /* Create "actors" */
-    TRY(kb_rpi2_Context_new(&context));
-    TRY(kb_rpi2_Event_new(&event, context));
-    TRY(kb_rpi2_sensors_LED_new(&led, event, kb_rpi2_PIN1));
-    TRY(kb_rpi2_sensors_FourKeys_new(&four_keys,
-                                     event,
-                                     kb_rpi2_PIN2,
-                                     kb_rpi2_PIN3,
-                                     kb_rpi2_PIN4,
-                                     kb_rpi2_PIN5,
-                                     kb_rpi2_PIN6));
+    KB_ERROR_TRY(kb_rpi2_Context_new(&context));
+    KB_ERROR_TRY(kb_rpi2_Event_new(&event, context));
+    KB_ERROR_TRY(kb_rpi2_sensors_LED_new(&led, event, kb_rpi2_PIN1));
+    KB_ERROR_TRY(kb_rpi2_sensors_FourKeys_new(&four_keys,
+                                              event,
+                                              kb_rpi2_PIN2,
+                                              kb_rpi2_PIN3,
+                                              kb_rpi2_PIN4,
+                                              kb_rpi2_PIN5,
+                                              kb_rpi2_PIN6));
 
     /* Bind callbacks */
-    TRY(kb_rpi2_sensors_FourKeys_bind_on_key_3(four_keys, on_key_3));
-    TRY(kb_rpi2_Sensor_bind_on_enable((kb_rpi2_Sensor *const)four_keys, on_enable));
+    KB_ERROR_TRY(kb_rpi2_sensors_FourKeys_bind_on_key_3(four_keys, on_key_3));
+    KB_ERROR_TRY(kb_rpi2_Sensor_bind_on_enable((kb_rpi2_Sensor *const)four_keys,
+                                               on_enable));
 
-    TRY(kb_rpi2_sensors_LED_bind_on_on(led, on_on));
+    KB_ERROR_TRY(kb_rpi2_sensors_LED_bind_on_on(led, on_on));
 
-    TRY(kb_rpi2_Context_bind_on_cycle_begin(context, on_cycle_begin));
-    TRY(kb_rpi2_Context_bind_on_stop(context, on_stop));
+    KB_ERROR_TRY(kb_rpi2_Context_bind_on_cycle_begin(context, on_cycle_begin));
+    KB_ERROR_TRY(kb_rpi2_Context_bind_on_stop(context, on_stop));
 
     /* Enter event loop */
-    TRY(kb_rpi2_Event_activate(event));
-    TRY(kb_rpi2_Context_start(context));
+    KB_ERROR_TRY(kb_rpi2_Event_activate(event));
+    KB_ERROR_TRY(kb_rpi2_Context_start(context));
 
     /* Clean up */
-    TRY(kb_rpi2_sensors_LED_del(&led));
-    TRY(kb_rpi2_sensors_FourKeys_del(&four_keys));
-    TRY(kb_rpi2_Event_del(&event));
-    TRY(kb_rpi2_Context_del(&context));
+    KB_ERROR_TRY(kb_rpi2_sensors_LED_del(&led));
+    KB_ERROR_TRY(kb_rpi2_sensors_FourKeys_del(&four_keys));
+    KB_ERROR_TRY(kb_rpi2_Event_del(&event));
+    KB_ERROR_TRY(kb_rpi2_Context_del(&context));
 
     /* Should not reach this point */
-    puts("Exiting now...");
+    puts("<<< Exiting...");
     return EXIT_SUCCESS;
 }

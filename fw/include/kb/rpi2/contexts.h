@@ -2,8 +2,8 @@
 ** INFO */
 
 /* Header guard */
-#ifndef __KB_RPI2_CONTEXTS_H_4121997444361183__
-#define __KB_RPI2_CONTEXTS_H_4121997444361183__
+#ifndef KB_RPI2_CONTEXTS_H_4121997444361183
+#define KB_RPI2_CONTEXTS_H_4121997444361183 1
 
 
 /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
@@ -192,4 +192,4 @@ kb_rpi2_Context_bind_on_exit(kb_rpi2_Context *const self,
                              kb_Error (*on_exit)(kb_rpi2_Context *const,
                                                  kb_rpi2_Event   *const));
 
-#endif /* __KB_RPI2_CONTEXTS_H_4121997444361183__ */
+#endif /* KB_RPI2_CONTEXTS_H_4121997444361183 */

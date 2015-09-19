@@ -110,7 +110,8 @@ def wrapper():
     INPUT_DIR  = '.'
     OUTPUT_DIR = join('build', 'kbjs')
     TARGET     = 'kbjs'
-    SOURCE     = ['kbjs.c']
+    SOURCE     = ['kbjs.c',
+                  join('src', 'contexts.c')]
 
     # C pre-processor path (include)
     CPPPATH = ['.',
@@ -147,5 +148,7 @@ def wrapper():
 
 #------------------------------------------------------------------------------#
 # Create build options
-duktape()
-wrapper()
+if 'duktape' in COMMAND_LINE_TARGETS:
+    duktape()
+else:
+    wrapper()

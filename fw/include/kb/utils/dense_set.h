@@ -2,8 +2,8 @@
 ** INFO */
 
 /* Header guard */
-#ifndef __KB_UTILS_DENSE_SET_H_32497603607726133__
-#define __KB_UTILS_DENSE_SET_H_32497603607726133__
+#ifndef KB_UTILS_DENSE_SET_H_32497603607726133
+#define KB_UTILS_DENSE_SET_H_32497603607726133 1
 
 /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 /* Include standard headers */
@@ -145,6 +145,17 @@ kb_utils_DenseSetIter_new(kb_utils_DenseSetIter **const self,
     kb_OKAY:
         if no error occured
     kb_SELF_IS_NULL:
+        if first argument is a NULL pointer
+    kb_ARG2_IS_NULL:
+        if second argument is a NULL pointer */
+kb_Error
+kb_utils_DenseSetIter_ini(kb_utils_DenseSetIter *const self,
+                          kb_utils_DenseSet     *const dense_set);
+/*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+/* Returns:
+    kb_OKAY:
+        if no error occured
+    kb_SELF_IS_NULL:
         if first argument is a NULL pointer */
 kb_Error
 kb_utils_DenseSetIter_del(kb_utils_DenseSetIter **const self);
@@ -161,4 +172,4 @@ kb_utils_DenseSetIter_next(kb_utils_DenseSetIter  *const self,
                            kb_utils_DenseSetItem **const item);
 
 
-#endif /* __KB_UTILS_DENSE_SET_H_32497603607726133__ */
+#endif /* KB_UTILS_DENSE_SET_H_32497603607726133 */

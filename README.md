@@ -7,6 +7,8 @@
 > feel free to browse or even contribute to it, now that you know what you are
 > dealing with ;)
 
+![Kibu Hackathon](fw/artwork/box-lid.png?raw=true)
+
 KIBU HACKATHON FRAMEWORK
 ========================
 
@@ -244,3 +246,17 @@ MyT_new(MyT **const self)
     return OKAY;
 }
 ```
+
+Warnings:
+---------
+
+- Do not call in any circumstances `kb_rpi2_Context_fin` or
+  `kb_rpi2_Context_del` methods inside a callback/the event loop, because that
+  will crash your application in a mysterious way.
+
+- Do not call `kb_rpi2_Pin_fin` or `kb_rpi2_Pin_del` methods when you are
+  implementing a new `kb_rpi2_Sensor` type, because non of the `kb_rpi2_Pin`
+  objects were created by you, and they will be *deleted* by the system at the
+  correct time.
+
+- Do not put `;` after the inherit-members-macros

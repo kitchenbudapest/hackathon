@@ -12,6 +12,11 @@ from scons_targets import (dense_set,
                            fw_context_01,
                            fw_context_02)
 
+#------------------------------------------------------------------------------#
+# If developer mode passed ($ scons devel=yes)
+DEVEL = ARGUMENTS.get('devel', False)
+
+
 # Essential variables
 all_warn   = False
 input_dir  = 'src'
@@ -36,7 +41,7 @@ GCCFLAGS = ['fdiagnostics-color=always']
 # CLANG specific  compiler flags
 CLANGFLAGS = ['fcolor-diagnostics',
               'fmacro-backtrace-limit=0']
-if all_warn:
+if DEVEL:
     CLANGFLAGS.append('Weverything')
 
 

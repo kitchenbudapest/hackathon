@@ -2,8 +2,8 @@
 ** INFO */
 
 /* Header guard */
-#ifndef __KB_ERROR_H_8506093783091019__
-#define __KB_ERROR_H_8506093783091019__
+#ifndef KB_ERROR_H_8506093783091019
+#define KB_ERROR_H_8506093783091019 1
 
 
 /*----------------------------------------------------------------------------*/
@@ -50,5 +50,4 @@ typedef enum
 const char *
 kb_Error_str(kb_Error error);
 
-
-#endif /* __KB_ERROR_H_8506093783091019__ */
+#endif /* KB_ERROR_H_8506093783091019 */

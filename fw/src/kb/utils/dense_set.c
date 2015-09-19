@@ -255,16 +255,35 @@ kb_utils_DenseSetIter_new(kb_utils_DenseSetIter **const self,
         return kb_ARG2_IS_NULL;
 
     /* Create new Iter object */
-    kb_utils_DenseSetIter *dense_set_iter;
-    if (!(dense_set_iter = malloc(sizeof(kb_utils_DenseSetIter))))
+    kb_utils_DenseSetIter *iter;
+    if (!(iter = malloc(sizeof(kb_utils_DenseSetIter))))
         return kb_ALLOC_FAIL;
 
-    /* Set values */
-    dense_set_iter->dense_set = dense_set;
-    dense_set_iter->index     = 0;
+    /* Initialize instance */
+    kb_utils_DenseSetIter_ini(iter, dense_set);
 
     /* Return new Iter object */
-    *self = dense_set_iter;
+    *self = iter;
+
+    /* If everything went fine */
+    return kb_OKAY;
+}
+
+
+/*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+kb_Error
+kb_utils_DenseSetIter_ini(kb_utils_DenseSetIter *const self,
+                          kb_utils_DenseSet     *const dense_set)
+{
+    /* If any of the arguments is NULL */
+    if (!self)
+        return kb_SELF_IS_NULL;
+    else if (!dense_set)
+        return kb_ARG2_IS_NULL;
+
+    /* Set values */
+    self->dense_set = dense_set;
+    self->index     = 0;
 
     /* If everything went fine */
     return kb_OKAY;

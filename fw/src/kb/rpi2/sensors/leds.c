@@ -21,7 +21,14 @@
             kb_rpi2_Sensor_fin
             kb_rpi2_Sensor_get_pin */
 #include <kb/rpi2/pins.h>
-/*  type  : kb_rpi2_Pin
+/*  const : kb_rpi2_Pin_OUTPUT
+            kb_rpi2_Pin_INPUT
+            kb_rpi2_Pin_HIGH
+            kb_rpi2_Pin_LOW
+    type  : kb_rpi2_Pin
+            kb_rpi2_PinId
+            kb_rpi2_PinRole
+            kb_rpi2_PinState
     func  : kb_rpi2_Pin_set_high
             kb_rpi2_Pin_set_low */
 #include <kb/rpi2/sensors/leds.h>
@@ -33,6 +40,16 @@
 enum pin_indices
 {
     PIN1 = 0,
+};
+/* Role values */
+static kb_rpi2_PinRole pin_roles[] =
+{
+    kb_rpi2_Pin_OUTPUT,
+};
+/* Initial states */
+static kb_rpi2_PinState pin_states[] =
+{
+    kb_rpi2_Pin_LOW,
 };
 
 
@@ -89,7 +106,9 @@ kb_rpi2_sensors_LED_ini(kb_rpi2_sensors_LED *const self,
     if ((error = kb_rpi2_Sensor_ini((kb_rpi2_Sensor *const)self,
                                     event,
                                     (size_t)1,
-                                    &pin_id)))
+                                    &pin_id,
+                                    pin_roles,
+                                    pin_states)))
         return error;
 
     /* Initialize data */

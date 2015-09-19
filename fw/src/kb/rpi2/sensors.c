@@ -23,16 +23,23 @@
 #include <kb/rpi2/events.h>
 /*  macro : KB_RPI2_PINS_COUNT
     type  : kb_rpi2_Event */
+#include <kb/rpi2/pins.h>
+/*  type  : kb_rpi2_Pin
+            kb_rpi2_PinId
+            kb_rpi2_PinRole
+            kb_rpi2_PinState */
 #include <kb/rpi2/sensors.h>
 /*  type  : kb_rpi2_Sensor */
 
 
 /*----------------------------------------------------------------------------*/
 kb_Error
-kb_rpi2_Sensor_new(kb_rpi2_Sensor **const self,
-                   kb_rpi2_Event   *const event,
-                   size_t                 pin_ids_count,
-                   kb_rpi2_PinId   *const pin_ids)
+kb_rpi2_Sensor_new(kb_rpi2_Sensor   **const self,
+                   kb_rpi2_Event     *const event,
+                   size_t                   pins_count,
+                   kb_rpi2_PinId     *const pin_ids,
+                   kb_rpi2_PinRole   *const pin_roles,
+                   kb_rpi2_PinState  *const pin_states)
 {
     /* If `self` is NULL */
     if (!self)
@@ -54,7 +61,12 @@ kb_rpi2_Sensor_new(kb_rpi2_Sensor **const self,
 
     /* Initialize new instance */
     kb_Error error;
-    if ((error = kb_rpi2_Sensor_ini(sensor, event, pin_ids_count, pin_ids)))
+    if ((error = kb_rpi2_Sensor_ini(sensor,
+                                    event,
+                                    pins_count,
+                                    pin_ids,
+                                    pin_roles,
+                                    pin_states)))
     {
         free(sensor);
         return error;
@@ -68,10 +80,12 @@ kb_rpi2_Sensor_new(kb_rpi2_Sensor **const self,
 
 /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 kb_Error
-kb_rpi2_Sensor_ini(kb_rpi2_Sensor *const self,
-                   kb_rpi2_Event  *const event,
-                   size_t                pin_ids_count,
-                   kb_rpi2_PinId  *const pin_ids)
+kb_rpi2_Sensor_ini(kb_rpi2_Sensor   *const self,
+                   kb_rpi2_Event    *const event,
+                   size_t                  pins_count,
+                   kb_rpi2_PinId    *const pin_ids,
+                   kb_rpi2_PinRole  *const pin_roles,
+                   kb_rpi2_PinState *const pin_states)
 {
     /* If any of the arguments is NULL */
     if (!self)
@@ -82,29 +96,33 @@ kb_rpi2_Sensor_ini(kb_rpi2_Sensor *const self,
         return kb_ARG4_IS_NULL;
 
     /* If too many `pin_id`s passed */
-    if (pin_ids_count > KB_RPI2_PINS_COUNT)
+    if (pins_count > KB_RPI2_PINS_COUNT)
         return kb_TOO_MANY_PINS_USED;
 
     /* Create storage for `pin_id`s */
-    if (!(self->pin_ids = malloc(sizeof(kb_rpi2_PinId)*pin_ids_count)))
+    if (!(self->pin_ids = malloc(sizeof(kb_rpi2_PinId)*pins_count)))
         return kb_ALLOC_FAIL;
 
     /* Initialize instance as DenseSetItem */
     kb_utils_DenseSetItem_ini((kb_utils_DenseSetItem *const)self);
 
     /* Store static data */
-    self->pin_ids_count = pin_ids_count;
-    self->event         = event;
-    self->state         = kb_rpi2_Sensor_DISABLED;
-    self->on_enable     = NULL;
-    self->on_disable    = NULL;
+    self->pins_count = pins_count;
+    self->event      = event;
+    self->state      = kb_rpi2_Sensor_DISABLED;
+    self->on_enable  = NULL;
+    self->on_disable = NULL;
 
     /* Store `pin_id`s and "reserve" pins */
     kb_Error error;
-    for (size_t i=0; i<pin_ids_count; i++)
+    for (size_t i=0; i<pins_count; i++)
     {
         self->pin_ids[i] = pin_ids[i];
-        if ((error = kb_rpi2_Event_use_pin(event, pin_ids[i], self)))
+        if ((error = kb_rpi2_Event_use_pin(event,
+                                           pin_ids[i],
+                                           pin_roles[i],
+                                           pin_states[i],
+                                           self)))
             return error;
     }
 
@@ -125,7 +143,7 @@ kb_rpi2_Sensor_fin(kb_rpi2_Sensor *const self)
         return kb_SELF_IS_NULL;
 
     /* Release pins */
-    for (size_t i=0; i<self->pin_ids_count; i++)
+    for (size_t i=0; i<self->pins_count; i++)
         kb_rpi2_Event_drop_pin(self->event, self->pin_ids[i]);
 
     /* Break the connection */
@@ -204,7 +222,7 @@ kb_rpi2_Sensor_enable(kb_rpi2_Sensor *const self)
             break;
 
         /* If sensor already enabled */
-        default:
+        case kb_rpi2_Sensor_ENABLED:
             break;
     }
 
@@ -238,7 +256,7 @@ kb_rpi2_Sensor_disable(kb_rpi2_Sensor *const self)
             break;
 
         /* If sensor already disabled */
-        default:
+        case kb_rpi2_Sensor_DISABLED:
             break;
     }
 
@@ -329,8 +347,32 @@ kb_rpi2_Sensor_get_pin(kb_rpi2_Sensor  *const self,
     else if (!pin)
         return kb_ARG2_IS_NULL;
 
-    if (pin_index >= self->pin_ids_count)
+    if (pin_index >= self->pins_count)
         return kb_PIN_INDEX_IS_OUT_OF_RANGE;
 
     return kb_rpi2_Event_get_pin(self->event, self->pin_ids[pin_index], pin);
+}
+
+
+/*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+kb_Error
+kb_rpi2_Sensor_listen_all_pins(kb_rpi2_Sensor *const self)
+{
+    /* If `self` is NULL */
+    if (!self)
+        return kb_SELF_IS_NULL;
+    /* If sensor is currently inactive */
+    else if (self->state == kb_rpi2_Sensor_DISABLED)
+        return kb_OKAY;
+
+    /* Go through all pins and listen to them */
+    kb_rpi2_Pin *pin;
+    for (size_t i=0; i<self->pins_count; i++)
+    {
+        kb_rpi2_Event_get_pin(self->event, self->pin_ids[i], &pin);
+        kb_rpi2_Pin_listen(pin);
+    }
+
+    /* If everything went fine */
+    return kb_OKAY;
 }

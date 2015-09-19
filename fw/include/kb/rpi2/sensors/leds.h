@@ -2,8 +2,8 @@
 ** INFO */
 
 /* Header guard */
-#ifndef __KB_RPI2_SENSORS_LEDS_H_8184762887585486__
-#define __KB_RPI2_SENSORS_LEDS_H_8184762887585486__
+#ifndef KB_RPI2_SENSORS_LEDS_H_8184762887585486
+#define KB_RPI2_SENSORS_LEDS_H_8184762887585486 1
 
 
 /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
@@ -71,4 +71,4 @@ kb_Error
 kb_rpi2_sensors_LED_unbind_on_off(kb_rpi2_sensors_LED *const self);
 
 
-#endif /* __KB_RPI2_SENSORS_LEDS_H_8184762887585486__ */
+#endif /* KB_RPI2_SENSORS_LEDS_H_8184762887585486 */

@@ -21,7 +21,14 @@
 /*  type  : kb_rpi2_Event
             kb_rpi2_Context */
 #include <kb/rpi2/pins.h>
-/*  type  : kb_rpi2_Pin
+/*  const : kb_rpi2_Pin_OUTPUT
+            kb_rpi2_Pin_INPUT
+            kb_rpi2_Pin_HIGH
+            kb_rpi2_Pin_LOW
+    type  : kb_rpi2_Pin
+            kb_rpi2_PinId
+            kb_rpi2_PinRole
+            kb_rpi2_PinState
     func  : kb_rpi2_Pin_bind_on_high */
 #include <kb/rpi2/sensors.h>
 /*  type  : kb_rpi2_Sensor
@@ -41,6 +48,24 @@ enum pin_indices
     PIN_COL2,
     PIN_COL3,
     PIN_COL4,
+};
+/* Role values */
+static kb_rpi2_PinRole pin_roles[] =
+{
+    kb_rpi2_Pin_OUTPUT,
+    kb_rpi2_Pin_INPUT,
+    kb_rpi2_Pin_INPUT,
+    kb_rpi2_Pin_INPUT,
+    kb_rpi2_Pin_INPUT,
+};
+/* Initial states */
+static kb_rpi2_PinState pin_states[] =
+{
+    kb_rpi2_Pin_LOW,
+    kb_rpi2_Pin_HIGH,
+    kb_rpi2_Pin_HIGH,
+    kb_rpi2_Pin_HIGH,
+    kb_rpi2_Pin_HIGH,
 };
 
 
@@ -152,7 +177,9 @@ kb_rpi2_sensors_FourKeys_ini(kb_rpi2_sensors_FourKeys *const self,
     if ((error = kb_rpi2_Sensor_ini((kb_rpi2_Sensor *const)self,
                                     event,
                                     (sizeof pin_ids)/sizeof(kb_rpi2_PinId),
-                                    pin_ids)))
+                                    pin_ids,
+                                    pin_roles,
+                                    pin_states)))
         return error;
 
     /* Set static values */

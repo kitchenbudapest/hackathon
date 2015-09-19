@@ -1,8 +1,16 @@
 /* INFO **
 ** INFO */
 
-#ifndef __KB_RPI2_ENUMS_H_6642544826973767__
-#define __KB_RPI2_ENUMS_H_6642544826973767__
+#ifndef KB_RPI2_ENUMS_H_6642544826973767
+#define KB_RPI2_ENUMS_H_6642544826973767 1
+
+/*----------------------------------------------------------------------------*/
+typedef enum
+{
+    kb_rpi2_Pin_OUTPUT,
+    kb_rpi2_Pin_INPUT,
+} kb_rpi2_PinRole;
+
 
 /*----------------------------------------------------------------------------*/
 typedef enum
@@ -37,4 +45,4 @@ typedef enum
 } kb_rpi2_SensorState;
 
 
-#endif /* __KB_RPI2_ENUMS_H_6642544826973767__ */
+#endif /* KB_RPI2_ENUMS_H_6642544826973767 */

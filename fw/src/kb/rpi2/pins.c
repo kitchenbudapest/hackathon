@@ -18,9 +18,12 @@
             kb_ARG3_IS_NULL
             kb_ALLOC_FAIL */
 #include <kb/rpi2/pins.h>
-/*  type  : kb_rpi2_PinState
+/*  type  : kb_rpi2_PinRole
+            kb_rpi2_PinState
             kb_rpi2_PinId
-    const : kb_rpi2_Pin_LOW
+    const : kb_rpi2_Pin_OUTPUT
+            kb_rpi2_Pin_INPUT
+            kb_rpi2_Pin_LOW
             kb_rpi2_Pin_HIGH */
 #include <kb/rpi2/sensors.h>
 /*  type  : kb_rpi2_Sensor */
@@ -82,20 +85,12 @@ const char *const kb_rpi2_PIN_LAYOUT =
 
 
 /*----------------------------------------------------------------------------*/
-/* Returns:
-    kb_OKAY:
-        if no error occured
-    kb_SELF_IS_NULL:
-        if first argument is a NULL pointer
-    kb_ARG3_IS_NULL:
-        if sensor argument is a NULL pointer
-    kb_ALLOC_FAIL:
-        if allocation of the new Pin object failed */
-
 kb_Error
-kb_rpi2_Pin_new(kb_rpi2_Pin    **const self,
-                kb_rpi2_PinId          pin_id,
-                kb_rpi2_Sensor  *const sensor)
+kb_rpi2_Pin_new(kb_rpi2_Pin      **const self,
+                kb_rpi2_PinId            pin_id,
+                kb_rpi2_PinRole          pin_role,
+                kb_rpi2_PinState         pin_state,
+                kb_rpi2_Sensor    *const sensor)
 {
     /* If `self` is NULL */
     if (!self)
@@ -115,7 +110,7 @@ kb_rpi2_Pin_new(kb_rpi2_Pin    **const self,
 
     /* Initialize new Pin object */
     kb_Error error;
-    if ((error = kb_rpi2_Pin_ini(pin, pin_id, sensor)))
+    if ((error = kb_rpi2_Pin_ini(pin, pin_id, pin_role, pin_state, sensor)))
     {
         free(pin);
         return error;
@@ -129,9 +124,11 @@ kb_rpi2_Pin_new(kb_rpi2_Pin    **const self,
 
 /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 kb_Error
-kb_rpi2_Pin_ini(kb_rpi2_Pin    *const self,
-                kb_rpi2_PinId         pin_id,
-                kb_rpi2_Sensor *const sensor)
+kb_rpi2_Pin_ini(kb_rpi2_Pin      *const self,
+                kb_rpi2_PinId           pin_id,
+                kb_rpi2_PinRole         pin_role,
+                kb_rpi2_PinState        pin_state,
+                kb_rpi2_Sensor   *const sensor)
 {
     /* If any of the arguments is NULL */
     if (!self)
@@ -143,10 +140,15 @@ kb_rpi2_Pin_ini(kb_rpi2_Pin    *const self,
     self->id      = pin_id;
 
     /*
-     * TODO: Get initial state from bcm2835 (somehow..)
+     * TODO: Check if pin_role is either OUTPUT or INPUT
      */
 
-    self->state   = kb_rpi2_Pin_LOW;
+    /*
+     * TODO: Check if pin_state is either LOW or HIGH
+     */
+
+    self->role    = pin_role;
+    self->state   = pin_state;
     self->sensor  = sensor;
     self->on_high = NULL;
     self->on_low  = NULL;
@@ -237,6 +239,64 @@ kb_rpi2_Pin_reset(kb_rpi2_Pin *const self)
      * TODO: Reset this pin via bcm2835
      *       Reset self->state as well
      */
+
+    /* If everything went fine */
+    return kb_OKAY;
+}
+
+
+/*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+kb_Error
+kb_rpi2_Pin_listen(kb_rpi2_Pin *const self)
+{
+    /* If `self` is NULL */
+    if (!self)
+        return kb_SELF_IS_NULL;
+
+    /* If signal changed */
+    /*
+     * TODO: get signal via bcm2835
+     */
+
+    /* If the state has been changed */
+    kb_rpi2_Event   *event;
+    kb_rpi2_Context *context;
+    switch (self->state)
+    {
+        /* If new state is HIGH */
+        case kb_rpi2_Pin_HIGH:
+            /* If there is an `on_high` callback, call it */
+            if (self->on_high)
+            {
+                /* Get `event` and `context` objects */
+                kb_rpi2_Sensor_callback_args(self->sensor,
+                                             &event,
+                                             &context);
+                /* Call callback */
+                self->on_high(self,
+                              self->sensor,
+                              event,
+                              context);
+            }
+            break;
+
+        /* If new state is LOW */
+        case kb_rpi2_Pin_LOW:
+            /* If there is an `on_high` callback, call it */
+            if (self->on_low)
+            {
+                /* Get `event` and `context` objects */
+                kb_rpi2_Sensor_callback_args(self->sensor,
+                                             &event,
+                                             &context);
+                /* Call callback */
+                self->on_low(self,
+                             self->sensor,
+                             event,
+                             context);
+            }
+            break;
+    }
 
     /* If everything went fine */
     return kb_OKAY;

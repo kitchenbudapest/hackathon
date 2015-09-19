@@ -35,9 +35,12 @@
     type  : kb_rpi2_Event */
 #include <kb/rpi2/sensors.h>
 /*  type  : kb_rpi2_Sensor
-    func  : kb_rpi2_Sensor_disable */
+    func  : kb_rpi2_Sensor_disable
+            kb_rpi2_Sensor_listen_all_pins */
 #include <kb/rpi2/pins.h>
 /*  type  : kb_rpi2_Pin
+            kb_rpi2_PinId
+            kb_rpi2_PinRole
     func  : kb_rpi2_Pin_new
             kb_rpi2_Pin_del
             kb_rpi2_Pin_set_high
@@ -196,9 +199,11 @@ kb_rpi2_Event_activate(kb_rpi2_Event *const self)
 
 /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 kb_Error
-kb_rpi2_Event_use_pin(kb_rpi2_Event  *const self,
-                      kb_rpi2_PinId         pin_id,
-                      kb_rpi2_Sensor *const sensor)
+kb_rpi2_Event_use_pin(kb_rpi2_Event    *const self,
+                      kb_rpi2_PinId           pin_id,
+                      kb_rpi2_PinRole         pin_role,
+                      kb_rpi2_PinState        pin_state,
+                      kb_rpi2_Sensor   *const sensor)
 {
     /* If any of the arguments iis NULL */
     if (!self)
@@ -217,13 +222,12 @@ kb_rpi2_Event_use_pin(kb_rpi2_Event  *const self,
     if (self->pins[pin_id])
         return kb_PIN_ALREADY_USED;
 
-    /* Store `sensor` */
-    if (kb_utils_DenseSet_push(self->sensors,
-                               (kb_utils_DenseSetItem *const)sensor))
-        return kb_ALLOC_FAIL;
-
     /* Create new Pin object */
-    return kb_rpi2_Pin_new(self->pins + pin_id, pin_id, sensor);
+    return kb_rpi2_Pin_new(self->pins + pin_id,
+                           pin_id,
+                           pin_role,
+                           pin_state,
+                           sensor);
 }
 
 
@@ -267,6 +271,33 @@ kb_rpi2_Event_get_pin(kb_rpi2_Event  *const self,
 
     /* Redirect pointer to a Pin object */
     *pin = self->pins[pin_id];
+
+    /* If everything went fine */
+    return kb_OKAY;
+}
+
+
+/*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+kb_Error
+kb_rpi2_Event_listen_all_pins(kb_rpi2_Event *const self)
+{
+    /* If `self` is NULL */
+    if (!self)
+        return kb_SELF_IS_NULL;
+
+    kb_Error               error;
+    kb_utils_DenseSetIter  iter;
+    kb_utils_DenseSetItem *item;
+
+    /* Create iterator */
+    if ((error = kb_utils_DenseSetIter_ini(&iter, self->sensors)))
+        return error;
+
+    /* Go through sensors and listen to their pins */
+    for (kb_utils_DenseSetIter_next(&iter, &item);
+         item;
+         kb_utils_DenseSetIter_next(&iter, &item))
+            kb_rpi2_Sensor_listen_all_pins((kb_rpi2_Sensor *const)item);
 
     /* If everything went fine */
     return kb_OKAY;
@@ -322,12 +353,40 @@ kb_rpi2_Event_unbind_sensor(kb_rpi2_Event  *const self,
 
 /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 kb_Error
+kb_rpi2_Event_enable_all_sensors(kb_rpi2_Event *const self)
+{
+    /* Local variables */
+    kb_Error               error;
+    kb_utils_DenseSetIter  iter;
+    kb_utils_DenseSetItem *item;
+
+    /* If `self` is NULL */
+    if (!self)
+        return kb_SELF_IS_NULL;
+
+    /* Create new Iterator object */
+    if ((error = kb_utils_DenseSetIter_ini(&iter, self->sensors)))
+        return error;
+
+    /* Iterate through all bound sensors and disable them */
+    for (kb_utils_DenseSetIter_next(&iter, &item);
+         item;
+         kb_utils_DenseSetIter_next(&iter, &item))
+            kb_rpi2_Sensor_enable((kb_rpi2_Sensor *const)item);
+
+    /* If everything went fine */
+    return kb_OKAY;
+}
+
+
+/*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+kb_Error
 kb_rpi2_Event_disable_all_sensors(kb_rpi2_Event *const self)
 {
     /* Local variables */
     kb_Error               error;
     kb_utils_DenseSetIter *iter;
-    kb_utils_DenseSetItem *sensor;
+    kb_utils_DenseSetItem *item;
 
     /* If `self` is NULL */
     if (!self)
@@ -337,14 +396,11 @@ kb_rpi2_Event_disable_all_sensors(kb_rpi2_Event *const self)
     if ((error = kb_utils_DenseSetIter_new(&iter, self->sensors)))
         return error;
 
-    /* Iterate through all bound sensors */
-    kb_utils_DenseSetIter_next(iter, &sensor);
-    while (sensor)
-    {
-        /* Disable each sensor */
-        kb_rpi2_Sensor_disable((kb_rpi2_Sensor *const)sensor);
-        kb_utils_DenseSetIter_next(iter, &sensor);
-    }
+    /* Iterate through all bound sensors and disable them */
+    for (kb_utils_DenseSetIter_next(iter, &item);
+         item;
+         kb_utils_DenseSetIter_next(iter, &item))
+            kb_rpi2_Sensor_disable((kb_rpi2_Sensor *const)item);
 
     /* Delete Iterator object */
     kb_utils_DenseSetIter_del(&iter);
@@ -352,3 +408,4 @@ kb_rpi2_Event_disable_all_sensors(kb_rpi2_Event *const self)
     /* If everything went fine */
     return kb_OKAY;
 }
+
