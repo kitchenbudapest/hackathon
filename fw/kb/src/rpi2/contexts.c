@@ -252,10 +252,6 @@ kb_rpi2_Context_start(kb_rpi2_Context *const self)
     /* Start looping */
     self->looping = true;
 
-    /* Iterator related variables */
-    kb_utils_DenseSetIter  iter;
-    kb_utils_DenseSetItem *item;
-
     /* Enter main loop */
     while (self->looping)
     {
@@ -357,83 +353,31 @@ kb_rpi2_Context_exit(kb_rpi2_Context *const self)
 
 
 /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-kb_Error
-kb_rpi2_Context_bind_on_start(kb_rpi2_Context *const self,
-                              kb_Error (*on_start)(kb_rpi2_Context *const,
-                                                   kb_rpi2_Event   *const))
-{
-    /* If any of the arguments is NULL */
-    if (!self)
-        return kb_SELF_IS_NULL;
-    else if (!on_start)
-        return kb_ARG2_IS_NULL;
-
-    /* Set callback */
-    self->on_start = on_start;
-
-    /* If everything went fine */
-    return kb_OKAY;
-}
-
-
+#define BIND_FUNCTION(FUNC)                                                    \
+    kb_Error                                                                   \
+    kb_rpi2_Context_bind_##FUNC(kb_rpi2_Context *const self,                   \
+                                kb_Error (*FUNC)(kb_rpi2_Context *const,       \
+                                                 kb_rpi2_Event   *const))      \
+    {                                                                          \
+        /* If any of the arguments is NULL */                                  \
+        if (!self)                                                             \
+            return kb_SELF_IS_NULL;                                            \
+        else if (!FUNC)                                                        \
+            return kb_ARG2_IS_NULL;                                            \
+                                                                               \
+        /* Set callback */                                                     \
+        self->FUNC = FUNC;                                                     \
+                                                                               \
+        /* If everything went fine */                                          \
+        return kb_OKAY;                                                        \
+    }
 /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-kb_Error
-kb_rpi2_Context_bind_on_stop(kb_rpi2_Context *const self,
-                             kb_Error (*on_stop)(kb_rpi2_Context *const,
-                                                 kb_rpi2_Event   *const))
-{
-    /* If any of the arguments is NULL */
-    if (!self)
-        return kb_SELF_IS_NULL;
-    else if (!on_stop)
-        return kb_ARG2_IS_NULL;
-
-    /* Set callback */
-    self->on_stop = on_stop;
-
-    /* If everything went fine */
-    return kb_OKAY;
-}
-
-
-/*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-kb_Error
-kb_rpi2_Context_bind_on_cycle_begin(kb_rpi2_Context *const self,
-                                    kb_Error (*on_cycle_begin)(kb_rpi2_Context *const,
-                                                               kb_rpi2_Event   *const))
-{
-    /* If any of the arguments is NULL */
-    if (!self)
-        return kb_SELF_IS_NULL;
-    else if (!on_cycle_begin)
-        return kb_ARG2_IS_NULL;
-
-    /* Set callback */
-    self->on_cycle_begin = on_cycle_begin;
-
-    /* If everything went fine */
-    return kb_OKAY;
-}
-
-
-/*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-kb_Error
-kb_rpi2_Context_bind_on_cycle_end(kb_rpi2_Context *const self,
-                                  kb_Error (*on_cycle_end)(kb_rpi2_Context *const,
-                                                           kb_rpi2_Event   *const))
-{
-    /* If any of the arguments is NULL */
-    if (!self)
-        return kb_SELF_IS_NULL;
-    else if (!on_cycle_end)
-        return kb_ARG2_IS_NULL;
-
-    /* Set callback */
-    self->on_cycle_end = on_cycle_end;
-
-    /* If everything went fine */
-    return kb_OKAY;
-}
+/* Create binding functions */
+BIND_FUNCTION(on_start)
+BIND_FUNCTION(on_stop)
+BIND_FUNCTION(on_cycle_begin)
+BIND_FUNCTION(on_cycle_end)
+BIND_FUNCTION(on_exit)
 
 
 /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
@@ -456,21 +400,27 @@ kb_rpi2_Context_bind_on_activate(kb_rpi2_Context *const self,
     return kb_OKAY;
 }
 
+
 /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-kb_Error
-kb_rpi2_Context_bind_on_exit(kb_rpi2_Context *const self,
-                             kb_Error (*on_exit)(kb_rpi2_Context *const,
-                                                 kb_rpi2_Event   *const))
-{
-    /* If any of the arguments is NULL */
-    if (!self)
-        return kb_SELF_IS_NULL;
-    else if (!on_exit)
-        return kb_ARG2_IS_NULL;
-
-    /* Set callback */
-    self->on_exit = on_exit;
-
-    /* If everything went fine */
-    return kb_OKAY;
-}
+#define UNBIND_FUNCTION(FUNC)                                                  \
+    kb_Error                                                                   \
+    kb_rpi2_Context_unbind_##FUNC(kb_rpi2_Context *const self)                 \
+    {                                                                          \
+        /* If `self` is NULL */                                                \
+        if (!self)                                                             \
+            return kb_SELF_IS_NULL;                                            \
+                                                                               \
+        /* Unset callback */                                                   \
+        self->FUNC = NULL;                                                     \
+                                                                               \
+        /* If everything went fine */                                          \
+        return kb_OKAY;                                                        \
+    }
+/*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+/* Create unbinding functions */
+UNBIND_FUNCTION(on_start)
+UNBIND_FUNCTION(on_stop)
+UNBIND_FUNCTION(on_cycle_begin)
+UNBIND_FUNCTION(on_cycle_end)
+UNBIND_FUNCTION(on_exit)
+UNBIND_FUNCTION(on_activate)

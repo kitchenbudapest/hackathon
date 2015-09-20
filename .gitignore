@@ -5,6 +5,7 @@
 .sconsign.dblite
 
 bins
+libs
 build
 duktape-*
 __pycache__

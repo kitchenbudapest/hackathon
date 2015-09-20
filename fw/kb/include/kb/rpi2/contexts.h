@@ -126,46 +126,17 @@ kb_rpi2_Context_exit(kb_rpi2_Context *const self);
         if first argument is a NULL pointer
     kb_ARG2_IS_NULL:
         if second argument is a NULL pointer */
-kb_Error
-kb_rpi2_Context_bind_on_start(kb_rpi2_Context *const self,
-                              kb_Error (*on_start)(kb_rpi2_Context *const,
-                                                   kb_rpi2_Event   *const));
-/*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-/* Returns:
-    kb_OKAY:
-        if no error occured
-    kb_SELF_IS_NULL:
-        if first argument is a NULL pointer
-    kb_ARG2_IS_NULL:
-        if second argument is a NULL pointer */
-kb_Error
-kb_rpi2_Context_bind_on_stop(kb_rpi2_Context *const self,
-                             kb_Error (*on_stop)(kb_rpi2_Context *const,
+#define KB_RPI2_CONTEXT_BIND_FUNCTION(FUNC)                                    \
+    kb_Error                                                                   \
+    kb_rpi2_Context_bind_##FUNC(kb_rpi2_Context *const self,                   \
+                                kb_Error (*FUNC)(kb_rpi2_Context *const,       \
                                                  kb_rpi2_Event   *const));
-/*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-/* Returns:
-    kb_OKAY:
-        if no error occured
-    kb_SELF_IS_NULL:
-        if first argument is a NULL pointer
-    kb_ARG2_IS_NULL:
-        if second argument is a NULL pointer */
-kb_Error
-kb_rpi2_Context_bind_on_cycle_begin(kb_rpi2_Context *const self,
-                                    kb_Error (*on_cycle_begin)(kb_rpi2_Context *const,
-                                                               kb_rpi2_Event   *const));
-/*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-/* Returns:
-    kb_OKAY:
-        if no error occured
-    kb_SELF_IS_NULL:
-        if first argument is a NULL pointer
-    kb_ARG2_IS_NULL:
-        if second argument is a NULL pointer */
-kb_Error
-kb_rpi2_Context_bind_on_cycle_end(kb_rpi2_Context *const self,
-                                  kb_Error (*on_cycle_end)(kb_rpi2_Context *const,
-                                                           kb_rpi2_Event   *const));
+KB_RPI2_CONTEXT_BIND_FUNCTION(on_start)
+KB_RPI2_CONTEXT_BIND_FUNCTION(on_stop)
+KB_RPI2_CONTEXT_BIND_FUNCTION(on_cycle_begin)
+KB_RPI2_CONTEXT_BIND_FUNCTION(on_cycle_end)
+KB_RPI2_CONTEXT_BIND_FUNCTION(on_exit)
+#undef KB_RPI2_CONTEXT_BIND_FUNCTION
 /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 /* Returns:
     kb_OKAY:
@@ -184,12 +155,17 @@ kb_rpi2_Context_bind_on_activate(kb_rpi2_Context *const self,
     kb_OKAY:
         if no error occured
     kb_SELF_IS_NULL:
-        if first argument is a NULL pointer
-    kb_ARG2_IS_NULL:
-        if second argument is a NULL pointer */
-kb_Error
-kb_rpi2_Context_bind_on_exit(kb_rpi2_Context *const self,
-                             kb_Error (*on_exit)(kb_rpi2_Context *const,
-                                                 kb_rpi2_Event   *const));
+        if first argument is a NULL pointer */
+#define KB_RPI2_CONTEXT_UNBIND_FUNCTION(FUNC)                                  \
+    kb_Error                                                                   \
+    kb_rpi2_Context_unbind_##FUNC(kb_rpi2_Context *const self);
+KB_RPI2_CONTEXT_UNBIND_FUNCTION(on_start)
+KB_RPI2_CONTEXT_UNBIND_FUNCTION(on_stop)
+KB_RPI2_CONTEXT_UNBIND_FUNCTION(on_cycle_begin)
+KB_RPI2_CONTEXT_UNBIND_FUNCTION(on_cycle_end)
+KB_RPI2_CONTEXT_UNBIND_FUNCTION(on_exit)
+KB_RPI2_CONTEXT_UNBIND_FUNCTION(on_activate)
+#undef KB_RPI2_CONTEXT_UNBIND_FUNCTION
+
 
 #endif /* KB_RPI2_CONTEXTS_H_4121997444361183 */

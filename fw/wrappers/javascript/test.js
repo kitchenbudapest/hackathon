@@ -5,9 +5,28 @@
 {
     'use strict';
 
-    print(kb.rpi2.Context);
-    print(Object.keys(kb.rpi2.Context));
-    print(new kb.rpi2.Context());
-    print(Object.keys(new kb.rpi2.Context()));
+    var context,
+        event1,
+        event2,
+        Context = kb.rpi2.Context,
+        Event   = kb.rpi2.Event;
 
+    context = new Context();
+    event1  = new Event(context);
+    event2  = new Event(context);
+
+    context.onCycleEnd = "hello, world!";
+
+    // context.onCycleEnd = function (c, e)
+    // {
+    //     print('in onCycleEnd, context =', c);
+    //     print('in onCycleEnd, event =', e);
+    //     c.stop();
+    // };
+
+    print(context);
+    print(Object.keys(context));
+
+    event1.activate();
+    context.start();
 })();

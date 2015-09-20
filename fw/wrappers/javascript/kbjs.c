@@ -28,6 +28,8 @@
 /* Include kbjs headers */
 #include "include/contexts.h"
 /*  func  : kbjs_register_Context */
+#include "include/events.h"
+/*  func  : kbjs_register_Event */
 
 
 /*----------------------------------------------------------------------------*/
@@ -35,6 +37,9 @@ int
 main(int argc,
      char const *argv[])
 {
+    /* TODO: **catch termination**
+             Catch Ctrl-C and Ctrl-D keys */
+
     /* If no file path passed */
     if (argc < 2)
     {
@@ -52,23 +57,35 @@ main(int argc,
     }
 
     /* Create modul objects */
+    /* STACK: [global] */
     duk_push_global_object(context);
+    /* STACK: [global, "kb"] */
     duk_push_string(context, "kb");
+    /* STACK: [global, "kb", {}] */
     duk_push_object(context);
+    /* STACK: [global, "kb", {}, "rpi2"] */
     duk_push_string(context, "rpi2");
+    /* STACK: [global, "kb", {}, "rpi2", {}] */
     duk_push_object(context);
+    /* STACK: [global, "kb", {rpi2: {}}] */
     duk_put_prop(context, -3);
+    /* STACK: [global] */
     duk_put_prop(context, -3);
+    /* STACK: [] */
     duk_pop(context);
 
     /* Load kbjs modules */
     kbjs_register_Context(context);
-    // kbjs_register_Event(context);
+    kbjs_register_Event(context);
     // kbjs_register_LED(context);
     // kbjs_register_FourKeys(context);
 
     /* Evaluate passed script */
-    duk_eval_file(context, argv[1]);
+    if (duk_peval_file(context, argv[1]))
+    {
+        fputs(duk_safe_to_string(context, -1), stderr);
+        fputs("\n", stderr);
+    }
 
     /* Clean up and terminate */
     duk_destroy_heap(context);

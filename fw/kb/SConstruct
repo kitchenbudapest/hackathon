@@ -66,21 +66,28 @@ def path_prefixer(folder, files):
 
 # Target: building duktape as a library
 #------------------------------------------------------------------------------#
-def duktape():
+def kb():
     # Output and inputs
-    INPUT_DIR  = join('duktape-1.3.0', 'src')
-    OUTPUT_DIR = join('build', 'duktape')
-    TARGET     = 'duktape'
-    SOURCE     = ['duktape.c']
+    INPUT_DIR  = '.'
+    OUTPUT_DIR = 'build'
+    TARGET     = join('libs', 'kb')
+    SOURCE     = [join('src', 'errors.c'),
+                  join('src', 'utils', 'dense_set.c'),
+                  join('src', 'rpi2', 'contexts.c'),
+                  join('src', 'rpi2', 'events.c'),
+                  join('src', 'rpi2', 'pins.c'),
+                  join('src', 'rpi2', 'sensors.c'),
+                  join('src', 'rpi2', 'sensors', 'four_keys.c'),
+                  join('src', 'rpi2', 'sensors', 'leds.c')]
 
     # C pre-processor path (include)
-    CPPPATH = [INPUT_DIR]
+    CPPPATH = [join(INPUT_DIR, 'include')]
     # Library path
     LIBPATH = [INPUT_DIR,
                '/usr/lib',
                '/usr/local/lib']
     # Libraries
-    LIBS    = ['m']
+    LIBS    = ['jemalloc']
 
     # Create environment
     environment = Environment(CC      = CC,
@@ -99,59 +106,10 @@ def duktape():
                                                              SOURCE))
 
     # Name this build
-    environment.Alias('duktape', build)
-
-
-
-# Target: building javascript wrapper
-#------------------------------------------------------------------------------#
-def wrapper():
-    # Output and inputs
-    INPUT_DIR  = '.'
-    OUTPUT_DIR = join('build', 'kbjs')
-    TARGET     = join('bins', 'kbjs')
-    SOURCE     = ['kbjs.c',
-                  join('src', 'errors.c'),
-                  join('src', 'js_types.c'),
-                  join('src', 'contexts.c'),
-                  join('src', 'events.c')]
-
-    # C pre-processor path (include)
-    CPPPATH = ['.',
-               '/usr/include',
-               '/usr/local/include']
-    # Library path
-    LIBPATH = ['.',
-               '/usr/lib',
-               '/usr/local/lib']
-    # Libraries
-    LIBS    = ['duktape', 'kb']
-
-    # Create environment
-    environment = Environment(CC      = CC,
-                              CCFLAGS = CCFLAGS,
-                              CPPPATH = CPPPATH,
-                              LIBPATH = LIBPATH,
-                              LIBS    = LIBS)
-
-    # Specify output directory
-    environment.VariantDir(variant_dir = OUTPUT_DIR,
-                           src_dir     = INPUT_DIR)
-
-    # Build (and set it as the defaulkt target
-    build = environment.Program(target = TARGET,
-                                source = path_prefixer(OUTPUT_DIR,
-                                                       SOURCE))
-
-    # Name this build
-    environment.Alias('kbjs', build)
+    environment.Alias('kb', build)
     Default(build)
-
 
 
 #------------------------------------------------------------------------------#
 # Create build options
-if 'duktape' in COMMAND_LINE_TARGETS:
-    duktape()
-else:
-    wrapper()
+kb()
