@@ -2,6 +2,10 @@
 ** INFO */
 
 /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+/* Include jemalloc headers */
+#include <jemalloc/jemalloc.h>
+
+/*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 /* Include standard headers */
 #include <stddef.h>
 /*  type  : size_t */

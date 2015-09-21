@@ -2,6 +2,10 @@
 ** INFO */
 
 /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+/* Include jemalloc headers */
+#include <jemalloc/jemalloc.h>
+
+/*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 /* Include standard headers */
 #include <stdlib.h>
 /*  func  : malloc
@@ -38,8 +42,10 @@
             kbjs_ArgumentTypeError
     func  : kbjs_Error_fmt */
 #include "include/types.h"
-/*  type  : kbjs_Context
-            kbjs_Event */
+/*  macro : KBJS_TYPES_STASH_KEY_LENGTH
+    type  : kbjs_Context
+            kbjs_Event
+    func  : kbjs_get_stash_key */
 #include "include/js_types.h"
 /*  func  : kbjs_js_types_str */
 
@@ -79,30 +85,30 @@ kbjs_Event_new(duk_context *context)
         return (duk_ret_t)0;
     }
 
-    /* Check the type of the first argument */
-    /* STACK: [args...,] */
-    duk_idx_t type;
-    switch ((type = duk_get_type(context, (duk_idx_t)0)))
-    {
-        case DUK_TYPE_OBJECT:
-            break;
+    /* STACK: [..., arg, kb] */
+    duk_get_global_string(context, "kb");
+    /* STACK: [..., arg, kb, rpi2] */
+    duk_get_prop_string(context, (duk_idx_t)-1, "rpi2");
+    /* STACK: [..., arg, kb, rpi2, Context] */
+    duk_get_prop_string(context, (duk_idx_t)-1, "Context");
 
-        default:
-            duk_error(context,
-                      (duk_errcode_t)kbjs_ArgumentTypeError,
-                      kbjs_Error_fmt(kbjs_ArgumentTypeError),
-                      FUNC_NAME,
-                      kbjs_js_types_str(DUK_TYPE_OBJECT),
-                      0,
-                      kbjs_js_types_str(type));
-            return (duk_ret_t)0;
-    }
+    /* If the given value is not instance of kb.rpi2.Context */
+    if (!duk_instanceof(context, (duk_idx_t)-4, (duk_idx_t)-1))
+        duk_error(context,
+                  (duk_errcode_t)kbjs_ArgumentTypeError,
+                  kbjs_Error_fmt(kbjs_ArgumentTypeError),
+                  FUNC_NAME,
+                  "kb.rpi2.Context",
+                  0,
+                  duk_safe_to_string(context, (duk_idx_t)-4));
 
-    // <<<<<<<<< TODO: if first argument does not have instance_ptr property !!!
+    /* STACK: [.., arg] */
+    duk_pop_3(context);
 
-    /* STACK: [args..., void*] */
+    /* STACK: [..., arg, void*] */
     duk_get_prop_string(context, (duk_idx_t)0, KBJS_INSTANCE_PTR);
-    /* STACK: [args..., void*] */
+
+    /* STACK: [..., arg, void*] */
     kbjs_Context *kb_context = duk_get_pointer(context, (duk_idx_t)-1);
 
     /* Create new Event instance */
@@ -129,7 +135,11 @@ kbjs_Event_new(duk_context *context)
         return (duk_ret_t)0;
     }
 
-    /* STACK: [args...] */
+    /* Store javascript references */
+    kb_event->js_context = context;
+    kbjs_get_stash_key(KBJS_TYPES_STASH_KEY_LENGTH, kb_event->js_stash_key);
+
+    /* STACK: [..., arg] */
     duk_pop(context);
 
     // duk_error(context,
@@ -139,37 +149,34 @@ kbjs_Event_new(duk_context *context)
     //           1,
     //           0);
 
-    /* STACK: [args..., this] */
+    /* STACK: [..., arg, this] */
     duk_push_this(context);
 
     /* Create and store instance pointer */
-    /* STACK: [args..., this, ""] */
+    /* STACK: [..., arg, this, ""] */
     duk_push_string(context, KBJS_INSTANCE_PTR);
-    /* STACK: [args..., this, "", void*] */
+    /* STACK: [..., arg, this, "", void*] */
     duk_push_pointer(context, kb_event);
-    /* STACK: [args..., this] */
+    /* STACK: [..., arg, this] */
     duk_put_prop(context, (duk_idx_t)-3);
 
     /* Create instance destructor */
-    /* STACK: [args..., this, Event_del] */
+    /* STACK: [..., arg, this, Event_del] */
     duk_push_c_function(context, kbjs_Event_del, (duk_idx_t)1);
-    /* STACK: [args..., this] */
+    /* STACK: [..., arg, this] */
     duk_set_finalizer(context, (duk_idx_t)-2);
 
     /* Store `this` on stash */
-    /* STACK: [args..., this, stash] */
+    /* STACK: [..., arg, this, stash] */
     duk_push_heap_stash(context);
-    /* STACK: [args..., this, stash, void*] */
-    duk_push_pointer(context, kb_context);
-    /* STACK: [args..., this, stash, void*, this] */
+    /* STACK: [..., arg, this, stash, void*] */
+    duk_push_string(context, kb_event->js_stash_key);
+    /* STACK: [..., arg, this, stash, void*, this] */
     duk_dup(context, (duk_idx_t)-3);
-    /* STACK: [args..., this, stash] */
+    /* STACK: [..., arg, this, stash] */
     duk_put_prop(context, (duk_idx_t)-3);
-    /* STACK: [args..., this] */
+    /* STACK: [..., args, this] */
     duk_pop(context);
-
-    /* Store javascript references */
-    kb_event->js_context = context;
 
     return (duk_ret_t)0;
 }

@@ -112,6 +112,7 @@ def wrapper():
     TARGET     = join('bins', 'kbjs')
     SOURCE     = ['kbjs.c',
                   join('src', 'errors.c'),
+                  join('src', 'types.c'),
                   join('src', 'js_types.c'),
                   join('src', 'contexts.c'),
                   join('src', 'events.c')]
@@ -125,7 +126,9 @@ def wrapper():
                '/usr/lib',
                '/usr/local/lib']
     # Libraries
-    LIBS    = ['duktape', 'kb']
+    LIBS    = ['duktape',
+               'jemalloc',
+               'kb']
 
     # Create environment
     environment = Environment(CC      = CC,

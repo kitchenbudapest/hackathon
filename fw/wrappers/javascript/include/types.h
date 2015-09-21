@@ -20,9 +20,18 @@
             KB_RPI2_EVENT_MEMBERS */
 
 
+/*----------------------------------------------------------------------------*/
+/* Helper function */
+int
+kbjs_get_stash_key(size_t  length,
+                   char   *buffer);
+
+
 /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+#define KBJS_TYPES_STASH_KEY_LENGTH (size_t)16
 #define KBJS_TYPES_MEMBERS()                                                   \
-    duk_context *js_context;
+    duk_context *js_context;                                                   \
+    char         js_stash_key[KBJS_TYPES_STASH_KEY_LENGTH];
 
 /*----------------------------------------------------------------------------*/
 typedef struct
