@@ -33,6 +33,7 @@ static const char *const ERRORS[] =
     "kb_SENSOR_IS_NOT_IN_EVENT",
     "kb_NO_EVENT_ACTIVATED",
     "kb_EVENT_NOT_BOUND_TO_CONTEXT",
+    "kb_EVENT_LOOP_ALREADY_RUNNING",
 
     /* Has to be the last one */
     "(Unknown Error)",
@@ -81,6 +82,8 @@ kb_Error_str(kb_Error error)
             return ERRORS[kb_NO_EVENT_ACTIVATED];
         case kb_EVENT_NOT_BOUND_TO_CONTEXT:
             return ERRORS[kb_EVENT_NOT_BOUND_TO_CONTEXT];
+        case kb_EVENT_LOOP_ALREADY_RUNNING:
+            return ERRORS[kb_EVENT_LOOP_ALREADY_RUNNING];
         default:
             return ERRORS[((sizeof ERRORS)/sizeof(const char *const) - (size_t)1)];
     }

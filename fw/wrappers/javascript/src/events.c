@@ -66,6 +66,16 @@ kbjs_Event_instance_str(duk_context *context);
 /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 static duk_ret_t
 kbjs_Event_activate(duk_context *context);
+/*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+static duk_ret_t
+kbjs_Event_reset_all_pins(duk_context *context);
+/*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+static duk_ret_t
+kbjs_Event_enable_all_sensors(duk_context *context);
+/*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+static duk_ret_t
+kbjs_Event_disable_all_sensors(duk_context *context);
+
 
 
 
@@ -73,7 +83,7 @@ kbjs_Event_activate(duk_context *context);
 static duk_ret_t
 kbjs_Event_new(duk_context *context)
 {
-    static const char *const FUNC_NAME = "kb.rpi2.Event() (initialize)";
+    static const char *const FUNC_NAME = "kb.rpi2.Event_initialize()";
 
     /* If function not called as a constructor */
     if (!duk_is_constructor_call(context))
@@ -186,7 +196,7 @@ kbjs_Event_new(duk_context *context)
 static duk_ret_t
 kbjs_Event_del(duk_context *context)
 {
-    static const char *const FUNC_NAME = "kb.rpi2.Event() (finalize)";
+    static const char *const FUNC_NAME = "kb.rpi2.Event_finalize()";
 
     /* STACK: [this, void*] */
     duk_get_prop_string(context, (duk_idx_t)-1, KBJS_INSTANCE_PTR);

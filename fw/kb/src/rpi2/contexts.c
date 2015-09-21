@@ -50,6 +50,7 @@
 
 /*----------------------------------------------------------------------------*/
 #define INITIAL_CONTEXT_LIMIT (size_t)32
+static bool EVENT_LOOP_ALREADY_RUNNING = false;
 
 
 /*----------------------------------------------------------------------------*/
@@ -221,6 +222,10 @@ kb_rpi2_Context_start(kb_rpi2_Context *const self)
 {
     kb_Error error;
 
+    /* If an event-loop is already running */
+    if (EVENT_LOOP_ALREADY_RUNNING)
+        return kb_EVENT_LOOP_ALREADY_RUNNING;
+
     /* If `self` is NULL */
     if (!self)
         return kb_SELF_IS_NULL;
@@ -247,6 +252,9 @@ kb_rpi2_Context_start(kb_rpi2_Context *const self)
             self->next_active = NULL;
         }
     }
+
+    /* Indicate that an event-loop has been started */
+    EVENT_LOOP_ALREADY_RUNNING = true;
 
     /* If there is an `on_start` callback, call it */
     if (self->on_start)
@@ -317,6 +325,9 @@ kb_rpi2_Context_start(kb_rpi2_Context *const self)
         /* Terminate program */
         exit(EXIT_SUCCESS);
     }
+
+    /* Indicate that an event-loop has been stopped */
+    EVENT_LOOP_ALREADY_RUNNING = false;
 
     /* If everything went fine */
     return kb_OKAY;

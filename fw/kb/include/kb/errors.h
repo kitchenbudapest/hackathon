@@ -42,6 +42,7 @@ typedef enum
     /* Context related error signals */
     kb_NO_EVENT_ACTIVATED,
     kb_EVENT_NOT_BOUND_TO_CONTEXT,
+    kb_EVENT_LOOP_ALREADY_RUNNING,
 
 } kb_Error;
 

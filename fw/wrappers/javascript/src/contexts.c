@@ -15,9 +15,38 @@
 /* Include duktape headers */
 #include <duktape.h>
 /*  type  : duk_context
-            duk_ret_t
             duk_idx_t
-            duk_function_list_entry */
+            duk_ret_t
+            duk_errcode_t
+            duk_function_list_entry
+    func  : duk_dup
+            duk_pop
+            duk_pop_3
+            duk_pop_n
+            duk_swap_top
+            duk_get_type
+            duk_get_prop
+            duk_get_prop_string
+            duk_get_pointer
+            duk_push_this
+            duk_push_object
+            duk_push_pointer
+            duk_push_string
+            duk_push_c_function
+            duk_push_heap_stash
+            duk_push_undefined
+            duk_push_global_object
+            duk_put_prop
+            duk_put_function_list
+            duk_put_prop_string
+            duk_set_finalizer
+            duk_def_prop
+            duk_to_boolean
+            duk_call_prop
+            duk_error
+            duk_is_undefined
+            duk_is_constructor_call
+            duk_is_callable */
 
 /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 /* Include kibu headers */
@@ -26,8 +55,13 @@
     func  : kb_Error_str */
 #include <kb/rpi2/contexts.h>
 /*  type  : kb_rpi2_Context
-    func  : kb_rpi2_Context_new
-            kb_rpi2_Context_del */
+    func  : kb_rpi2_Context_ini
+            kb_rpi2_Context_fin
+            kb_rpi2_Context_unbind_*
+            kb_rpi2_Context_bind_*
+            kb_rpi2_Context_start
+            kb_rpi2_Context_stop
+            kb_rpi2_Context_exit */
 
 /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 /* Include kbjs headers */
@@ -74,71 +108,57 @@ static duk_ret_t
 kbjs_Context_exit(duk_context *context);
 
 
-
 /*----------------------------------------------------------------------------*/
 /* Callback wrappers */
-#define CALLBACK_WRAPPERS(CNAME, JSNAME)                                       \
+#define CALLBACK_WRAPPER(C_NAME, JS_NAME)                                      \
     static kb_Error                                                            \
-    CNAME(kb_rpi2_Context *const kb_context,                                   \
-          kb_rpi2_Event   *const kb_event)                                     \
+    C_NAME(kb_rpi2_Context *const kb_context,                                  \
+           kb_rpi2_Event   *const kb_event)                                    \
     {                                                                          \
-        static const char *PROP_NAME = "kb.rpi2.Context." JSNAME;              \
-                                                                               \
         /* STACK: [...] */                                                     \
         duk_context *context = ((kbjs_Context *const)kb_context)->js_context;  \
                                                                                \
         /* STACK: [..., stash] */                                              \
         duk_push_heap_stash(context);                                          \
                                                                                \
-        /* STACK: [..., stash, int] */                                         \
+        /* STACK: [..., stash, ""] */                                          \
         duk_push_string(context,                                               \
                         ((kbjs_Context *const)kb_context)->js_stash_key);      \
         /* STACK: [..., stash, this] */                                        \
         duk_get_prop(context, (duk_idx_t)-2);                                  \
                                                                                \
-        /* STACK: [..., stash, this, int] */                                   \
+        /* STACK: [..., stash, this, "_JS_NAME"] */                            \
+        duk_push_string(context, "_" JS_NAME);                                 \
+        /* STACK: [..., stash, this, "_JS_NAME", this] */                      \
+        duk_dup(context, (duk_idx_t)-2);                                       \
+                                                                               \
+        /* Get event */                                                        \
+        /* STACK: [..., stash, this, "_JS_NAME", this, "key"] */               \
         duk_push_string(context, ((kbjs_Event *const)kb_event)->js_stash_key); \
-        /* STACK: [..., stash, this, event] */                                 \
-        duk_get_prop(context, (duk_idx_t)-3);                                  \
+        /* STACK: [..., stash, this, "_JS_NAME", this, event] */               \
+        duk_get_prop(context, (duk_idx_t)-2);                                  \
                                                                                \
-        /* STACK: [..., stash, this, event, this.JSNAME] */                    \
-        duk_get_prop_string(context, (duk_idx_t)-2, JSNAME);                   \
-        /* If the given value is undefined */                                  \
-        if (duk_is_undefined(context, (duk_idx_t)-1))                          \
-            return kb_OKAY;                                                    \
-        /* If the given value is not a function */                             \
-        else if (!duk_is_callable(context, (duk_idx_t)-1))                     \
-        {                                                                      \
-            duk_error(context,                                                 \
-                  (duk_errcode_t)kbjs_PropertyTypeError,                       \
-                  kbjs_Error_fmt(kbjs_PropertyTypeError),                      \
-                  PROP_NAME,                                                   \
-                  kbjs_js_types_str(duk_get_type(context, (duk_idx_t)-1)));    \
-            return kb_FAIL;                                                    \
-        }                                                                      \
-                                                                               \
-        /* STACK: [..., stash, this, event, this.JSNAME, this] */              \
-        duk_dup(context, (duk_idx_t)-3);                                       \
-        /* STACK: [..., stash, this, event, this.JSNAME, this, event] */       \
-        duk_dup(context, (duk_idx_t)-3);                                       \
-        /* STACK: [..., stash, this, event, result] */                         \
-        duk_call(context, (duk_idx_t)2);                                       \
+        /* Invoke callback */                                                  \
+        /* STACK: [..., stash, this, result] */                                \
+        duk_call_prop(context, (duk_idx_t)-4, (duk_idx_t)2);                   \
                                                                                \
         kb_Error error = kb_OKAY;                                              \
+        /* STACK: [..., stash, this, bool(result)] */                          \
         if (duk_to_boolean(context, (duk_idx_t)-1))                            \
             error = kb_FAIL;                                                   \
                                                                                \
         /* STACK: [...] */                                                     \
-        duk_pop_n(context, (duk_idx_t)4);                                      \
+        duk_pop_3(context);                                                    \
         return error;                                                          \
     }
 /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 /* Create callback wrappers */
-CALLBACK_WRAPPERS(on_start,       "onStart")
-CALLBACK_WRAPPERS(on_cycle_begin, "onCycleBegin")
-CALLBACK_WRAPPERS(on_cycle_end,   "onCycleEnd")
-CALLBACK_WRAPPERS(on_stop,        "onStop")
-CALLBACK_WRAPPERS(on_exit,        "onExit")
+CALLBACK_WRAPPER(on_start,       "onStart")
+CALLBACK_WRAPPER(on_stop,        "onStop")
+CALLBACK_WRAPPER(on_cycle_begin, "onCycleBegin")
+CALLBACK_WRAPPER(on_cycle_end,   "onCycleEnd")
+CALLBACK_WRAPPER(on_exit,        "onExit")
+#undef CALLBACK_WRAPPER
 /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 static kb_Error
 on_activate(kb_rpi2_Context *const kb_context,
@@ -156,29 +176,29 @@ on_activate(kb_rpi2_Context *const kb_context,
     /* STACK: [..., stash, this] */
     duk_get_prop(context, (duk_idx_t)-2);
 
-    /* STACK: [..., stash, this, "onActivate"] */
-    duk_push_string(context, "onActivate");
-    /* STACK: [..., stash, this, "onActivate", this] */
+    /* STACK: [..., stash, this, "_onActivate"] */
+    duk_push_string(context, "_onActivate");
+    /* STACK: [..., stash, this, "_onActivate", this] */
     duk_dup(context, (duk_idx_t)-2);
 
     /* If nth activation call */
     if (kb_curr_event)
     {
         /* Get curr_event */
-        /* STACK: [..., stash, this, "onActivate", this, ""] */
+        /* STACK: [..., stash, this, "_onActivate", this, ""] */
         duk_push_string(context, ((kbjs_Event *const)kb_curr_event)->js_stash_key);
-        /* STACK: [..., stash, this, "onActivate", this, curr] */
+        /* STACK: [..., stash, this, "_onActivate", this, curr] */
         duk_get_prop(context, (duk_idx_t)-5);
     }
     /* If first activation call */
     else
-        /* STACK: [..., stash, this, "onActivate", this, curr=undefined] */
+        /* STACK: [..., stash, this, "_onActivate", this, curr=undefined] */
         duk_push_undefined(context);
 
     /* Get next_event */
-    /* STACK: [..., stash, this, "onActivate", this, curr, ""] */
+    /* STACK: [..., stash, this, "_onActivate", this, curr, ""] */
     duk_push_string(context, ((kbjs_Event *const)kb_next_event)->js_stash_key);
-    /* STACK: [..., stash, this, "onActivate", this, curr, next] */
+    /* STACK: [..., stash, this, "_onActivate", this, curr, next] */
     duk_get_prop(context, (duk_idx_t)-6);
 
     /* Try to call callback */
@@ -197,99 +217,110 @@ on_activate(kb_rpi2_Context *const kb_context,
 
 
 /*----------------------------------------------------------------------------*/
-static duk_ret_t
-on_activate_setter(duk_context *context)
-{
-    static const char *FUNC_NAME = "kb.rpi2.Context.onActivate (setter)";
-
-    puts(FUNC_NAME);
-
-    /* STACK: [..., arg] */
-    /* If argument is undefined */
-    if (duk_is_undefined(context, (duk_idx_t)-1))
-    {
-        /* If the given value is something else */
-        /* STACK: [..., arg, this] */
-        duk_push_this(context);
-
-        /* STACK: [..., arg, this, ""] */
-        duk_get_prop_string(context, (duk_idx_t)-1, KBJS_INSTANCE_PTR);
-        /* STACK: [..., arg, this, void*] */
-        kbjs_Context *kb_context = duk_get_pointer(context, (duk_idx_t)-1);
-
-        /* Unset callback */
-        kb_Error kb_error;
-        if ((kb_error = kb_rpi2_Context_unbind_on_activate(
-                (kb_rpi2_Context *const)kb_context)))
-                    duk_error(context,
-                              (duk_errcode_t)kbjs_InternalError,
-                              kbjs_Error_fmt(kbjs_InternalError),
-                              kb_Error_str(kb_error),
-                              FUNC_NAME);
-
-        /* Set value */
-        /* STACK: [..., arg, this] */
-        // duk_pop(context);
-        /* STACK: [..., arg, this, undefined] */
-        // duk_push_undefined(context);
+/* Callback getters */
+#define CALLBACK_GETTER(C_NAME, JS_NAME)                                       \
+    static duk_ret_t                                                           \
+    C_NAME##_getter(duk_context *context)                                      \
+    {                                                                          \
+        /* STACK: [..., this] */                                               \
+        duk_push_this(context);                                                \
+        /* STACK: [..., this, value] */                                        \
+        duk_get_prop_string(context, (duk_idx_t)-1, "_" JS_NAME);              \
+        return (duk_idx_t)1;                                                   \
     }
-    /* If argument is a function */
-    else if (duk_is_callable(context, (duk_idx_t)-1))
-    {
-        /* If the given value is something else */
-        /* STACK: [..., arg, this] */
-        duk_push_this(context);
+/*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+/* Create getter */
+CALLBACK_GETTER(on_start,       "onStart")
+CALLBACK_GETTER(on_stop,        "onStop")
+CALLBACK_GETTER(on_cycle_begin, "onCycleBegin")
+CALLBACK_GETTER(on_cycle_end,   "onCycleEnd")
+CALLBACK_GETTER(on_activate,    "onActivate")
+CALLBACK_GETTER(on_exit,        "onExit")
+#undef CALLBACK_GETTER
 
-        /* STACK: [..., arg, this, ""] */
-        duk_get_prop_string(context, (duk_idx_t)-1, KBJS_INSTANCE_PTR);
-        /* STACK: [..., arg, this, void*] */
-        kbjs_Context *kb_context = duk_get_pointer(context, (duk_idx_t)-1);
 
-        /* Unset callback */
-        kb_Error kb_error;
-        if ((kb_error = kb_rpi2_Context_bind_on_activate(
-                (kb_rpi2_Context *const)kb_context,
-                on_activate)))
-                    duk_error(context,
-                              (duk_errcode_t)kbjs_InternalError,
-                              kbjs_Error_fmt(kbjs_InternalError),
-                              kb_Error_str(kb_error),
-                              FUNC_NAME);
-
-        /* Set value */
-        /* STACK: [..., arg, this] */
-        // duk_pop(context);
-        // /* STACK: [..., arg, this, function] */
-        // duk_dup(context, (duk_idx_t)-2);
-        // fputs("==> STACK: ", stderr);
-        // duk_dump_context_stderr(context);
+/*----------------------------------------------------------------------------*/
+#define CALLBACK_SETTER(C_NAME, JS_NAME)                                       \
+    static duk_ret_t                                                           \
+    C_NAME##_setter(duk_context *context)                                      \
+    {                                                                          \
+        static const char *FUNC_NAME = "kb.rpi2.Context." JS_NAME "_setter";   \
+        kb_Error kb_error;                                                     \
+        kbjs_Context *kb_context;                                              \
+                                                                               \
+        /* STACK: [..., arg] */                                                \
+        /* If argument is undefined */                                         \
+        if (duk_is_undefined(context, (duk_idx_t)-1))                          \
+        {                                                                      \
+            /* If the given value is something else */                         \
+            /* STACK: [..., arg, this] */                                      \
+            duk_push_this(context);                                            \
+                                                                               \
+            /* STACK: [..., arg, this, ""] */                                  \
+            duk_get_prop_string(context, (duk_idx_t)-1, KBJS_INSTANCE_PTR);    \
+            /* STACK: [..., arg, this, void*] */                               \
+            kb_context = duk_get_pointer(context, (duk_idx_t)-1);              \
+                                                                               \
+            /* Unset callback */                                               \
+            if ((kb_error = kb_rpi2_Context_unbind_##C_NAME(                   \
+                    (kb_rpi2_Context *const)kb_context)))                      \
+                        duk_error(context,                                     \
+                                  (duk_errcode_t)kbjs_InternalError,           \
+                                  kbjs_Error_fmt(kbjs_InternalError),          \
+                                  kb_Error_str(kb_error),                      \
+                                  FUNC_NAME);                                  \
+        }                                                                      \
+        /* If argument is a function */                                        \
+        else if (duk_is_callable(context, (duk_idx_t)-1))                      \
+        {                                                                      \
+            /* If the given value is something else */                         \
+            /* STACK: [..., arg, this] */                                      \
+            duk_push_this(context);                                            \
+                                                                               \
+            /* STACK: [..., arg, this, ""] */                                  \
+            duk_get_prop_string(context, (duk_idx_t)-1, KBJS_INSTANCE_PTR);    \
+            /* STACK: [..., arg, this, void*] */                               \
+            kb_context = duk_get_pointer(context, (duk_idx_t)-1);              \
+                                                                               \
+            /* Unset callback */                                               \
+            if ((kb_error = kb_rpi2_Context_bind_##C_NAME(                     \
+                    (kb_rpi2_Context *const)kb_context,                        \
+                    C_NAME)))                                                  \
+                        duk_error(context,                                     \
+                                  (duk_errcode_t)kbjs_InternalError,           \
+                                  kbjs_Error_fmt(kbjs_InternalError),          \
+                                  kb_Error_str(kb_error),                      \
+                                  FUNC_NAME);                                  \
+        }                                                                      \
+        /* If argument is something else */                                    \
+        else                                                                   \
+            duk_error(context,                                                 \
+                      (duk_errcode_t)kbjs_PropertyTypeError,                   \
+                      kbjs_Error_fmt(kbjs_PropertyTypeError),                  \
+                      FUNC_NAME,                                               \
+                      kbjs_js_types_str(duk_get_type(context, (duk_idx_t)-1)));\
+                                                                               \
+        /* Store value */                                                      \
+        /* STACK: [..., arg, this] */                                          \
+        duk_pop(context);                                                      \
+        /* STACK: [..., this, arg] */                                          \
+        duk_swap_top(context, (duk_idx_t)-2);                                  \
+        /* STACK: [..., this] */                                               \
+        duk_put_prop_string(context, (duk_idx_t)-2, "_" JS_NAME);              \
+        /* STACK: [...] */                                                     \
+        duk_pop(context);                                                      \
+        return (duk_ret_t)0;                                                   \
     }
-    /* If argument is something else */
-    else
-        duk_error(context,
-                  (duk_errcode_t)kbjs_PropertyTypeError,
-                  kbjs_Error_fmt(kbjs_PropertyTypeError),
-                  FUNC_NAME,
-                  kbjs_js_types_str(duk_get_type(context, (duk_idx_t)-1)));
+/*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+/* Create setter */
+CALLBACK_SETTER(on_start,       "onStart")
+CALLBACK_SETTER(on_stop,        "onStop")
+CALLBACK_SETTER(on_cycle_begin, "onCycleBegin")
+CALLBACK_SETTER(on_cycle_end,   "onCycleEnd")
+CALLBACK_SETTER(on_activate,    "onActivate")
+CALLBACK_SETTER(on_exit,        "onExit")
+#undef CALLBACK_SETTER
 
-    fputs("==> STACK: ", stderr);
-    duk_dump_context_stderr(context);
-
-    /* STACK: [..., arg] */
-    duk_pop_2(context);
-    /* STACK: [..., arg, arg] */
-    duk_dup(context, (duk_idx_t)-1);
-
-    // /* STACK: [..., arg, this] */
-    // // duk_put_prop_string(context, (duk_idx_t)-2, "onActivate");
-    // /* STACK: [..., arg] */
-    // duk_pop_2(context);
-
-    fputs("==> STACK: ", stderr);
-    duk_dump_context_stderr(context);
-
-    return (duk_ret_t)1;
-}
 
 
 /*----------------------------------------------------------------------------*/
@@ -297,7 +328,7 @@ on_activate_setter(duk_context *context)
 static duk_ret_t
 kbjs_Context_new(duk_context *context)
 {
-    static const char *FUNC_NAME = "kb.rpi2.Context() (initialize)";
+    static const char *FUNC_NAME = "kb.rpi2.Context_initialize()";
 
     /* If function not called as a constructor */
     if (!duk_is_constructor_call(context))
@@ -323,22 +354,6 @@ kbjs_Context_new(duk_context *context)
                   kb_Error_str(kb_error),
                   FUNC_NAME);
 
-    /* Set callback wrappers */
-    #define BIND_FUNCTION(FNAME)                                               \
-        if ((kb_error = kb_rpi2_Context_bind_##FNAME(                          \
-                (kb_rpi2_Context *const)kb_context,                            \
-                FNAME)))                                                       \
-            duk_error(context,                                                 \
-                      (duk_errcode_t)kbjs_InternalError,                       \
-                      kbjs_Error_fmt(kbjs_InternalError),                      \
-                      kb_Error_str(kb_error),                                  \
-                      FUNC_NAME);
-    BIND_FUNCTION(on_start)
-    BIND_FUNCTION(on_cycle_begin)
-    BIND_FUNCTION(on_cycle_end)
-    BIND_FUNCTION(on_stop)
-    BIND_FUNCTION(on_exit)
-
     /* Store javascript references */
     kb_context->js_context = context;
     kbjs_get_stash_key(KBJS_TYPES_STASH_KEY_LENGTH, kb_context->js_stash_key);
@@ -346,17 +361,51 @@ kbjs_Context_new(duk_context *context)
     /* STACK: [args..., this] */
     duk_push_this(context);
 
-    /* Set property-setters */
-    /* STACK: [args..., this, "JSNAME"] */
-    duk_push_string(context, "onActivate");
-    /* STACK: [args..., this, "JSNAME", function] */
-    duk_push_c_function(context, on_activate_setter, (duk_idx_t)1);
-    /* STACK: [args..., this, "JSNAME", function, "setter"] */
-    duk_push_string(context, "setter");
-    /* STACK: [args..., this, "JSNAME", function] */
-    duk_put_prop_string(context, (duk_idx_t)-2, "name");
-    /* STACK: [args..., this] */
-    duk_def_prop(context, (duk_idx_t)-3, DUK_DEFPROP_HAVE_SETTER);
+    /* Set virtual methods */
+    #define SET_VIRTUAL_METHODS(NAME, GETTER, SETTER)                          \
+        /* STACK: [args..., this, "NAME"] */                                   \
+        duk_push_string(context, NAME);                                        \
+                                                                               \
+        /* Create getter */                                                    \
+        /* STACK: [args..., this, "NAME", getter] */                           \
+        duk_push_c_function(context, GETTER, (duk_idx_t)0);                    \
+        /* STACK: [args..., this, "NAME", getter, "getter"] */                 \
+        duk_push_string(context, NAME "_getter");                              \
+        /* STACK: [args..., this, "NAME", getter] */                           \
+        duk_put_prop_string(context, (duk_idx_t)-2, "name");                   \
+                                                                               \
+        /* Create setter */                                                    \
+        /* STACK: [args..., this, "NAME", getter, setter] */                   \
+        duk_push_c_function(context, SETTER, (duk_idx_t)1);                    \
+        /* STACK: [args..., this, "NAME", getter, setter, "setter"] */         \
+        duk_push_string(context, NAME "_setter");                              \
+        /* STACK: [args..., this, "NAME", getter, setter] */                   \
+        duk_put_prop_string(context, (duk_idx_t)-2, "name");                   \
+                                                                               \
+        /* Store methods */                                                    \
+        /* STACK: [args..., this] */                                           \
+        duk_def_prop(context,                                                  \
+                     (duk_idx_t)-4,                                            \
+                     DUK_DEFPROP_HAVE_GETTER | DUK_DEFPROP_HAVE_SETTER);
+    SET_VIRTUAL_METHODS("onStart",
+                        on_start_getter,
+                        on_start_setter);
+    SET_VIRTUAL_METHODS("onStop",
+                        on_stop_getter,
+                        on_stop_setter);
+    SET_VIRTUAL_METHODS("onCycleBegin",
+                        on_cycle_begin_getter,
+                        on_cycle_begin_setter);
+    SET_VIRTUAL_METHODS("onCycleEnd",
+                        on_cycle_end_getter,
+                        on_cycle_end_setter);
+    SET_VIRTUAL_METHODS("onActivate",
+                        on_activate_getter,
+                        on_activate_setter);
+    SET_VIRTUAL_METHODS("onExit",
+                        on_exit_getter,
+                        on_exit_setter);
+    #undef SET_VIRTUAL_METHODS
 
     /* Create and store instance pointer */
     /* STACK: [args..., this, ""] */
@@ -393,7 +442,7 @@ kbjs_Context_new(duk_context *context)
 static duk_ret_t
 kbjs_Context_del(duk_context *context)
 {
-    static const char *FUNC_NAME = "kb.rpi2.Context() (finalize)";
+    static const char *FUNC_NAME = "kb.rpi2.Context_finalize()";
 
     /* STACK: [this, void*] */
     duk_get_prop_string(context, (duk_idx_t)-1, KBJS_INSTANCE_PTR);
@@ -504,7 +553,29 @@ kbjs_Context_stop(duk_context *context)
 static duk_ret_t
 kbjs_Context_exit(duk_context *context)
 {
-    (void)context;
+    static const char *FUNC_NAME = "kb.rpi2.Context.exit()";
+
+    /* STACK: [args..., this] */
+    duk_push_this(context);
+
+    /* STACK: [args..., this, void*] */
+    duk_get_prop_string(context, (duk_idx_t)-1, KBJS_INSTANCE_PTR);
+    kbjs_Context *kb_context = duk_get_pointer(context, (duk_idx_t)-1);
+
+    /* Delete kibu Context instance */
+    kb_Error kb_error;
+    if ((kb_error = kb_rpi2_Context_stop((kb_rpi2_Context *const)kb_context)))
+    {
+        duk_error(context,
+                  (duk_errcode_t)kbjs_InternalError,
+                  kbjs_Error_fmt(kbjs_InternalError),
+                  kb_Error_str(kb_error),
+                  FUNC_NAME);
+        return (duk_ret_t)0;
+    }
+
+    /* STACK: [args...] */
+    duk_pop_n(context, 2);
     return (duk_ret_t)0;
 }
 

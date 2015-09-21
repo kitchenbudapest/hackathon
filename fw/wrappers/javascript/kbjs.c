@@ -9,6 +9,11 @@
 #include <stdio.h>
 /*  const : stderr
     func  : fputs */
+#include <signal.h>
+/*  const : SIGINT
+    func  : signal
+            raise
+            SIG_DFL */
 
 
 /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
@@ -33,12 +38,32 @@
 
 
 /*----------------------------------------------------------------------------*/
+static duk_context *context = NULL;
+
+/*----------------------------------------------------------------------------*/
+static void
+on_signal_interruption(int sig_num)
+{
+    /* If a duktape context was created destroy it */
+    if (context)
+        duk_destroy_heap(context);
+
+    /* Report to the user */
+    fputs("\nkbjs: Interrupted by user\n", stderr);
+
+    /* Use the default handler and raise same signal */
+    signal(sig_num, SIG_DFL);
+    raise(sig_num);
+}
+
+
+/*----------------------------------------------------------------------------*/
 int
 main(int argc,
      char const *argv[])
 {
-    /* TODO: **catch termination**
-             Catch Ctrl-C and Ctrl-D keys */
+    /* Catch interruption signal */
+    signal(SIGINT, on_signal_interruption);
 
     /* If no file path passed */
     if (argc < 2)

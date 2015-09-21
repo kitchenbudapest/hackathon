@@ -1,6 +1,7 @@
 *.pyc
 *.pyo
 *.o
+*.html
 
 .sconsign.dblite
 
