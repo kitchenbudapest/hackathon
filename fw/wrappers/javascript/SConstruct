@@ -116,7 +116,8 @@ def wrapper():
                   join('src', 'pin_ids.c'),
                   join('src', 'js_types.c'),
                   join('src', 'contexts.c'),
-                  join('src', 'events.c')]
+                  join('src', 'events.c'),
+                  join('src', 'sensors', 'leds.c')]
 
     # C pre-processor path (include)
     CPPPATH = ['.',

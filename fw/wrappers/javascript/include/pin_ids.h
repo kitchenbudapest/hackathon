@@ -12,6 +12,10 @@
 
 
 /*----------------------------------------------------------------------------*/
+extern const char *const kbjs_PIN_ID_PROTO_STASH_KEY;
+extern const char *const kbjs_PIN_ID_VALUE_KEY;
+
+/*----------------------------------------------------------------------------*/
 void
 kbjs_register_PinIds(duk_context *context);
 

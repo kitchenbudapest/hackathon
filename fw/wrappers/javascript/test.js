@@ -8,9 +8,11 @@
     var context,
         event1,
         event2,
+        led1,
+        led2,
         Context = kb.rpi2.Context,
         Event   = kb.rpi2.Event,
-        LED     = kb.rpi2.sensors.LED
+        LED     = kb.rpi2.sensors.LED,
         PIN1    = kb.rpi2.PIN1;
 
     context = new Context();
@@ -57,12 +59,14 @@
     {
         print('inside: onEnable');
         print('led:', led1.name);
+        led1.on();
     }
 
     led2.onEnable = function ()
     {
         print('inside: onEnable');
         print('led:', led2.name);
+        led2.off();
     }
 
     event1.activate();

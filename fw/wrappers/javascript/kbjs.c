@@ -113,7 +113,7 @@ main(int argc,
     kbjs_register_PinIds(context);
     kbjs_register_Context(context);
     kbjs_register_Event(context);
-    // kbjs_register_LED(context);
+    kbjs_register_LED(context);
     // kbjs_register_FourKeys(context);
 
     /* Evaluate passed script */

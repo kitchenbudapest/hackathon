@@ -74,6 +74,7 @@
             kbjs_InvocationError
             kbjs_ArgumentError
             kbjs_PropertyTypeError
+            kbjs_AllocationError
     func  : kbjs_Error_fmt */
 #include "include/types.h"
 /*  macro : KBJS_TYPES_STASH_KEY_LENGTH
