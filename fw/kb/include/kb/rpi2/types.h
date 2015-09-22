@@ -16,7 +16,8 @@
 #include <kb/utils/dense_set.h>
 /*  type  : kb_utils_DenseSet */
 #include <kb/rpi2/enums.h>
-/*  type  : kb_rpi2_PinRole
+/*  const : kb_rpi2_PINS_COUNT,
+    type  : kb_rpi2_PinRole
             kb_rpi2_PinState
             kb_rpi2_PinId
             kb_rpi2_SensorState */
@@ -68,12 +69,11 @@ typedef struct kb_rpi2_context
          throughout the system, instead of storing only pointers to them.
          Pro: Fewer alloc and free call
          Con: Way larger Event object sizes */
-#define KB_RPI2_PINS_COUNT (size_t)40
 #define KB_RPI2_EVENT_MEMBERS()                                                \
     KB_UTILS_DENSE_SET_ITEM_MEMBERS()                                          \
     struct kb_rpi2_context *context;                                           \
     kb_utils_DenseSet      *sensors;                                           \
-    struct kb_rpi2_pin     *pins[KB_RPI2_PINS_COUNT];
+    struct kb_rpi2_pin     *pins[kb_rpi2_PINS_COUNT];
 /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 typedef struct kb_rpi2_event
 {

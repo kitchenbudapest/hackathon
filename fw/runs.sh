@@ -30,19 +30,21 @@ else
             printf "Missing executable (second argument)\n";
         # If there is a second argument
         else
-            printf "==> $commands valgrind --track-origins=yes"
-            printf                       " --leak-check=full"
-            printf                       " ./$2\n";
+            printf "==> $commands valgrind --track-origins=yes";
+            printf                       " --leak-check=full";
+            printf                       " $2 ${@:3}";
+            printf "\n";
             decorate;
             valgrind --track-origins=yes \
                      --leak-check=full   \
-                     ./$2;
+                     $2 "${@:3}";
         fi;
     # If running
     else
-        printf "==> $commands ./$1\n";
+        printf "==> $commands $1 ${@:2}";
+        printf "\n";
         decorate;
-        ./$1;
+        $1 "${@:2}";
     fi;
 fi;
 

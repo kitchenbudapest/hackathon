@@ -15,9 +15,13 @@
 
 /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 /* Include kibu headers */
+#include <kb/rpi2/enums.h>
+/*  type  : kb_rpi2_PinId */
 #include <kb/rpi2/types.h>
 /*  macro : KB_RPI2_CONTEXT_MEMBERS
             KB_RPI2_EVENT_MEMBERS */
+#include <kb/rpi2/sensors/leds.h>
+/*  macro : KB_RPI2_SENSORS_LED_MEMBERS */
 
 
 /*----------------------------------------------------------------------------*/
@@ -48,6 +52,23 @@ typedef struct
     KBJS_TYPES_MEMBERS()
 } kbjs_Event;
 
-#undef KBJS_TYPES_MEMBERS
 
+/*----------------------------------------------------------------------------*/
+typedef struct
+{
+    kb_rpi2_PinId id;
+    const char    str[(size_t)16];
+    KBJS_TYPES_MEMBERS()
+} kbjs_PinId;
+
+
+/*----------------------------------------------------------------------------*/
+typedef struct
+{
+    KB_RPI2_SENSORS_LED_MEMBERS()
+    KBJS_TYPES_MEMBERS()
+} kbjs_LED;
+
+
+#undef KBJS_TYPES_MEMBERS
 #endif /* KBJS_TYPES_H_6530818369583821 */

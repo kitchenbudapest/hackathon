@@ -78,7 +78,6 @@ kbjs_Event_disable_all_sensors(duk_context *context);
 
 
 
-
 /*----------------------------------------------------------------------------*/
 static duk_ret_t
 kbjs_Event_new(duk_context *context)
@@ -87,13 +86,10 @@ kbjs_Event_new(duk_context *context)
 
     /* If function not called as a constructor */
     if (!duk_is_constructor_call(context))
-    {
         duk_error(context,
                   (duk_errcode_t)kbjs_InvocationError,
                   kbjs_Error_fmt(kbjs_InvocationError),
                   FUNC_NAME);
-        return (duk_ret_t)0;
-    }
 
     /* STACK: [..., arg, kb] */
     duk_get_global_string(context, "kb");
@@ -124,26 +120,20 @@ kbjs_Event_new(duk_context *context)
     /* Create new Event instance */
     kbjs_Event *kb_event;
     if (!(kb_event = malloc(sizeof(kbjs_Event))))
-    {
         duk_error(context,
                   (duk_errcode_t)kbjs_AllocationError,
                   kbjs_Error_fmt(kbjs_AllocationError),
                   FUNC_NAME);
-        return (duk_ret_t)0;
-    }
 
     /* Initialize instance as kibu Event */
     kb_Error kb_error;
     if ((kb_error = kb_rpi2_Event_ini((kb_rpi2_Event   *const)kb_event,
                                       (kb_rpi2_Context *const)kb_context)))
-    {
         duk_error(context,
                   (duk_errcode_t)kbjs_InternalError,
                   kbjs_Error_fmt(kbjs_InternalError),
                   kb_Error_str(kb_error),
                   FUNC_NAME);
-        return (duk_ret_t)0;
-    }
 
     /* Store javascript references */
     kb_event->js_context = context;
@@ -151,13 +141,6 @@ kbjs_Event_new(duk_context *context)
 
     /* STACK: [..., arg] */
     duk_pop(context);
-
-    // duk_error(context,
-    //           (duk_errcode_t)kbjs_ArgumentError,
-    //           kbjs_Error_fmt(kbjs_ArgumentError),
-    //           FUNC_NAME,
-    //           1,
-    //           0);
 
     /* STACK: [..., arg, this] */
     duk_push_this(context);
@@ -303,7 +286,7 @@ kbjs_register_Event(duk_context *context)
     /* STACK: [global, kb, rpi, "Event", Event_new(), "toString"] */
     duk_push_string(context, "toString");
     /* STACK: [global, kb, rpi, "Event", Event_new(), "toString", toString()] */
-    duk_push_c_function(context, kbjs_Event_type_str, (duk_idx_t)1);
+    duk_push_c_function(context, kbjs_Event_type_str, (duk_idx_t)0);
     /* STACK: [global, kb, rpi, "Event", Event_new()] */
     duk_put_prop(context, (duk_idx_t)-3);
 

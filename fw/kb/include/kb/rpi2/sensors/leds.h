@@ -17,18 +17,22 @@
 /*  type  : kb_rpi2_Sensor
     macro : kb_rpi2_SENSOR_MEMBERS */
 
-
 /*----------------------------------------------------------------------------*/
+#define KB_RPI2_SENSORS_LED_MEMBERS()                                          \
+    KB_RPI2_SENSOR_MEMBERS()                                                   \
+    kb_Error (*on_on)(struct kb_rpi2_sensors_led *const,                       \
+                      kb_rpi2_Event              *const,                       \
+                      kb_rpi2_Context            *const);                      \
+    kb_Error (*on_off)(struct kb_rpi2_sensors_led *const,                      \
+                       kb_rpi2_Event              *const,                      \
+                       kb_rpi2_Context            *const);
+/*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 typedef struct kb_rpi2_sensors_led
 {
-    KB_RPI2_SENSOR_MEMBERS()
-    kb_Error (*on_on)(struct kb_rpi2_sensors_led *const,
-                      kb_rpi2_Event              *const,
-                      kb_rpi2_Context            *const);
-    kb_Error (*on_off)(struct kb_rpi2_sensors_led *const,
-                       kb_rpi2_Event              *const,
-                       kb_rpi2_Context            *const);
+    KB_RPI2_SENSORS_LED_MEMBERS()
 } kb_rpi2_sensors_LED;
+
+
 /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 kb_Error
 kb_rpi2_sensors_LED_new(kb_rpi2_sensors_LED **const self,

@@ -9,7 +9,9 @@
         event1,
         event2,
         Context = kb.rpi2.Context,
-        Event   = kb.rpi2.Event;
+        Event   = kb.rpi2.Event,
+        LED     = kb.rpi2.sensors.LED
+        PIN1    = kb.rpi2.PIN1;
 
     context = new Context();
 
@@ -18,6 +20,12 @@
 
     event1.name = 'event1';
     event2.name = 'event2';
+
+    led1 = new LED(event1, PIN1);
+    led2 = new LED(event2, PIN1);
+
+    led1.name = 'led1';
+    led2.name = 'led2';
 
     context.onCycleBegin = function ()
     {
@@ -44,6 +52,18 @@
         print('curr:', curr_event ? curr_event.name : undefined);
         print('next:', next_event.name);
     };
+
+    led1.onEnable = function ()
+    {
+        print('inside: onEnable');
+        print('led:', led1.name);
+    }
+
+    led2.onEnable = function ()
+    {
+        print('inside: onEnable');
+        print('led:', led2.name);
+    }
 
     event1.activate();
     context.start();

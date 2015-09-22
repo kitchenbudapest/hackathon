@@ -31,10 +31,14 @@
 
 /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 /* Include kbjs headers */
+#include "include/pin_ids.h"
+/*  func  : kbjs_register_PinIds */
 #include "include/contexts.h"
 /*  func  : kbjs_register_Context */
 #include "include/events.h"
 /*  func  : kbjs_register_Event */
+// #include "include/sensors/leds.h"
+/*  func  : kbjs_register_LED */
 
 
 /*----------------------------------------------------------------------------*/
@@ -92,7 +96,13 @@ main(int argc,
     duk_push_string(context, "rpi2");
     /* STACK: [global, "kb", {}, "rpi2", {}] */
     duk_push_object(context);
-    /* STACK: [global, "kb", {rpi2: {}}] */
+    /* STACK: [global, "kb", {}, "rpi2", {}, "sensors"] */
+    duk_push_string(context, "sensors");
+    /* STACK: [global, "kb", {}, "rpi2", {}, "sensors", {}] */
+    duk_push_object(context);
+    /* STACK: [global, "kb", {}, "rpi2", {sensors:{}}] */
+    duk_put_prop(context, -3);
+    /* STACK: [global, "kb", {rpi2:{sensors:{}}}] */
     duk_put_prop(context, -3);
     /* STACK: [global] */
     duk_put_prop(context, -3);
@@ -100,6 +110,7 @@ main(int argc,
     duk_pop(context);
 
     /* Load kbjs modules */
+    kbjs_register_PinIds(context);
     kbjs_register_Context(context);
     kbjs_register_Event(context);
     // kbjs_register_LED(context);

@@ -113,6 +113,7 @@ def wrapper():
     SOURCE     = ['kbjs.c',
                   join('src', 'errors.c'),
                   join('src', 'types.c'),
+                  join('src', 'pin_ids.c'),
                   join('src', 'js_types.c'),
                   join('src', 'contexts.c'),
                   join('src', 'events.c')]

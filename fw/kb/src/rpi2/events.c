@@ -31,12 +31,13 @@
             kb_utils_DenseSetIter_new
             kb_utils_DenseSetIter_del
             kb_utils_DenseSetIter_next */
+#include <kb/rpi2/enums.h>
+/*  const : kb_rpi2_PINS_COUNT */
 #include <kb/rpi2/contexts.h>
 /*  type  : kb_rpi2_Context
     func  : kb_rpi2_Context_activate_event */
 #include <kb/rpi2/events.h>
-/*  macro : KB_RPI2_PINS_COUNT
-    type  : kb_rpi2_Event */
+/*  type  : kb_rpi2_Event */
 #include <kb/rpi2/sensors.h>
 /*  type  : kb_rpi2_Sensor
     func  : kb_rpi2_Sensor_disable
@@ -58,7 +59,7 @@
 /*----------------------------------------------------------------------------*/
 #define KB_RPI2_CHECK_PIN_ID_IN_RANGE(P)                                       \
     if ((size_t)P < (size_t)0 &&                                               \
-        (size_t)P >= KB_RPI2_PINS_COUNT)                                       \
+        (size_t)P >= (size_t)kb_rpi2_PINS_COUNT)                               \
         return kb_INVALID_PIN_ID;
 
 
@@ -116,7 +117,7 @@ kb_rpi2_Event_ini(kb_rpi2_Event   *const self,
         return kb_ALLOC_FAIL;
 
     /* "Zero out" all Pin objects in the array */
-    for (size_t i=0; i<KB_RPI2_PINS_COUNT; i++)
+    for (size_t i=0; i<(size_t)kb_rpi2_PINS_COUNT; i++)
         self->pins[i] = NULL;
 
     /* Set values */
@@ -138,7 +139,7 @@ kb_rpi2_Event_fin(kb_rpi2_Event *const self)
 
     /* Delete all Pins objects in the array */
     kb_rpi2_Pin **pins = self->pins;
-    for (size_t i=0; i<KB_RPI2_PINS_COUNT; i++)
+    for (size_t i=0; i<(size_t)kb_rpi2_PINS_COUNT; i++)
         kb_rpi2_Pin_del(pins + i);
 
     /* Delete DenseSet object */
@@ -317,7 +318,7 @@ kb_rpi2_Event_reset_all_pins(kb_rpi2_Event *const self)
         return kb_SELF_IS_NULL;
 
     /* Iterate through all pins and reset all of them */
-    for (size_t i=0; i<KB_RPI2_PINS_COUNT; i++)
+    for (size_t i=0; i<(size_t)kb_rpi2_PINS_COUNT; i++)
         kb_rpi2_Pin_reset(self->pins[i]);
 
     /* If everything went fine */

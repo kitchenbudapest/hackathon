@@ -21,12 +21,13 @@
 #include <kb/utils/dense_set.h>
 /*  type  : kb_utils_DenseSetItem
     func  : kb_utils_DenseSetItem_ini */
+#include <kb/rpi2/enums.h>
+/*  const : kb_rpi2_PINS_COUNT */
 #include <kb/rpi2/types.h>
 /*  type  : kb_rpi2_Event
             kb_rpi2_Context */
 #include <kb/rpi2/events.h>
-/*  macro : KB_RPI2_PINS_COUNT
-    type  : kb_rpi2_Event */
+/*  type  : kb_rpi2_Event */
 #include <kb/rpi2/pins.h>
 /*  type  : kb_rpi2_Pin
             kb_rpi2_PinId
@@ -100,7 +101,7 @@ kb_rpi2_Sensor_ini(kb_rpi2_Sensor   *const self,
         return kb_ARG4_IS_NULL;
 
     /* If too many `pin_id`s passed */
-    if (pins_count > KB_RPI2_PINS_COUNT)
+    if (pins_count > kb_rpi2_PINS_COUNT)
         return kb_TOO_MANY_PINS_USED;
 
     /* Create storage for `pin_id`s */

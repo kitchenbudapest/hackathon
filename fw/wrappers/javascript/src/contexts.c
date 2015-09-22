@@ -21,8 +21,8 @@
             duk_function_list_entry
     func  : duk_dup
             duk_pop
+            duk_pop_2
             duk_pop_3
-            duk_pop_n
             duk_swap_top
             duk_get_type
             duk_get_prop
@@ -226,7 +226,7 @@ on_activate(kb_rpi2_Context *const kb_context,
         duk_push_this(context);                                                \
         /* STACK: [..., this, value] */                                        \
         duk_get_prop_string(context, (duk_idx_t)-1, "_" JS_NAME);              \
-        return (duk_idx_t)1;                                                   \
+        return (duk_ret_t)1;                                                   \
     }
 /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 /* Create getter */
@@ -451,20 +451,17 @@ kbjs_Context_del(duk_context *context)
     /* Delete kibu Context instance */
     kb_Error kb_error;
     if ((kb_error = kb_rpi2_Context_fin((kb_rpi2_Context *const)kb_context)))
-    {
         duk_error(context,
                   (duk_errcode_t)kbjs_InternalError,
                   kbjs_Error_fmt(kbjs_InternalError),
                   kb_Error_str(kb_error),
                   FUNC_NAME);
-        return (duk_ret_t)0;
-    }
 
     /* Deallocate instance */
     free(kb_context);
 
     /* STACK: [] */
-    duk_pop_n(context, (duk_idx_t)2);
+    duk_pop_2(context);
     return (duk_ret_t)0;
 }
 
@@ -503,17 +500,14 @@ kbjs_Context_start(duk_context *context)
     /* Delete kibu Context instance */
     kb_Error kb_error;
     if ((kb_error = kb_rpi2_Context_start((kb_rpi2_Context *const)kb_context)))
-    {
         duk_error(context,
                   (duk_errcode_t)kbjs_InternalError,
                   kbjs_Error_fmt(kbjs_InternalError),
                   kb_Error_str(kb_error),
                   FUNC_NAME);
-        return (duk_ret_t)0;
-    }
 
     /* STACK: [args...] */
-    duk_pop_n(context, 2);
+    duk_pop_2(context);
     return (duk_ret_t)0;
 }
 
@@ -534,17 +528,14 @@ kbjs_Context_stop(duk_context *context)
     /* Delete kibu Context instance */
     kb_Error kb_error;
     if ((kb_error = kb_rpi2_Context_stop((kb_rpi2_Context *const)kb_context)))
-    {
         duk_error(context,
                   (duk_errcode_t)kbjs_InternalError,
                   kbjs_Error_fmt(kbjs_InternalError),
                   kb_Error_str(kb_error),
                   FUNC_NAME);
-        return (duk_ret_t)0;
-    }
 
     /* STACK: [args...] */
-    duk_pop_n(context, 2);
+    duk_pop_2(context);
     return (duk_ret_t)0;
 }
 
@@ -565,17 +556,14 @@ kbjs_Context_exit(duk_context *context)
     /* Delete kibu Context instance */
     kb_Error kb_error;
     if ((kb_error = kb_rpi2_Context_stop((kb_rpi2_Context *const)kb_context)))
-    {
         duk_error(context,
                   (duk_errcode_t)kbjs_InternalError,
                   kbjs_Error_fmt(kbjs_InternalError),
                   kb_Error_str(kb_error),
                   FUNC_NAME);
-        return (duk_ret_t)0;
-    }
 
     /* STACK: [args...] */
-    duk_pop_n(context, 2);
+    duk_pop_2(context);
     return (duk_ret_t)0;
 }
 
@@ -613,7 +601,7 @@ kbjs_register_Context(duk_context *context)
     /* STACK: [global, kb, rpi, "Context", Context_new(), "toString"] */
     duk_push_string(context, "toString");
     /* STACK: [global, kb, rpi, "Context", Context_new(), "toString", toString()] */
-    duk_push_c_function(context, kbjs_Context_type_str, (duk_idx_t)1);
+    duk_push_c_function(context, kbjs_Context_type_str, (duk_idx_t)0);
     /* STACK: [global, kb, rpi, "Context", Context_new()] */
     duk_put_prop(context, (duk_idx_t)-3);
 
@@ -634,5 +622,5 @@ kbjs_register_Context(duk_context *context)
 
     /* Clean up */
     /* STACK: [] */
-    duk_pop_n(context, (duk_idx_t)3);
+    duk_pop_3(context);
 }
