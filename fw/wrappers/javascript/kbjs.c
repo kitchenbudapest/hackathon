@@ -37,7 +37,7 @@
 /*  func  : kbjs_register_Context */
 #include "include/events.h"
 /*  func  : kbjs_register_Event */
-// #include "include/sensors/leds.h"
+#include "include/sensors/leds.h"
 /*  func  : kbjs_register_LED */
 
 
