@@ -24,6 +24,7 @@ static const char *const ERRORS[] =
     "kb_ARG4_IS_NULL",
     "kb_ARG5_IS_NULL",
     "kb_ALLOC_FAIL",
+    "kb_BCM2835_INIT_FAIL",
     "kb_ITEM_NOT_IN_CONTAINER",
     "kb_INVALID_PIN_ID",
     "kb_PIN_ALREADY_USED",
@@ -64,6 +65,8 @@ kb_Error_str(kb_Error error)
             return ERRORS[kb_ARG5_IS_NULL];
         case kb_ALLOC_FAIL:
             return ERRORS[kb_ALLOC_FAIL];
+        case kb_BCM2835_INIT_FAIL:
+            return ERRORS[kb_BCM2835_INIT_FAIL];
         case kb_ITEM_NOT_IN_CONTAINER:
             return ERRORS[kb_ITEM_NOT_IN_CONTAINER];
         case kb_INVALID_PIN_ID:

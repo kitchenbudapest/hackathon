@@ -42,11 +42,11 @@ CLANGFLAGS_DEVEL = ['Weverything']
 
 # Set flags based on the above variables
 #------------------------------------------------------------------------------#
-if CC == 'clang':
+if CC.startswith('clang'):
     if DEVEL:
         CLANGFLAGS.extend(CLANGFLAGS_DEVEL)
     flags = CLANGFLAGS
-elif CC == 'gcc':
+elif CC.startswith('gcc'):
     if DEVEL:
         GCCFLAGS.extend(GCCFLAGS_DEVEL)
     flags = GCCFLAGS

@@ -89,6 +89,41 @@ const char *const kb_rpi2_PIN_LAYOUT =
 
 
 /*----------------------------------------------------------------------------*/
+static size_t USED_PIN_COUNTER = (size_t)0;
+
+
+/*----------------------------------------------------------------------------*/
+static inline kb_Error
+kb_rpi2_Pins_initialize(void)
+{
+    #ifdef __arm__
+        /* If this is the first Pin object created in this session,
+       or the first one created after a session already finished */
+        if (!USED_PIN_COUNTER &&
+            !bcm_2835_init())
+        {
+            ++USED_PIN_COUNTER;
+            return kb_BCM2835_INIT_FAIL;
+        }
+    #endif
+    return kb_OKAY;
+}
+
+
+/*----------------------------------------------------------------------------*/
+static inline kb_Error
+kb_rpi2_Pins_finalize(void)
+{
+    #ifdef __arm__
+        /* If this is the last finalization call in a session */
+        if (!(--USED_PIN_COUNTER))
+            bcm_2835_close();
+    #endif
+    return kb_OKAY;
+}
+
+
+/*----------------------------------------------------------------------------*/
 kb_Error
 kb_rpi2_Pin_new(kb_rpi2_Pin      **const self,
                 kb_rpi2_PinId            pin_id,
@@ -115,6 +150,13 @@ kb_rpi2_Pin_new(kb_rpi2_Pin      **const self,
     /* Initialize new Pin object */
     kb_Error error;
     if ((error = kb_rpi2_Pin_ini(pin, pin_id, pin_role, pin_state, sensor)))
+    {
+        free(pin);
+        return error;
+    }
+
+    /* Initialize low level access */
+    if ((error = kb_rpi2_Pins_initialize())
     {
         free(pin);
         return error;

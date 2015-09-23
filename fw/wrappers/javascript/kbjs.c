@@ -5,7 +5,8 @@
 /* Include standard headers */
 #include <stdlib.h>
 /*  const : EXIT_SUCCESS
-            EXIT_FAILURE */
+            EXIT_FAILURE
+    func  : exit */
 #include <stdio.h>
 /*  const : stderr
     func  : fputs */
@@ -56,7 +57,12 @@ on_signal_interruption(int sig_num)
     fputs("\nkbjs: Interrupted by user\n", stderr);
 
     /* Use the default handler and raise same signal */
-    signal(sig_num, SIG_DFL);
+    if (signal(sig_num, SIG_DFL))
+    {
+        fputs("kbjs: Cannot set signal handling\n", stderr);
+        exit(EXIT_FAILURE);
+    }
+
     raise(sig_num);
 }
 
@@ -67,7 +73,11 @@ main(int argc,
      char const *argv[])
 {
     /* Catch interruption signal */
-    signal(SIGINT, on_signal_interruption);
+    if (signal(SIGINT, on_signal_interruption))
+    {
+        fputs("kbjs: Cannot set signal handling\n", stderr);
+        return EXIT_FAILURE;
+    }
 
     /* If no file path passed */
     if (argc < 2)

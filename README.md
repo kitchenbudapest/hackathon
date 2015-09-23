@@ -23,18 +23,152 @@ Currenlty supported languages:
 - Python
 - JavaScript
 
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+***COMPILER EVERYTHING WITH `clang-3.5` ON THE RASPBIAN !!!***
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 WIP: Random Stuffs
 ------------------
 
-Raspberry Pi's default login data:
+1. Install Raspbian:
 
-```
-user: pi
-pass: raspberry
-```
+    ```bash
+    # Download disk image and unarchive it
+    $ cd downloads
+    $ wget https://downloads.raspberrypi.org/raspbian/images/
+           raspbian-2015-05-07/2015-05-05-raspbian-wheezy.zip
+    $ unzip 2015-05-05-raspbian-wheezy.img
+
+    # Insert SD card
+    $ lsblk
+
+    # Copy image to card
+    $ sudo dd bs=4M if=2015-05-05-raspbian-wheezy.img of=/dev/sdd
+
+    # Flush cache and remove card
+    $ sudo sync
+    ```
+
+2. Boot up for the first time:
+
+    For the first time, the RPi2 will automatically start the `raspi-config`
+    program for you. You should do the following:
+
+    ```
+    1 Expand Filesystem
+    |
+    8 Advanced Options
+    |
+    +-- A4 SSH
+    |   |
+    |   `-- Enable => Ok
+    |
+    +-- A5 Device Tree
+    |   |
+    |   `-- Yes => Ok
+    |
+    `-- Finish
+        |
+        `-- Reboot => Yes
+    ```
+
+3. Install packages:
+
+    After the reboot login. Login data:
+
+    ```
+    user: pi
+    pass: raspberry
+    ```
+
+    Install modern packages:
+
+    ```bash
+    # Update everything
+    $ sudo apt-get update
+    $ sudo apt-get upgrade
+
+    # Get modern gcc, clang, python and scons
+    $ sudo nano /etc/apt/sources/list
+        wheezy => jessie
+    $ sudo apt-get update
+    $ sudo apt-get install gcc-4.9 clang-3.5 python3.4 scons
+        -> Restart services => Yes
+
+    # Switch back to wheezy
+    $ sudo nano /etc/apt/sources/list
+        jessie => wheezy
+    $ sudo apt-get update
+    ```
+
+    Install framework core:
+
+    ```bash
+    # Edit bashrc
+    $ cd
+
+    # Append the following lines to end of the rc file
+    $ nano .bashrc
+        export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/lib/
+        export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib/
+
+        Ctrl-X => Y => Enter
+
+    # Reload bashrc
+    $ source .bashrc
+
+    # Install custom allocation manager library
+    $ sudo apt-get install libjemalloc-dev libjemalloc1
+
+    # Create folder for projects
+    $ mkdir devel
+    $ cd devel
+
+    # Get framework
+    $ git clone https://github.com/kitchenbudapest/hackathon.git
+    $ cd hackathon
+
+    # Install framework core
+    $ cd fw/kb
+
+    # Build library
+    $ scons
+
+    # Install headers and library
+    $ sudo cp -R include/kb /usr/local/include/
+    $ sudo mv libs/libkb.so /usr/local/lib/
+    ```
+
+    Install framework wrappers:
+
+    ```bash
+    $ cd ../wrappers/javascript
+    $ wget http://duktape.org/duktape-1.3.0.tar.xz
+
+    # Extract archive:
+    $ tar xf duktape-1.3.0.tar.xz
+
+    # Build library
+    $ scons duktape
+
+    # Install headers and the library:
+    $ sudo cp duktape-1.3.0/src/duktape.h /usr/local/include
+    $ sudo cp duktape-1.3.0/src/duk_config.h /usr/local/include
+    $ sudo mv libduktape.so /usr/local/lib/
+
+    # Build application:
+    $ scons kbjs
+
+    # Install app:
+    $ sudo mv kbjs /usr/local/bin/
+
+    # Run tests:
+    $ kbjs check.js
+    ```
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 Make sure SSH is enabled:
 
@@ -83,25 +217,6 @@ $ ./sync_pi.sh
 
 Install dependencies:
 
-Low-level GPIO access:
-
-```
-$ git clone git://git.drogon.net/wiringPi
-$ cd wiringPi
-$ ./build
-```
-
-Build system
-```
-$ sudo apt-get install scons
-```
-After the wiringPi has been successfully installed, you can list the pins:
-
-```
-$ gpio readall
-```
-
-
 ETC:
 
 ```
@@ -139,7 +254,7 @@ $ sudo raspi-config
 $ sudo reboot
 ```
 
-- - -
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 Naming Conventions:
 -------------------

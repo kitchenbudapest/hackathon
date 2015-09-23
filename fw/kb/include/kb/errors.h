@@ -24,6 +24,9 @@ typedef enum
     /* Memory management related error signals */
     kb_ALLOC_FAIL,
 
+    /* Wrapped external library related errors */
+    kb_BCM2835_INIT_FAIL,
+
     /* Utility related error signals */
     kb_ITEM_NOT_IN_CONTAINER,
 

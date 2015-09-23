@@ -1,7 +1,21 @@
 Build `duktape` and `kbjs` from source:
 =======================================
 
-1. Build and install shared library of `duktape`:
+1. Add library path for the linker to look up:
+
+    ```bash
+    # Edit bashrc
+    $ nano ~/.bashrc
+        export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/lib/
+        export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib/
+
+        Ctrl-X => Y => Enter
+
+    # Reload bashrc
+    $ source ~/.bashrc
+    ```
+
+2. Build and install shared library of `duktape`:
 
     ```bash
     # Download release:
@@ -19,7 +33,7 @@ Build `duktape` and `kbjs` from source:
     $ sudo mv libduktape.so /usr/local/lib/
     ```
 
-2. Build and install javascript interpreter `kbjs`:
+3. Build and install javascript interpreter `kbjs`:
 
     ```bash
     # Build application:
