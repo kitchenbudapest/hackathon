@@ -38,19 +38,46 @@ In order to detect which key is pressed from the matrix, we make row line low, a
 
 ![alt text](img/ararray.png)
 
+#### First step
+
+Download [Keypad](https://github.com/Chris--A/Keypad) header library, and paste to your /Documents/Arduino/libraries/ lib.
+
 #### Example code
 ```
-#include "Arduino.h"
-#include "Keypad.h"
+#include <Keypad.h>
 
-const byte ROWS = 1; //one rows
-const byte COLS = 4; //four columns
-char keys[ROWS][COLS] = {
-  {'1','2','3','4'},
+const byte numRows= 1; //number of rows on the keypad
+const byte numCols= 4; //number of columns on the keypad
+
+//keymap defines the key pressed according to the row and columns just as appears on the keypad
+char keymap[numRows][numCols]=
+{
+{'1', '2', '3', '4'},
 };
-byte rowPins[ROWS] = {2}; //connect to the row pinout of the keypad
-byte colPins[COLS] = {3, 4, 5, 6}; //connect to the column pinouts of the keypad
 
-Keypad keypad = Keypad( makeKeymap(keys), rowPins, colPins, ROWS, COLS );
+//Code that shows the the keypad connections to the arduino terminals
+byte rowPins[numRows] = {2}; //Rows 0 to 1
+byte colPins[numCols]= {6,5,4,3}; //Columns 0 to 3
+
+//initializes an instance of the Keypad class
+Keypad myKeypad= Keypad(makeKeymap(keymap), rowPins, colPins, numRows, numCols);
+
+void setup()
+{
+Serial.begin(9600);
+}
+
+//If key is pressed, this key is stored in 'keypressed' variable
+//If key is not equal to 'NO_KEY', then this key is printed out
+//if count=17, then count is reset back to 0 (this means no key is pressed during the whole keypad scan process
+void loop()
+{
+char keypressed = myKeypad.getKey();
+if (keypressed != NO_KEY)
+{
+Serial.print(keypressed);
+}
+}
 ```
-###### Source: 8051projects.net, adafruit.com
+###### Source:
+[Here](http://8051projects.net), [Here](http://adafruit.com)

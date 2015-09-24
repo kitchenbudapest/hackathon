@@ -10,6 +10,8 @@ In its simplest form, the sensor operates as an analog transducer, directly retu
 
 Frequently, a Hall sensor is combined with circuitry that allows the device to act in a digital (on/off) mode, and may be called a switch in this configuration.
 
+### Raspberry PI usage:
+
 #### Pinout
 
 ![alt text](img/pir2.jpg)
@@ -20,7 +22,46 @@ Frequently, a Hall sensor is combined with circuitry that allows the device to a
 
 ![alt text](img/hall4.png)
 
+### Arduino nano usage:
 
+#### Pinout
+
+![alt text](img/arduino_pinout.png)
+
+#### Wiring
+
+![alt text](img/hallarduino.png)
+
+#### Example code
+```
+int hallPin=5;
+
+int statePin=LOW;
+
+
+void setup()
+{
+pinMode(hallPin,INPUT);
+Serial.begin(9600);
+}
+
+void loop()
+{
+statePin=digitalRead(hallPin);
+if (Serial.available())
+{
+if( statePin==HIGH)
+{
+Serial.println("North");
+}
+else if(statePin==LOW)
+{
+Serial.println("South");
+}
+}
+delay(500);
+}
+```
 
 
 

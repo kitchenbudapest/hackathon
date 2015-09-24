@@ -23,6 +23,8 @@ Soil moisture sensors measure the volumetric water content in soil.[1] Since the
 * Sensor in humid soil: 300 < value < 700
 * Sensor in water: value > 700
 
+### Raspberry PI usage:
+
 #### Pinout
 
 ![alt text](img/pir2.jpg)
@@ -31,4 +33,34 @@ Soil moisture sensors measure the volumetric water content in soil.[1] Since the
 
 ![alt text](img/moisti3.png)
 
-###### Source: wikipedia.org
+### Arduino nano usage:
+
+#### Pinout
+
+![alt text](img/arduino_pinout.png)
+
+#### Wiring
+
+![alt text](img/moistiardu.png)
+
+#### Example code
+```
+int sensorPin = 0;    // select the input pin for the potentiometer
+int sensorValue = 0;  // variable to store the value coming from the sensor
+
+void setup() {
+  // declare the ledPin as an OUTPUT:
+   Serial.begin(9600);  
+}
+
+void loop() {
+  // read the value from the sensor:
+  sensorValue = analogRead(sensorPin);    
+  delay(1000);          
+  Serial.print("sensor = " );                       
+  Serial.println(sensorValue);                   
+}
+```
+
+###### Source:
+[Here](http://wikipedia.org)
