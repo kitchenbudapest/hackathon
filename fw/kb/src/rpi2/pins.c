@@ -11,6 +11,14 @@
 /*  func  : malloc
             free */
 
+/*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+#ifdef __arm__
+    /* Include bcm2835 headers */
+    #include <bcm2835.h>
+    /*  const : RPI_BPLUS_GPIO_J8_*
+        func  : bcm2835_init
+                bcm2835_close */
+#endif /* __arm__ */
 
 /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 /* Include kibu headers */
@@ -38,58 +46,68 @@
 
 
 /*----------------------------------------------------------------------------*/
-const char *const kb_rpi2_PIN_LAYOUT =
-    "           +-----+-----+\n"
-    "         0 |     |     |  1\n"
-    "           +-----+-----+\n"
-    "         2 |     |     |  3\n"
-    "           +-----+-----+\n"
-    "         4 |     |     |  5\n"
-    "+---+------+-----+-----+\n"
-    "| G |    6 |     |     |  7\n"
-    "| P |      +-----+-----+\n"
-    "| I |    8 |     |     |  9\n"
-    "| O |      +-----+-----+\n"
-    "+---+   10 |     |     | 11\n"
-    "           +-----+-----+\n"
-    "        12 |     |     | 13\n"
-    "           +-----+-----+\n"
-    "        14 |     |     | 15\n"
-    "           +-----+-----+\n"
-    "        16 |     |     | 17\n"
-    "           +-----+-----+\n"
-    "        18 |     |     | 19\n"
-    "           +-----+-----+\n"
-    "        20 |     |     | 21\n"
-    "           +-----+-----+\n"
-    "        22 |     |     | 23\n"
-    "           +-----+-----+\n"
-    "        24 |     |     | 25\n"
-    "           +-----+-----+\n"
-    "        26 |     |     | 27\n"
-    "           +-----+-----+\n"
-    "        28 |     |     | 29\n"
-    "           +-----+-----+\n"
-    "        30 |     |     | 31\n"
-    "           +-----+-----+\n"
-    "        32 |     |     | 33\n"
-    "           +-----+-----+\n"
-    "        34 |     |     | 35\n"
-    "           +-----+-----+\n"
-    "        36 |     |     | 37\n"
-    "           +-----+-----+\n"
-    "        38 |     |     | 39\n"
-    "           +-----+-----+\n";
-
-
-/*----------------------------------------------------------------------------*/
 #define kb_rpi2_CHECK_SELF_IS_NULL(S)                                          \
     if (!S)                                                                    \
         return kb_SELF_IS_NULL;
 
 
 /*----------------------------------------------------------------------------*/
-static size_t USED_PIN_COUNTER = (size_t)0;
+#ifdef __arm__
+    /* Pin reference counting */
+    static size_t USED_PIN_COUNTER = (size_t)0;
+
+    /* J8 -> kb_rpi2_PINx */
+    #define INVALID_PIN_GND0 -1
+    #define INVALID_PIN_PWR3 -2
+    #define INVALID_PIN_PWR5 -3
+    #define INVALID_PIN_RSVD -4
+    static const int PIN_CONVERSION[] =
+    {
+        [kb_rpi2_PIN1]  = INVALID_PIN_PWR3,
+        [kb_rpi2_PIN2]  = INVALID_PIN_PWR5,
+        [kb_rpi2_PIN3]  = RPI_BPLUS_GPIO_J8_03,
+        [kb_rpi2_PIN4]  = INVALID_PIN_PWR5,
+        [kb_rpi2_PIN5]  = RPI_BPLUS_GPIO_J8_05,
+        [kb_rpi2_PIN6]  = INVALID_PIN_GND0,
+        [kb_rpi2_PIN7]  = INVALID_PIN_RSVD,
+        [kb_rpi2_PIN8]  = INVALID_PIN_RSVD,
+        [kb_rpi2_PIN9]  = INVALID_PIN_GND0,
+        [kb_rpi2_PIN10] = INVALID_PIN_RSVD,
+
+        [kb_rpi2_PIN11] = RPI_BPLUS_GPIO_J8_11,
+        [kb_rpi2_PIN12] = RPI_BPLUS_GPIO_J8_12,
+        [kb_rpi2_PIN13] = RPI_BPLUS_GPIO_J8_13,
+        [kb_rpi2_PIN14] = INVALID_PIN_GND0,
+        [kb_rpi2_PIN15] = RPI_BPLUS_GPIO_J8_15,
+        [kb_rpi2_PIN16] = RPI_BPLUS_GPIO_J8_16,
+        [kb_rpi2_PIN17] = INVALID_PIN_PWR3,
+        [kb_rpi2_PIN18] = RPI_BPLUS_GPIO_J8_18,
+        [kb_rpi2_PIN19] = RPI_BPLUS_GPIO_J8_19,
+        [kb_rpi2_PIN20] = INVALID_PIN_GND0,
+
+        [kb_rpi2_PIN21] = RPI_BPLUS_GPIO_J8_21,
+        [kb_rpi2_PIN22] = RPI_BPLUS_GPIO_J8_22,
+        [kb_rpi2_PIN23] = RPI_BPLUS_GPIO_J8_23,
+        [kb_rpi2_PIN24] = RPI_BPLUS_GPIO_J8_24,
+        [kb_rpi2_PIN25] = INVALID_PIN_GND0,
+        [kb_rpi2_PIN26] = RPI_BPLUS_GPIO_J8_26,
+        [kb_rpi2_PIN27] = INVALID_PIN_RSVD,
+        [kb_rpi2_PIN28] = INVALID_PIN_RSVD,
+        [kb_rpi2_PIN29] = RPI_BPLUS_GPIO_J8_29,
+        [kb_rpi2_PIN30] = INVALID_PIN_GND0,
+
+        [kb_rpi2_PIN31] = RPI_BPLUS_GPIO_J8_31,
+        [kb_rpi2_PIN32] = RPI_BPLUS_GPIO_J8_32,
+        [kb_rpi2_PIN33] = RPI_BPLUS_GPIO_J8_33,
+        [kb_rpi2_PIN34] = INVALID_PIN_GND0,
+        [kb_rpi2_PIN35] = RPI_BPLUS_GPIO_J8_35,
+        [kb_rpi2_PIN36] = RPI_BPLUS_GPIO_J8_36,
+        [kb_rpi2_PIN37] = RPI_BPLUS_GPIO_J8_37,
+        [kb_rpi2_PIN38] = RPI_BPLUS_GPIO_J8_38,
+        [kb_rpi2_PIN39] = INVALID_PIN_GND0,
+        [kb_rpi2_PIN40] = RPI_BPLUS_GPIO_J8_40,
+    };
+#endif /* __arm__ */
 
 
 /*----------------------------------------------------------------------------*/
@@ -100,12 +118,12 @@ kb_rpi2_Pins_initialize(void)
         /* If this is the first Pin object created in this session,
        or the first one created after a session already finished */
         if (!USED_PIN_COUNTER &&
-            !bcm_2835_init())
+            !bcm2835_init())
         {
             ++USED_PIN_COUNTER;
             return kb_BCM2835_INIT_FAIL;
         }
-    #endif
+    #endif /* __arm__ */
     return kb_OKAY;
 }
 
@@ -117,8 +135,8 @@ kb_rpi2_Pins_finalize(void)
     #ifdef __arm__
         /* If this is the last finalization call in a session */
         if (!(--USED_PIN_COUNTER))
-            bcm_2835_close();
-    #endif
+            bcm2835_close();
+    #endif /* __arm__ */
     return kb_OKAY;
 }
 
@@ -155,13 +173,6 @@ kb_rpi2_Pin_new(kb_rpi2_Pin      **const self,
         return error;
     }
 
-    /* Initialize low level access */
-    if ((error = kb_rpi2_Pins_initialize())
-    {
-        free(pin);
-        return error;
-    }
-
     /* If everything went fine, return values */
     *self = pin;
     return kb_OKAY;
@@ -182,17 +193,65 @@ kb_rpi2_Pin_ini(kb_rpi2_Pin      *const self,
     else if (!sensor)
         return kb_ARG3_IS_NULL;
 
+    /* Initialize low level access */
+    kb_Error error;
+    if ((error = kb_rpi2_Pins_initialize()))
+        return error;
+
+    #ifdef __arm__
+        /* Get bcm pin representation */
+        RPiGPIOPin bcm_pin;
+        switch (PIN_CONVERSION[pin_id])
+        {
+            case INVALID_PIN_GND0:
+                return kb_PIN_IS_GROUND;
+
+            case INVALID_PIN_PWR3:
+                return kb_PIN_IS_POWER_V3_3;
+
+            case INVALID_PIN_PWR5:
+                return kb_PIN_IS_POWER_V5;
+
+            case INVALID_PIN_RSVD:
+                return kb_PIN_IS_RESERVED;
+
+            default:
+                bcm_pin = PIN_CONVERSION[pin_id];
+        }
+
+        /* Set PinState */
+        switch (pin_state)
+        {
+            case kb_rpi2_Pin_LOW:
+                bcm2835_gpio_clr(bcm_pin);
+                break;
+
+            case kb_rpi2_Pin_HIGH:
+                bcm2835_gpio_set(bcm_pin);
+                break;
+
+            default:
+                return kb_INVALID_PIN_STATE;
+        }
+
+        /* Set PinRole */
+        switch (pin_role)
+        {
+            case kb_rpi2_Pin_OUTPUT:
+                bcm2835_gpio_fsel(bcm_pin, BCM2835_GPIO_FSEL_OUTP);
+                break;
+
+            case kb_rpi2_Pin_INPUT:
+                bcm2835_gpio_fsel(bcm_pin, BCM2835_GPIO_FSEL_INPT);
+                break;
+
+            default:
+                return kb_INVALID_PIN_ROLE;
+        }
+    #endif /* __arm__ */
+
     /* Initialize Pin object */
     self->id      = pin_id;
-
-    /*
-     * TODO: Check if pin_role is either OUTPUT or INPUT
-     */
-
-    /*
-     * TODO: Check if pin_state is either LOW or HIGH
-     */
-
     self->role    = pin_role;
     self->state   = pin_state;
     self->sensor  = sensor;
@@ -211,6 +270,11 @@ kb_rpi2_Pin_fin(kb_rpi2_Pin *const self)
     /* If `self` is NULL */
     if (!self)
         return kb_SELF_IS_NULL;
+
+    /* Finalize low level access */
+    kb_Error error;
+    if ((error = kb_rpi2_Pins_finalize()))
+        return error;
 
     /*
      * TODO: Reset this pin via bcm2835
@@ -373,12 +437,13 @@ kb_rpi2_Pin_set_high(kb_rpi2_Pin *const self)
                       context);
     }
 
-    /* SWitch state */
-    self->state = kb_rpi2_Pin_HIGH;
+    #ifdef __arm__
+        /* Set pin HIGH via bcm2835 */
+        bcm2835_gpio_set(PIN_CONVERSION[self->id]);
+    #endif /* __arm__ */
 
-    /*
-     * TODO: Set this pin HIGH via bcm2835
-     */
+    /* Switch state */
+    self->state = kb_rpi2_Pin_HIGH;
 
     /* If everything went fine */
     return kb_OKAY;
@@ -409,12 +474,13 @@ kb_rpi2_Pin_set_low(kb_rpi2_Pin *const self)
                      context);
     }
 
+    #ifdef __arm__
+        /* Set pin LOW via bcm2835 */
+        bcm2835_gpio_clr(PIN_CONVERSION[self->id]);
+    #endif /* __arm__ */
+
     /* Switch state */
     self->state = kb_rpi2_Pin_LOW;
-
-    /*
-     * TODO: Set this pin LOW via bcm2835
-     */
 
     /* If everything went fine */
     return kb_OKAY;

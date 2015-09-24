@@ -32,9 +32,15 @@ typedef enum
 
     /* Pin related error signals */
     kb_INVALID_PIN_ID,
+    kb_INVALID_PIN_STATE,
+    kb_INVALID_PIN_ROLE,
     kb_PIN_ALREADY_USED,
     kb_PIN_DOES_NOT_EXIST,
     kb_TOO_MANY_PINS_USED,
+    kb_PIN_IS_GROUND,
+    kb_PIN_IS_POWER_V3_3,
+    kb_PIN_IS_POWER_V5,
+    kb_PIN_IS_RESERVED,
 
     /* Sensor related error signals */
     kb_PIN_INDEX_IS_OUT_OF_RANGE,

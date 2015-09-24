@@ -23,14 +23,19 @@ Currenlty supported languages:
 - Python
 - JavaScript
 
+From here on...
+
+WIP: Random Stuffs
+==================
+
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 ***COMPILER EVERYTHING WITH `clang-3.5` ON THE RASPBIAN !!!***
+***`sudo LD_LIBRARY_PATH=/usr/local/lib kbjs file.js`***
 
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-WIP: Random Stuffs
-------------------
+Prepare your Raspberry Pi 2
+---------------------------
 
 1. Install Raspbian:
 
@@ -170,18 +175,13 @@ WIP: Random Stuffs
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-Make sure SSH is enabled:
-
-```
-$ raspi-config
-=> Advanced settings
-=> enable SSH
-```
+Start developing on the Raspberry Pi 2
+--------------------------------------
 
 Install `sshfs` on your system and then mount the whole raspberry pi to a folder
 called `rpi`
 
-```
+```bash
 $ pacman -S sshfs
 $ cd /tmp
 $ mkdir rpi
@@ -191,13 +191,13 @@ $ mkdir documents
 ```
 
 To unmount sshfs:
-```
+```bash
 $ sudo umount -l /tmp/rpi
 ```
 
 Create a local directory, where you will work on your computer:
 
-```
+```bash
 $ cd ~/documents
 $ mkdir MyProject
 $ cd MyProject
@@ -205,14 +205,15 @@ $ cd MyProject
 
 Whenever you want to sync the folder use rsync:
 
-```
+```bash
 $ rsync --progress --recursive --archive --delete . /tmp/rpi/documents/MyProject
 ```
 
 or use the `sync_pi.sh`:
-```
+
+```bash
 $ chmod +x sync_pi.sh
-$ ./sync_pi.sh
+$ ./sync_pi.sh <source> <destination> [<interval (sec)>]
 ```
 
 Install dependencies:
@@ -230,31 +231,17 @@ Install dependency `bcm2835`:
 $ cd /tmp
 $ wget http://www.airspayce.com/mikem/bcm2835/bcm2835-1.45.tar.gz
 $ tar zxvf bcm2835-1.45.tar.gz
-$ cd bcm2835
+$ cd bcm2835-1.45
 $ ./configure
 $ make
 $ sudo make check
 $ sudo make install
 ```
 
-Enable Device Tree:
-
-```
-$ sudo raspi-config
-  |
-  +--> 8 Advanced Options
-  |    |
-  |    '--> A5 Device Tree
-  |         |
-  |         +--> Yes
-  |         |
-  |         '--> Ok
-  |
-  '--> Finish
-$ sudo reboot
-```
-
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+Developer Notes
+===============
 
 Naming Conventions:
 -------------------

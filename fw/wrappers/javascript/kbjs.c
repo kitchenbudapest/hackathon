@@ -16,7 +16,6 @@
             raise
             SIG_DFL */
 
-
 /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 /* Include duktape headers */
 #include <duktape.h>
@@ -32,6 +31,8 @@
 
 /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 /* Include kbjs headers */
+#include "include/built_ins.h"
+/*  func  : kbjs_register_built_ins */
 #include "include/pin_ids.h"
 /*  func  : kbjs_register_PinIds */
 #include "include/contexts.h"
@@ -94,6 +95,9 @@ main(int argc,
               "the creation of the duktape heap\n", stderr);
         return EXIT_FAILURE;
     }
+
+    /* Create built-ins */
+    kbjs_register_built_ins(context);
 
     /* Create modul objects */
     /* STACK: [global] */

@@ -18,7 +18,7 @@ DEVEL = ARGUMENTS.get('devel', False)
 # Set global variables
 #------------------------------------------------------------------------------#
 # C compiler
-CC = 'clang'
+CC = ARGUMENTS.get('cc', 'clang')
 
 # C compiler (generic) flags
 CCFLAGS = ['v',
@@ -42,11 +42,11 @@ CLANGFLAGS_DEVEL = ['Weverything']
 
 # Set flags based on the above variables
 #------------------------------------------------------------------------------#
-if CC == 'clang':
+if CC.startswith('clang'):
     if DEVEL:
         CLANGFLAGS.extend(CLANGFLAGS_DEVEL)
     flags = CLANGFLAGS
-elif CC == 'gcc':
+elif CC.startswith('gcc'):
     if DEVEL:
         GCCFLAGS.extend(GCCFLAGS_DEVEL)
     flags = GCCFLAGS
@@ -111,6 +111,7 @@ def wrapper():
     OUTPUT_DIR = join('build', 'kbjs')
     TARGET     = join('bins', 'kbjs')
     SOURCE     = ['kbjs.c',
+                  join('src', 'built_ins.c'),
                   join('src', 'errors.c'),
                   join('src', 'types.c'),
                   join('src', 'pin_ids.c'),
@@ -130,7 +131,9 @@ def wrapper():
     # Libraries
     LIBS    = ['duktape',
                'jemalloc',
-               'kb']
+               'kb',
+               'm',
+               'bcm2835']
 
     # Create environment
     environment = Environment(CC      = CC,

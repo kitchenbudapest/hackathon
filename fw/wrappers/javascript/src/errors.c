@@ -48,22 +48,16 @@ kbjs_Error_fmt(kbjs_Error error)
     {
         case kbjs_AllocationError:
             return ERRORS[kbjs_AllocationError];
-
         case kbjs_InternalError:
             return ERRORS[kbjs_InternalError];
-
         case kbjs_InvocationError:
             return ERRORS[kbjs_InvocationError];
-
         case kbjs_ArgumentError:
             return ERRORS[kbjs_ArgumentError];
-
         case kbjs_ArgumentTypeError:
             return ERRORS[kbjs_ArgumentTypeError];
-
         case kbjs_PropertyTypeError:
             return ERRORS[kbjs_PropertyTypeError];
-
         default:
             return ERRORS[0];
     }
