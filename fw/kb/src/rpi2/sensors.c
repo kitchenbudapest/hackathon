@@ -44,6 +44,7 @@ kb_rpi2_Sensor_new(kb_rpi2_Sensor   **const self,
                    size_t                   pins_count,
                    kb_rpi2_PinId     *const pin_ids,
                    kb_rpi2_PinRole   *const pin_roles,
+                   kb_rpi2_PinPull   *const pin_pulls,
                    kb_rpi2_PinState  *const pin_states)
 {
     /* If `self` is NULL */
@@ -71,6 +72,7 @@ kb_rpi2_Sensor_new(kb_rpi2_Sensor   **const self,
                                     pins_count,
                                     pin_ids,
                                     pin_roles,
+                                    pin_pulls,
                                     pin_states)))
     {
         free(sensor);
@@ -90,6 +92,7 @@ kb_rpi2_Sensor_ini(kb_rpi2_Sensor   *const self,
                    size_t                  pins_count,
                    kb_rpi2_PinId    *const pin_ids,
                    kb_rpi2_PinRole  *const pin_roles,
+                   kb_rpi2_PinPull  *const pin_pulls,
                    kb_rpi2_PinState *const pin_states)
 {
     /* If any of the arguments is NULL */
@@ -126,6 +129,7 @@ kb_rpi2_Sensor_ini(kb_rpi2_Sensor   *const self,
         if ((error = kb_rpi2_Event_use_pin(event,
                                            pin_ids[i],
                                            pin_roles[i],
+                                           pin_pulls[i],
                                            pin_states[i],
                                            self)))
             return error;

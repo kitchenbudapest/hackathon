@@ -99,6 +99,7 @@ kb_Error
 kb_rpi2_Event_use_pin(kb_rpi2_Event    *const self,
                       kb_rpi2_PinId           pin_id,
                       kb_rpi2_PinRole         pin_role,
+                      kb_rpi2_PinPull         pin_pull,
                       kb_rpi2_PinState        pin_state,
                       kb_rpi2_Sensor   *const sensor);
 /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
@@ -116,6 +117,15 @@ kb_rpi2_Event_listen_all_pins(kb_rpi2_Event *const self);
 /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 kb_Error
 kb_rpi2_Event_reset_all_pins(kb_rpi2_Event *const self);
+/*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+#define KB_RPI2_EVENT_PINS_LOOP_CALLBACKS(FUNC)                                \
+    kb_Error                                                                   \
+    kb_rpi2_Event_pins_##FUNC(kb_rpi2_Event *const self);
+KB_RPI2_EVENT_PINS_LOOP_CALLBACKS(on_start)
+KB_RPI2_EVENT_PINS_LOOP_CALLBACKS(on_stop)
+KB_RPI2_EVENT_PINS_LOOP_CALLBACKS(on_cycle_begin)
+KB_RPI2_EVENT_PINS_LOOP_CALLBACKS(on_cycle_end)
+#undef KB_RPI2_EVENT_PINS_LOOP_CALLBACKS
 /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 kb_Error
 kb_rpi2_Event_bind_sensor(kb_rpi2_Event  *const self,

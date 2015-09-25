@@ -108,9 +108,14 @@ typedef struct kb_rpi2_sensor
     /* Static data */                                                          \
     kb_rpi2_PinId           id;                                                \
     kb_rpi2_PinRole         role;                                              \
+    kb_rpi2_PinPull         pull;                                              \
     kb_rpi2_PinState        state;                                             \
     struct kb_rpi2_sensor  *sensor;                                            \
-    /* Available callbacks */                                                  \
+    /* Callbacks */                                                            \
+    kb_Error              (*on_start)(struct kb_rpi2_pin *const);              \
+    kb_Error              (*on_stop)(struct kb_rpi2_pin *const);               \
+    kb_Error              (*on_cycle_begin)(struct kb_rpi2_pin *const);        \
+    kb_Error              (*on_cycle_end)(struct kb_rpi2_pin *const);          \
     kb_Error              (*on_high)(struct kb_rpi2_pin     *const,            \
                                      struct kb_rpi2_sensor  *const,            \
                                      struct kb_rpi2_event   *const,            \

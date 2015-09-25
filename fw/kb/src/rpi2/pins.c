@@ -117,12 +117,9 @@ kb_rpi2_Pins_initialize(void)
     #ifdef __arm__
         /* If this is the first Pin object created in this session,
        or the first one created after a session already finished */
-        if (!USED_PIN_COUNTER &&
+        if (!(USED_PIN_COUNTER++) &&
             !bcm2835_init())
-        {
-            ++USED_PIN_COUNTER;
-            return kb_BCM2835_INIT_FAIL;
-        }
+                return kb_BCM2835_INIT_FAIL;
     #endif /* __arm__ */
     return kb_OKAY;
 }
@@ -146,6 +143,7 @@ kb_Error
 kb_rpi2_Pin_new(kb_rpi2_Pin      **const self,
                 kb_rpi2_PinId            pin_id,
                 kb_rpi2_PinRole          pin_role,
+                kb_rpi2_PinPull          pin_pull,
                 kb_rpi2_PinState         pin_state,
                 kb_rpi2_Sensor    *const sensor)
 {
@@ -167,7 +165,12 @@ kb_rpi2_Pin_new(kb_rpi2_Pin      **const self,
 
     /* Initialize new Pin object */
     kb_Error error;
-    if ((error = kb_rpi2_Pin_ini(pin, pin_id, pin_role, pin_state, sensor)))
+    if ((error = kb_rpi2_Pin_ini(pin,
+                                 pin_id,
+                                 pin_role,
+                                 pin_pull,
+                                 pin_state,
+                                 sensor)))
     {
         free(pin);
         return error;
@@ -184,6 +187,7 @@ kb_Error
 kb_rpi2_Pin_ini(kb_rpi2_Pin      *const self,
                 kb_rpi2_PinId           pin_id,
                 kb_rpi2_PinRole         pin_role,
+                kb_rpi2_PinPull         pin_pull,
                 kb_rpi2_PinState        pin_state,
                 kb_rpi2_Sensor   *const sensor)
 {
@@ -219,19 +223,23 @@ kb_rpi2_Pin_ini(kb_rpi2_Pin      *const self,
                 bcm_pin = PIN_CONVERSION[pin_id];
         }
 
-        /* Set PinState */
-        switch (pin_state)
+        /* Set PinPull */
+        switch (pin_pull)
         {
-            case kb_rpi2_Pin_LOW:
-                bcm2835_gpio_clr(bcm_pin);
+            case kb_rpi2_Pin_OFF:
+                bcm2835_gpio_set_pud(bcm_pin, BCM2835_GPIO_PUD_OFF);
                 break;
 
-            case kb_rpi2_Pin_HIGH:
-                bcm2835_gpio_set(bcm_pin);
+            case kb_rpi2_Pin_UP:
+                bcm2835_gpio_set_pud(bcm_pin, BCM2835_GPIO_PUD_UP);
+                break;
+
+            case kb_rpi2_Pin_DOWN:
+                bcm2835_gpio_set_pud(bcm_pin, BCM2835_GPIO_PUD_DOWN);
                 break;
 
             default:
-                return kb_INVALID_PIN_STATE;
+                return kb_INVALID_PIN_PULL;
         }
 
         /* Set PinRole */
@@ -248,15 +256,35 @@ kb_rpi2_Pin_ini(kb_rpi2_Pin      *const self,
             default:
                 return kb_INVALID_PIN_ROLE;
         }
+
+        /* Set PinState */
+        switch (pin_state)
+        {
+            case kb_rpi2_Pin_LOW:
+                bcm2835_gpio_clr(bcm_pin);
+                break;
+
+            case kb_rpi2_Pin_HIGH:
+                bcm2835_gpio_set(bcm_pin);
+                break;
+
+            default:
+                return kb_INVALID_PIN_STATE;
+        }
     #endif /* __arm__ */
 
     /* Initialize Pin object */
-    self->id      = pin_id;
-    self->role    = pin_role;
-    self->state   = pin_state;
-    self->sensor  = sensor;
-    self->on_high = NULL;
-    self->on_low  = NULL;
+    self->id             = pin_id;
+    self->role           = pin_role;
+    self->pull           = pin_pull;
+    self->state          = pin_state;
+    self->sensor         = sensor;
+    self->on_start       = NULL;
+    self->on_stop        = NULL;
+    self->on_cycle_begin = NULL;
+    self->on_cycle_end   = NULL;
+    self->on_high        = NULL;
+    self->on_low         = NULL;
 
     /* If everything went fine */
     return kb_OKAY;
@@ -564,3 +592,78 @@ kb_rpi2_Pin_unbind_on_low(kb_rpi2_Pin *const self)
     /* If everything went fine */
     return kb_OKAY;
 }
+
+
+/*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+/* TODO: **Only bind methods are enough**
+         unbind methods are unnecessary, as bind_on_x(self, NULL) could do the
+         exact same thing, and it eliminates an extra conditional and an extra
+         method definition */
+#define PIN_LOOP_CALLBACK_BIND(FUNC)                                           \
+    kb_Error                                                                   \
+    kb_rpi2_Pin_bind_##FUNC(kb_rpi2_Pin *const self,                           \
+                            kb_Error (*FUNC)(kb_rpi2_Pin *const))              \
+    {                                                                          \
+        /* If `self` is NULL */                                                \
+        if (!self)                                                             \
+            return kb_SELF_IS_NULL;                                            \
+                                                                               \
+        /* If `on_low` is NULL */                                              \
+        if (!FUNC)                                                             \
+            return kb_ARG2_IS_NULL;                                            \
+                                                                               \
+        /* Set callback function */                                            \
+        self->FUNC = FUNC;                                                     \
+                                                                               \
+        /* If everything went fine */                                          \
+        return kb_OKAY;                                                        \
+    }
+PIN_LOOP_CALLBACK_BIND(on_start)
+PIN_LOOP_CALLBACK_BIND(on_stop)
+PIN_LOOP_CALLBACK_BIND(on_cycle_begin)
+PIN_LOOP_CALLBACK_BIND(on_cycle_end)
+#undef PIN_LOOP_CALLBACK_BIND
+
+
+/*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+#define PIN_LOOP_CALLBACK_UNBIND(FUNC)                                         \
+    kb_Error                                                                   \
+    kb_rpi2_Pin_unbind_##FUNC(kb_rpi2_Pin *const self)                         \
+    {                                                                          \
+        /* If `self` is NULL */                                                \
+        if (!self)                                                             \
+            return kb_SELF_IS_NULL;                                            \
+                                                                               \
+        /* Unset callback function */                                          \
+        self->FUNC = NULL;                                                     \
+                                                                               \
+        /* If everything went fine */                                          \
+        return kb_OKAY;                                                        \
+    }
+PIN_LOOP_CALLBACK_UNBIND(on_start)
+PIN_LOOP_CALLBACK_UNBIND(on_stop)
+PIN_LOOP_CALLBACK_UNBIND(on_cycle_begin)
+PIN_LOOP_CALLBACK_UNBIND(on_cycle_end)
+#undef PIN_LOOP_CALLBACK_UNBIND
+
+
+/*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+#define PIN_LOOP_CALLBACK_CALL(FUNC)                                           \
+    kb_Error                                                                   \
+    kb_rpi2_Pin_##FUNC(kb_rpi2_Pin *const self)                                \
+    {                                                                          \
+        /* If `self` is NULL */                                                \
+        if (!self)                                                             \
+            return kb_SELF_IS_NULL;                                            \
+                                                                               \
+        /* If instance has `on_FUNC` callback, call it */                      \
+        if (self->FUNC)                                                        \
+            return self->FUNC(self);                                           \
+        /* If not, return */                                                   \
+        return kb_OKAY;                                                        \
+    }
+PIN_LOOP_CALLBACK_CALL(on_start)
+PIN_LOOP_CALLBACK_CALL(on_stop)
+PIN_LOOP_CALLBACK_CALL(on_cycle_begin)
+PIN_LOOP_CALLBACK_CALL(on_cycle_end)
+#undef PIN_LOOP_CALLBACK_CALL

@@ -34,6 +34,7 @@ typedef enum
     kb_INVALID_PIN_ID,
     kb_INVALID_PIN_STATE,
     kb_INVALID_PIN_ROLE,
+    kb_INVALID_PIN_PULL,
     kb_PIN_ALREADY_USED,
     kb_PIN_DOES_NOT_EXIST,
     kb_TOO_MANY_PINS_USED,

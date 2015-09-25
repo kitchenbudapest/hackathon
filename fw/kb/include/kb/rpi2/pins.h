@@ -31,6 +31,7 @@ kb_Error
 kb_rpi2_Pin_new(kb_rpi2_Pin      **const self,
                 kb_rpi2_PinId            pin_id,
                 kb_rpi2_PinRole          pin_role,
+                kb_rpi2_PinPull          pin_pull,
                 kb_rpi2_PinState         pin_state,
                 kb_rpi2_Sensor    *const sensor);
 /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
@@ -47,6 +48,7 @@ kb_Error
 kb_rpi2_Pin_ini(kb_rpi2_Pin      *const self,
                 kb_rpi2_PinId           pin_id,
                 kb_rpi2_PinRole         pin_role,
+                kb_rpi2_PinPull         pin_pull,
                 kb_rpi2_PinState        pin_state,
                 kb_rpi2_Sensor   *const sensor);
 /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
@@ -153,6 +155,33 @@ kb_rpi2_Pin_bind_on_low(kb_rpi2_Pin *const self,
         if first argument is a NULL pointer */
 kb_Error
 kb_rpi2_Pin_unbind_on_low(kb_rpi2_Pin *const self);
-
+/*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+#define KB_RPI2_PIN_LOOP_CALLBACK_BIND(FUNC)                                   \
+    kb_Error                                                                   \
+    kb_rpi2_Pin_bind_##FUNC(kb_rpi2_Pin *const self,                           \
+                            kb_Error (*FUNC)(kb_rpi2_Pin *const));
+KB_RPI2_PIN_LOOP_CALLBACK_BIND(on_start)
+KB_RPI2_PIN_LOOP_CALLBACK_BIND(on_stop)
+KB_RPI2_PIN_LOOP_CALLBACK_BIND(on_cycle_begin)
+KB_RPI2_PIN_LOOP_CALLBACK_BIND(on_cycle_end)
+#undef KB_RPI2_PIN_LOOP_CALLBACK_BIND
+/*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+#define KB_RPI2_PIN_LOOP_CALLBACK_UNBIND(FUNC)                                 \
+    kb_Error                                                                   \
+    kb_rpi2_Pin_unbind_##FUNC(kb_rpi2_Pin *const self);
+KB_RPI2_PIN_LOOP_CALLBACK_UNBIND(on_start)
+KB_RPI2_PIN_LOOP_CALLBACK_UNBIND(on_stop)
+KB_RPI2_PIN_LOOP_CALLBACK_UNBIND(on_cycle_begin)
+KB_RPI2_PIN_LOOP_CALLBACK_UNBIND(on_cycle_end)
+#undef KB_RPI2_PIN_LOOP_CALLBACK_UNBIND
+/*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+#define KB_RPI2_PIN_LOOP_CALLBACK_CALL(FUNC)                                   \
+    kb_Error                                                                   \
+    kb_rpi2_Pin_##FUNC(kb_rpi2_Pin *const self);
+KB_RPI2_PIN_LOOP_CALLBACK_CALL(on_start)
+KB_RPI2_PIN_LOOP_CALLBACK_CALL(on_stop)
+KB_RPI2_PIN_LOOP_CALLBACK_CALL(on_cycle_begin)
+KB_RPI2_PIN_LOOP_CALLBACK_CALL(on_cycle_end)
+#undef KB_RPI2_PIN_LOOP_CALLBACK_CALL
 
 #endif /* KB_RPI2_PINS_H_15777440527397069 */

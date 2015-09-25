@@ -20,6 +20,14 @@ typedef enum
 } kb_rpi2_PinState;
 
 
+/*----------------------------------------------------------------------------*/
+typedef enum
+{
+    kb_rpi2_Pin_OFF,
+    kb_rpi2_Pin_UP,
+    kb_rpi2_Pin_DOWN,
+} kb_rpi2_PinPull;
+
 
 /*----------------------------------------------------------------------------*/
 typedef enum

@@ -207,6 +207,7 @@ kb_Error
 kb_rpi2_Event_use_pin(kb_rpi2_Event    *const self,
                       kb_rpi2_PinId           pin_id,
                       kb_rpi2_PinRole         pin_role,
+                      kb_rpi2_PinPull         pin_pull,
                       kb_rpi2_PinState        pin_state,
                       kb_rpi2_Sensor   *const sensor)
 {
@@ -231,6 +232,7 @@ kb_rpi2_Event_use_pin(kb_rpi2_Event    *const self,
     return kb_rpi2_Pin_new(self->pins + pin_id,
                            pin_id,
                            pin_role,
+                           pin_pull,
                            pin_state,
                            sensor);
 }
@@ -324,6 +326,31 @@ kb_rpi2_Event_reset_all_pins(kb_rpi2_Event *const self)
     /* If everything went fine */
     return kb_OKAY;
 }
+
+
+/*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+#define PINS_LOOP_CALLBACKS(FUNC)                                              \
+    kb_Error                                                                   \
+    kb_rpi2_Event_pins_##FUNC(kb_rpi2_Event *const self)                       \
+    {                                                                          \
+        /* If `self` is NULL */                                                \
+        if (!self)                                                             \
+            return kb_SELF_IS_NULL;                                            \
+                                                                               \
+        /* Iterate through all pins and reset all of them */                   \
+        kb_Error error;                                                        \
+        for (size_t i=0; i<(size_t)kb_rpi2_PINS_COUNT; i++)                    \
+            if ((error = kb_rpi2_Pin_##FUNC(self->pins[i])))                   \
+                return error;                                                  \
+                                                                               \
+        /* If everything went fine */                                          \
+        return kb_OKAY;                                                        \
+    }
+PINS_LOOP_CALLBACKS(on_start)
+PINS_LOOP_CALLBACKS(on_stop)
+PINS_LOOP_CALLBACKS(on_cycle_begin)
+PINS_LOOP_CALLBACKS(on_cycle_end)
+#undef PINS_LOOP_CALLBACKS
 
 
 /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */

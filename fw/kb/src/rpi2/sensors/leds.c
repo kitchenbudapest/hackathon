@@ -46,12 +46,17 @@ enum pin_indices
     PIN1 = 0,
 };
 /* Role values */
-static kb_rpi2_PinRole pin_roles[] =
+static kb_rpi2_PinRole PIN_ROLES[] =
 {
     kb_rpi2_Pin_OUTPUT,
 };
+/* Initial pulls */
+static kb_rpi2_PinPull PIN_PULLS[] =
+{
+    kb_rpi2_Pin_OFF,
+};
 /* Initial states */
-static kb_rpi2_PinState pin_states[] =
+static kb_rpi2_PinState PIN_STATES[] =
 {
     kb_rpi2_Pin_LOW,
 };
@@ -111,17 +116,14 @@ kb_rpi2_sensors_LED_ini(kb_rpi2_sensors_LED *const self,
                                     event,
                                     (size_t)1,
                                     &pin_id,
-                                    pin_roles,
-                                    pin_states)))
+                                    PIN_ROLES,
+                                    PIN_PULLS,
+                                    PIN_STATES)))
         return error;
 
     /* Initialize data */
     self->on_on  = NULL;
     self->on_off = NULL;
-
-    /*
-     * TODO: set PIN1 to output and LOW
-     */
 
     /* If everything went fine */
     return kb_OKAY;

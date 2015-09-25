@@ -43,7 +43,11 @@
 /*  type  : kb_rpi2_Event
     func  : kb_rpi2_Event_reset_pins
             kb_rpi2_Event_disable_all
-            kb_rpi2_Event_listen_all_pins */
+            kb_rpi2_Event_listen_all_pins
+            kb_rpi2_Event_pins_on_start
+            kb_rpi2_Event_pins_on_stop
+            kb_rpi2_Event_pins_on_cycle_begin
+            kb_rpi2_Event_pins_on_cycle_end */
 #include <kb/rpi2/contexts.h>
 /*  type  : kb_rpi2_Context */
 
@@ -256,6 +260,10 @@ kb_rpi2_Context_start(kb_rpi2_Context *const self)
     /* Indicate that an event-loop has been started */
     EVENT_LOOP_ALREADY_RUNNING = true;
 
+    /* Call pins' `on_start` callbacks */
+    if ((error = kb_rpi2_Event_pins_on_start(self->curr_active)))
+        return error;
+
     /* If there is an `on_start` callback, call it */
     if (self->on_start)
         if ((error = self->on_start(self, self->curr_active)))
@@ -267,18 +275,26 @@ kb_rpi2_Context_start(kb_rpi2_Context *const self)
     /* Enter main loop */
     while (self->looping)
     {
+        /* Call pins' `on_cycle_begin` callbacks */
+        kb_rpi2_Event_pins_on_cycle_begin(self->curr_active);
+
         /* If there is an `on_cycle_begin` callback, call it */
         if (self->on_cycle_begin)
             if ((error = self->on_cycle_begin(self, self->curr_active)))
                 return error;
 
         /* Get signals from pins */
-        kb_rpi2_Event_listen_all_pins(self->curr_active);
+        if ((error = kb_rpi2_Event_listen_all_pins(self->curr_active)))
+            return error;
 
         /* If there is an `on_cycle_end` callback, call it */
         if (self->on_cycle_end)
             if ((error = self->on_cycle_end(self, self->curr_active)))
                 return error;
+
+        /* Call pins' `on_cycle_end` callbacks */
+        if ((error = kb_rpi2_Event_pins_on_cycle_end(self->curr_active)))
+            return error;
 
         /* If event-activation has been scheduled */
         if (self->next_active)
@@ -309,6 +325,10 @@ kb_rpi2_Context_start(kb_rpi2_Context *const self)
     if (self->on_stop)
         if ((error = self->on_stop(self, self->curr_active)))
             return error;
+
+    /* Call pins' `on_stop` callbacks */
+    if ((error = kb_rpi2_Event_pins_on_stop(self->curr_active)))
+        return error;
 
     /* If program should exit */
     if (self->exiting)

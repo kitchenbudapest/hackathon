@@ -54,7 +54,7 @@ enum pin_indices
     PIN_COL4,
 };
 /* Role values */
-static kb_rpi2_PinRole pin_roles[] =
+static kb_rpi2_PinRole PIN_ROLES[] =
 {
     kb_rpi2_Pin_OUTPUT,
     kb_rpi2_Pin_INPUT,
@@ -62,10 +62,19 @@ static kb_rpi2_PinRole pin_roles[] =
     kb_rpi2_Pin_INPUT,
     kb_rpi2_Pin_INPUT,
 };
-/* Initial states */
-static kb_rpi2_PinState pin_states[] =
+/* Initial pulls */
+static kb_rpi2_PinPull PIN_PULLS[] =
 {
-    kb_rpi2_Pin_LOW,
+    kb_rpi2_Pin_OFF,
+    kb_rpi2_Pin_UP,
+    kb_rpi2_Pin_UP,
+    kb_rpi2_Pin_UP,
+    kb_rpi2_Pin_UP,
+};
+/* Initial states */
+static kb_rpi2_PinState PIN_STATES[] =
+{
+    kb_rpi2_Pin_HIGH,
     kb_rpi2_Pin_HIGH,
     kb_rpi2_Pin_HIGH,
     kb_rpi2_Pin_HIGH,
@@ -98,6 +107,25 @@ ON_KEY_X_FUNCTION(1)
 ON_KEY_X_FUNCTION(2)
 ON_KEY_X_FUNCTION(3)
 ON_KEY_X_FUNCTION(4)
+#undef ON_KEY_X_FUNCTION
+
+
+/*----------------------------------------------------------------------------*/
+/* Internal callbacks */
+static kb_Error
+pin_row_on_cycle_begin(kb_rpi2_Pin *const pin)
+{
+    return kb_rpi2_Pin_set_low(pin);
+}
+
+
+/*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+/* Internal callbacks */
+static kb_Error
+pin_row_on_cycle_end(kb_rpi2_Pin *const pin)
+{
+    return kb_rpi2_Pin_set_high(pin);
+}
 
 
 /*----------------------------------------------------------------------------*/
@@ -140,10 +168,6 @@ kb_rpi2_sensors_FourKeys_new(kb_rpi2_sensors_FourKeys **const self,
         return error;
     }
 
-    /*
-     * TODO: set PIN_ROW to output and HIGH
-     */
-
     /* If everything went fine, return values */
     *self = four_keys;
     return kb_OKAY;
@@ -182,9 +206,16 @@ kb_rpi2_sensors_FourKeys_ini(kb_rpi2_sensors_FourKeys *const self,
                                     event,
                                     (sizeof pin_ids)/sizeof(kb_rpi2_PinId),
                                     pin_ids,
-                                    pin_roles,
-                                    pin_states)))
+                                    PIN_ROLES,
+                                    PIN_PULLS,
+                                    PIN_STATES)))
         return error;
+
+    /* Set pin callbacks */
+    kb_rpi2_Pin *pin;
+    kb_rpi2_Sensor_get_pin((kb_rpi2_Sensor *const)self, PIN_ROW, &pin);
+    kb_rpi2_Pin_bind_on_cycle_begin(pin, pin_row_on_cycle_begin);
+    kb_rpi2_Pin_bind_on_cycle_end(pin, pin_row_on_cycle_end);
 
     /* Set static values */
     self->on_key_1 = NULL;

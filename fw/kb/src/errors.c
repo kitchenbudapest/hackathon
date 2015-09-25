@@ -30,6 +30,7 @@ static const char *const ERRORS[] =
     [kb_INVALID_PIN_ID]             = "kb_INVALID_PIN_ID",
     [kb_INVALID_PIN_STATE]          = "kb_INVALID_PIN_STATE",
     [kb_INVALID_PIN_ROLE]           = "kb_INVALID_PIN_ROLE",
+    [kb_INVALID_PIN_PULL]           = "kb_INVALID_PIN_PULL",
     [kb_PIN_ALREADY_USED]           = "kb_PIN_ALREADY_USED",
     [kb_PIN_DOES_NOT_EXIST]         = "kb_PIN_DOES_NOT_EXIST",
     [kb_TOO_MANY_PINS_USED]         = "kb_TOO_MANY_PINS_USED",
@@ -79,6 +80,8 @@ kb_Error_str(kb_Error error)
             return ERRORS[kb_INVALID_PIN_STATE];
         case kb_INVALID_PIN_ROLE:
             return ERRORS[kb_INVALID_PIN_ROLE];
+        case kb_INVALID_PIN_PULL:
+            return ERRORS[kb_INVALID_PIN_PULL];
         case kb_PIN_ALREADY_USED:
             return ERRORS[kb_PIN_ALREADY_USED];
         case kb_PIN_DOES_NOT_EXIST:
