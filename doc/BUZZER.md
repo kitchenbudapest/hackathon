@@ -31,11 +31,7 @@ DC signal can not makes the Buzzer tweet. Must 2K ~ 5K square ave (PWM) to Drive
 
 #### Example code
 ```
-/*
-Adafruit Arduino - Lesson 10. Simple Sounds
-*/
-
-int speakerPin = 12;
+int speakerPin = 4;
 
 int numTones = 10;
 int tones[] = {261, 277, 294, 311, 330, 349, 370, 392, 415, 440};
@@ -57,5 +53,5 @@ void loop()
 ```
 
 
-###### Source: 
+###### Source:
 [Here](http://wikipedia.org)

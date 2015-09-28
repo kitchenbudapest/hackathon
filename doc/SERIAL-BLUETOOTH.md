@@ -16,6 +16,8 @@ Reading serial data on Android with [BlueTerm](https://play.google.com/store/app
 
 ![alt text](img/blue1.png)
 
+### Raspberry PI usage:
+
 #### Pinout
 
 ![alt text](img/pir2.jpg)
@@ -23,3 +25,42 @@ Reading serial data on Android with [BlueTerm](https://play.google.com/store/app
 #### Wiring
 
 ![alt text](img/blue.png)
+
+### Arduino nano usage:
+
+#### Pinout
+
+![alt text](img/arduino_pinout.png)
+
+#### Wiring
+
+![alt text](img/blueardu.png)
+
+#### Example code
+```
+String message; //string that stores the incoming message
+
+void setup()
+{
+  Serial.begin(9600); //set baud rate
+}
+
+void loop()
+{
+  while(Serial.available())
+  {//while there is data available on the serial monitor
+    message+=char(Serial.read());//store string from serial command
+  }
+  if(!Serial.available())
+  {
+    if(message!="")
+    {//if data is available
+      Serial.println(message); //show the data
+      message=""; //clear the data
+    }
+  }
+  delay(5000); //delay
+}
+```
+###### Source:
+[Here](http://42bots.com/tutorials/hc-06-bluetooth-module-datasheet-and-configuration-with-arduino/)

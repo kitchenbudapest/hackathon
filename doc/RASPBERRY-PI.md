@@ -128,4 +128,4 @@ Click the Connect button and you will be prompted for the password that was spec
 Don't use the logout menu as you would on the Raspberry Pi desktop when you want to close down. Just close the Remote Desktop Viewer window itself and then use the kill command on the Raspberry Pi, described above, to shut down the VNC server.
 
 
-###### Source: www.raspberrypi.org, wikipedia.org 
+###### Source: www.raspberrypi.org, wikipedia.org
