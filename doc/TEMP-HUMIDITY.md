@@ -113,4 +113,5 @@ void loop() {
 }
 ```
 
-###### Source: adafruit.com
+###### Source:
+[Here](http://adafruit.com)

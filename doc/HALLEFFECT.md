@@ -63,6 +63,5 @@ delay(500);
 }
 ```
 
-
-
-###### Source: wikipedia.org, engineersgarage.com
+###### Source:
+[Here](http://wikipedia.org), [Here](http://engineersgarage.com)
