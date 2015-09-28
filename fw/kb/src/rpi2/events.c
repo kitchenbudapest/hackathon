@@ -2,16 +2,17 @@
 ** INFO */
 
 /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-/* Include jemalloc headers */
-#include <jemalloc/jemalloc.h>
-
-/*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 /* Include standard headers */
 #include <stddef.h>
 /*  type  : size_t */
 #include <stdlib.h>
 /*  func  : malloc
             free */
+
+/*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+/* Include jemalloc headers */
+#include <jemalloc/jemalloc.h>
+
 /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 /* Include kibu headers */
 #include <kb/errors.h>
@@ -337,11 +338,18 @@ kb_rpi2_Event_reset_all_pins(kb_rpi2_Event *const self)
         if (!self)                                                             \
             return kb_SELF_IS_NULL;                                            \
                                                                                \
-        /* Iterate through all pins and reset all of them */                   \
+        /* Iterate through all pins and call their callbacks */                \
         kb_Error error;                                                        \
         for (size_t i=0; i<(size_t)kb_rpi2_PINS_COUNT; i++)                    \
-            if ((error = kb_rpi2_Pin_##FUNC(self->pins[i])))                   \
-                return error;                                                  \
+            switch ((error = kb_rpi2_Pin_##FUNC(self->pins[i])))               \
+            {                                                                  \
+                /* If pin is not used */                                       \
+                case kb_SELF_IS_NULL:                                          \
+                    continue;                                                  \
+                /* If other error appeared */                                  \
+                default:                                                       \
+                    return error;                                              \
+            }                                                                  \
                                                                                \
         /* If everything went fine */                                          \
         return kb_OKAY;                                                        \

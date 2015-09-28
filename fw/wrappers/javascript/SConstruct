@@ -70,7 +70,7 @@ def duktape():
     # Output and inputs
     INPUT_DIR  = join('duktape-1.3.0', 'src')
     OUTPUT_DIR = join('build', 'duktape')
-    TARGET     = 'duktape'
+    TARGET     = join('libs', 'duktape')
     SOURCE     = ['duktape.c']
 
     # C pre-processor path (include)
@@ -118,7 +118,11 @@ def wrapper():
                   join('src', 'js_types.c'),
                   join('src', 'contexts.c'),
                   join('src', 'events.c'),
-                  join('src', 'sensors', 'leds.c')]
+                  join('src', 'sensors', 'leds.c'),
+                  join('src', 'sensors', 'four_keys.c'),
+                  join('src', 'sensors', 'rgb_leds.c'),
+                  join('src', 'sensors', 'step_motors.c'),
+                  join('src', 'sensors', 'photo_resistors.c'),]
 
     # C pre-processor path (include)
     CPPPATH = ['.',
@@ -132,8 +136,11 @@ def wrapper():
     LIBS    = ['duktape',
                'jemalloc',
                'kb',
-               'm',
-               'bcm2835']
+               'm']
+
+    # If this is not a desktop build
+    if not ARGUMENTS.get('desktop', False):
+        LIBS.append('bcm2835')
 
     # Create environment
     environment = Environment(CC      = CC,

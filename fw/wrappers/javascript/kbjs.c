@@ -41,6 +41,14 @@
 /*  func  : kbjs_register_Event */
 #include "include/sensors/leds.h"
 /*  func  : kbjs_register_LED */
+#include "include/sensors/four_keys.h"
+/*  func  : kbjs_register_FourKeys */
+#include "include/sensors/rgb_leds.h"
+/*  func  : kbjs_register_RGBLED */
+#include "include/sensors/step_motors.h"
+/*  func  : kbjs_register_StepMotor */
+#include "include/sensors/photo_resistors.h"
+/*  func  : kbjs_register_PhotoResistor */
 
 
 /*----------------------------------------------------------------------------*/
@@ -128,7 +136,10 @@ main(int argc,
     kbjs_register_Context(context);
     kbjs_register_Event(context);
     kbjs_register_LED(context);
-    // kbjs_register_FourKeys(context);
+    kbjs_register_FourKeys(context);
+    kbjs_register_RGBLED(context);
+    kbjs_register_StepMotor(context);
+    kbjs_register_PhotoResistor(context);
 
     /* Evaluate passed script */
     if (duk_peval_file(context, argv[1]))

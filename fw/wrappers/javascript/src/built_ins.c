@@ -41,8 +41,8 @@
     func  : kbjs_Error_fmt */
 
 /*----------------------------------------------------------------------------*/
-static long int S_TO_MS                  = 1000L;
-static long int MS_TO_NS                 = 1000000L;
+static long S_TO_MS                      = 1000L;
+static long MS_TO_NS                     = 1000000L;
 static const char *const SLEEP_FUNC_NAME = "sleep";
 
 

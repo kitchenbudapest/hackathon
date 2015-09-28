@@ -2,8 +2,8 @@
 ** INFO */
 
 /* Header guard */
-#ifndef KBJS_SENSORS_LED_H_2932343353432585
-#define KBJS_SENSORS_LED_H_2932343353432585 1
+#ifndef KBJS_SENSORS_STEP_MOTORS_H_8928482018117462
+#define KBJS_SENSORS_STEP_MOTORS_H_8928482018117462 1
 
 /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 /* Include kbjs headers */
@@ -12,7 +12,7 @@
 
 
 /*----------------------------------------------------------------------------*/
-/* kbjs_register_LED */
-KBJS_SENSORS_COMMON_REGISTER_WRAPPER_H(LED)
+/* kbjs_register_StepMotor */
+KBJS_SENSORS_COMMON_REGISTER_WRAPPER_H(StepMotor)
 
-#endif /* KBJS_SENSORS_LED_H_2932343353432585 */
+#endif /* KBJS_SENSORS_STEP_MOTORS_H_8928482018117462 */

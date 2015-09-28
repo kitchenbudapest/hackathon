@@ -78,7 +78,10 @@ def kb():
                   join('src', 'rpi2', 'pins.c'),
                   join('src', 'rpi2', 'sensors.c'),
                   join('src', 'rpi2', 'sensors', 'four_keys.c'),
-                  join('src', 'rpi2', 'sensors', 'leds.c')]
+                  join('src', 'rpi2', 'sensors', 'leds.c'),
+                  join('src', 'rpi2', 'sensors', 'rgb_leds.c'),
+                  join('src', 'rpi2', 'sensors', 'step_motors.c'),
+                  join('src', 'rpi2', 'sensors', 'photo_resistors.c'),]
 
     # C pre-processor path (include)
     CPPPATH = [join(INPUT_DIR, 'include')]
@@ -87,7 +90,12 @@ def kb():
                '/usr/lib',
                '/usr/local/lib']
     # Libraries
-    LIBS    = ['jemalloc']
+    LIBS    = ['jemalloc',
+               'm']
+
+    # If this is not a desktop build
+    if not ARGUMENTS.get('desktop', False):
+        LIBS.append('bcm2835')
 
     # Create environment
     environment = Environment(CC      = CC,

@@ -2,14 +2,14 @@
 ** INFO */
 
 /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-/* Include jemalloc headers */
-#include <jemalloc/jemalloc.h>
-
-/*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 /* Include standard headers */
 #include <stdlib.h>
 /*  func  : malloc
             free */
+
+/*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+/* Include jemalloc headers */
+#include <jemalloc/jemalloc.h>
 
 /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 #ifdef __arm__
@@ -260,6 +260,9 @@ kb_rpi2_Pin_ini(kb_rpi2_Pin      *const self,
         /* Set PinState */
         switch (pin_state)
         {
+            case kb_rpi2_Pin_UNSET:
+                break;
+
             case kb_rpi2_Pin_LOW:
                 bcm2835_gpio_clr(bcm_pin);
                 break;
@@ -391,10 +394,26 @@ kb_rpi2_Pin_listen(kb_rpi2_Pin *const self)
     if (!self)
         return kb_SELF_IS_NULL;
 
-    /* If signal changed */
-    /*
-     * TODO: get signal via bcm2835
-     */
+    /* Save previous state */
+    kb_rpi2_PinState state = self->state;
+
+    #ifdef __arm__
+        /* Get signal level of pin */
+        switch (bcm2835_gpio_lev(PIN_CONVERSION[self->id]))
+        {
+            case LOW:
+                self->state = kb_rpi2_Pin_LOW;
+                break;
+
+            case HIGH:
+                self->state = kb_rpi2_Pin_HIGH;
+                break;
+        }
+    #endif /* __arm__ */
+
+    /* If nothing has changed */
+    if (state == self->state)
+        return kb_OKAY;
 
     /* If the state has been changed */
     kb_rpi2_Event   *event;
@@ -434,6 +453,10 @@ kb_rpi2_Pin_listen(kb_rpi2_Pin *const self)
                              context);
             }
             break;
+
+        /* If it is still unset => this cannot happen */
+        case kb_rpi2_Pin_UNSET:
+            return kb_FAIL;
     }
 
     /* If everything went fine */

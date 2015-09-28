@@ -15,6 +15,7 @@ typedef enum
 /*----------------------------------------------------------------------------*/
 typedef enum
 {
+    kb_rpi2_Pin_UNSET,
     kb_rpi2_Pin_LOW,
     kb_rpi2_Pin_HIGH,
 } kb_rpi2_PinState;

@@ -20,21 +20,24 @@
 
 
 /*----------------------------------------------------------------------------*/
+#define KB_RPI2_SENSORS_FOUR_KEYS_MEMBERS()                                    \
+    KB_RPI2_SENSOR_MEMBERS()                                                   \
+    kb_Error (*on_key_1)(struct kb_rpi2_sensors_four_keys *const,              \
+                         kb_rpi2_Event                    *const,              \
+                         kb_rpi2_Context                  *const);             \
+    kb_Error (*on_key_2)(struct kb_rpi2_sensors_four_keys *const,              \
+                         kb_rpi2_Event                    *const,              \
+                         kb_rpi2_Context                  *const);             \
+    kb_Error (*on_key_3)(struct kb_rpi2_sensors_four_keys *const,              \
+                         kb_rpi2_Event                    *const,              \
+                         kb_rpi2_Context                  *const);             \
+    kb_Error (*on_key_4)(struct kb_rpi2_sensors_four_keys *const,              \
+                         kb_rpi2_Event                    *const,              \
+                         kb_rpi2_Context                  *const);
+/*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 typedef struct kb_rpi2_sensors_four_keys
 {
-    KB_RPI2_SENSOR_MEMBERS()
-    kb_Error (*on_key_1)(struct kb_rpi2_sensors_four_keys *const,
-                         kb_rpi2_Event                    *const,
-                         kb_rpi2_Context                  *const);
-    kb_Error (*on_key_2)(struct kb_rpi2_sensors_four_keys *const,
-                         kb_rpi2_Event                    *const,
-                         kb_rpi2_Context                  *const);
-    kb_Error (*on_key_3)(struct kb_rpi2_sensors_four_keys *const,
-                         kb_rpi2_Event                    *const,
-                         kb_rpi2_Context                  *const);
-    kb_Error (*on_key_4)(struct kb_rpi2_sensors_four_keys *const,
-                         kb_rpi2_Event                    *const,
-                         kb_rpi2_Context                  *const);
+    KB_RPI2_SENSORS_FOUR_KEYS_MEMBERS()
 } kb_rpi2_sensors_FourKeys;
 
 
@@ -79,10 +82,7 @@ KB_RPI2_SENSORS_FOUR_KEYS_ON_KEY_X_BIND_FUNCTION(4)
 #define KB_RPI2_SENSORS_FOUR_KEYS_ON_KEY_X_UNBIND_FUNCTION(KEY)                \
     kb_Error                                                                   \
     kb_rpi2_sensors_FourKeys_unbind_on_key_##KEY(                              \
-        kb_rpi2_sensors_FourKeys *const  self,                                 \
-        kb_Error (*on_key_##KEY)(kb_rpi2_sensors_FourKeys *const,              \
-                                 kb_rpi2_Event            *const,              \
-                                 kb_rpi2_Context          *const));
+        kb_rpi2_sensors_FourKeys *const  self);
 KB_RPI2_SENSORS_FOUR_KEYS_ON_KEY_X_UNBIND_FUNCTION(1)
 KB_RPI2_SENSORS_FOUR_KEYS_ON_KEY_X_UNBIND_FUNCTION(2)
 KB_RPI2_SENSORS_FOUR_KEYS_ON_KEY_X_UNBIND_FUNCTION(3)

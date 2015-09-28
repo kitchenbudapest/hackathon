@@ -161,7 +161,7 @@ Prepare your Raspberry Pi 2
     # Install headers and the library:
     $ sudo cp duktape-1.3.0/src/duktape.h /usr/local/include
     $ sudo cp duktape-1.3.0/src/duk_config.h /usr/local/include
-    $ sudo mv libduktape.so /usr/local/lib/
+    $ sudo mv libs/libduktape.so /usr/local/lib/
 
     # Build application:
     $ scons kbjs

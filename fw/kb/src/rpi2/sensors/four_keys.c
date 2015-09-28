@@ -2,14 +2,14 @@
 ** INFO */
 
 /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-/* Include jemalloc headers */
-#include <jemalloc/jemalloc.h>
-
-/*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 /* Include standard headers */
 #include <stdlib.h>
 /*  func  : malloc
             free */
+
+/*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+/* Include jemalloc headers */
+#include <jemalloc/jemalloc.h>
 
 /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 /* Include kibu headers */
@@ -74,11 +74,11 @@ static kb_rpi2_PinPull PIN_PULLS[] =
 /* Initial states */
 static kb_rpi2_PinState PIN_STATES[] =
 {
-    kb_rpi2_Pin_HIGH,
-    kb_rpi2_Pin_HIGH,
-    kb_rpi2_Pin_HIGH,
-    kb_rpi2_Pin_HIGH,
-    kb_rpi2_Pin_HIGH,
+    kb_rpi2_Pin_LOW,
+    kb_rpi2_Pin_UNSET,
+    kb_rpi2_Pin_UNSET,
+    kb_rpi2_Pin_UNSET,
+    kb_rpi2_Pin_UNSET,
 };
 
 
@@ -281,7 +281,7 @@ kb_rpi2_sensors_FourKeys_del(kb_rpi2_sensors_FourKeys **const self)
         kb_rpi2_Sensor_get_pin((kb_rpi2_Sensor *const)self,                    \
                                PIN_COL##KEY,                                   \
                                &pin);                                          \
-        kb_rpi2_Pin_bind_on_high(pin, FourKeys_on_key_##KEY);                  \
+        kb_rpi2_Pin_bind_on_low(pin, FourKeys_on_key_##KEY);                   \
                                                                                \
         /* If everything went fine */                                          \
         return kb_OKAY;                                                        \
@@ -299,16 +299,11 @@ ON_KEY_X_BIND_FUNCTION(4)
 #define ON_KEY_X_UNBIND_FUNCTION(KEY)                                          \
     kb_Error                                                                   \
     kb_rpi2_sensors_FourKeys_unbind_on_key_##KEY(                              \
-        kb_rpi2_sensors_FourKeys *const  self,                                 \
-        kb_Error (*on_key_##KEY)(kb_rpi2_sensors_FourKeys *const,              \
-                                 kb_rpi2_Event            *const,              \
-                                 kb_rpi2_Context          *const))             \
+        kb_rpi2_sensors_FourKeys *const  self)                                 \
     {                                                                          \
         /* If any of the arguments is NULL */                                  \
         if (!self)                                                             \
             return kb_SELF_IS_NULL;                                            \
-        else if (!on_key_##KEY)                                                \
-            return kb_ARG2_IS_NULL;                                            \
                                                                                \
         /* Assign new callback */                                              \
         self->on_key_##KEY = NULL;                                             \
@@ -317,7 +312,7 @@ ON_KEY_X_BIND_FUNCTION(4)
         kb_rpi2_Sensor_get_pin((kb_rpi2_Sensor *const)self,                    \
                                PIN_COL##KEY,                                   \
                                &pin);                                          \
-        kb_rpi2_Pin_unbind_on_high(pin);                                       \
+        kb_rpi2_Pin_unbind_on_low(pin);                                        \
                                                                                \
         /* If everything went fine */                                          \
         return kb_OKAY;                                                        \

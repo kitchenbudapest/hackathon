@@ -45,8 +45,9 @@ do
               --archive                  \
               --checksum                 \
               --delete                   \
-              --exclude main             \
               --exclude build            \
+              --exclude bins             \
+              --exclude libs             \
               --exclude .sconsign.dblite \
               $1                         \
               $2;

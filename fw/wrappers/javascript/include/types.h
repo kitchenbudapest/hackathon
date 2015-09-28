@@ -22,6 +22,14 @@
             KB_RPI2_EVENT_MEMBERS */
 #include <kb/rpi2/sensors/leds.h>
 /*  macro : KB_RPI2_SENSORS_LED_MEMBERS */
+#include <kb/rpi2/sensors/four_keys.h>
+/*  macro : KB_RPI2_SENSORS_FOUR_KEYS_MEMBERS */
+#include <kb/rpi2/sensors/rgb_leds.h>
+/*  macro : KB_RPI2_SENSORS_RGB_LED_MEMBERS */
+#include <kb/rpi2/sensors/step_motors.h>
+/*  macro : KB_RPI2_SENSORS_STEP_MOTOR_MEMBERS */
+#include <kb/rpi2/sensors/photo_resistors.h>
+/*  macro : KB_RPI2_SENSORS_PHOTO_RESISTOR_MEMBERS */
 
 
 /*----------------------------------------------------------------------------*/
@@ -68,6 +76,35 @@ typedef struct
     KB_RPI2_SENSORS_LED_MEMBERS()
     KBJS_TYPES_MEMBERS()
 } kbjs_LED;
+
+
+/*----------------------------------------------------------------------------*/
+typedef struct
+{
+    KB_RPI2_SENSORS_FOUR_KEYS_MEMBERS()
+    KBJS_TYPES_MEMBERS()
+} kbjs_FourKeys;
+
+/*----------------------------------------------------------------------------*/
+typedef struct
+{
+    KB_RPI2_SENSORS_RGB_LED_MEMBERS()
+    KBJS_TYPES_MEMBERS()
+} kbjs_RGBLED;
+
+/*----------------------------------------------------------------------------*/
+typedef struct
+{
+    KB_RPI2_SENSORS_STEP_MOTOR_MEMBERS()
+    KBJS_TYPES_MEMBERS()
+} kbjs_StepMotor;
+
+/*----------------------------------------------------------------------------*/
+typedef struct
+{
+    KB_RPI2_SENSORS_PHOTO_RESISTOR_MEMBERS()
+    KBJS_TYPES_MEMBERS()
+} kbjs_PhotoResistor;
 
 
 #undef KBJS_TYPES_MEMBERS
