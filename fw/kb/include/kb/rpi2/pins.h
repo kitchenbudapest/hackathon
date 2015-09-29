@@ -96,6 +96,9 @@ kb_rpi2_Pin_reset(kb_rpi2_Pin *const self);
 kb_Error
 kb_rpi2_Pin_listen(kb_rpi2_Pin *const self);
 /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+kb_Error
+kb_rpi2_Pin_unset(kb_rpi2_Pin *const self);
+/*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 /* Returns:
     kb_OKAY:
         if no error occured

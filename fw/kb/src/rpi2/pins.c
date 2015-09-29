@@ -466,6 +466,21 @@ kb_rpi2_Pin_listen(kb_rpi2_Pin *const self)
 
 /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 kb_Error
+kb_rpi2_Pin_unset(kb_rpi2_Pin *const self)
+{
+    /* If `self` is NULL */
+    if (!self)
+        return kb_SELF_IS_NULL;
+
+    /* Switch state */
+    self->state = kb_rpi2_Pin_UNSET;
+
+    /* If everything went fine */
+    return kb_OKAY;
+}
+
+/*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+kb_Error
 kb_rpi2_Pin_set_high(kb_rpi2_Pin *const self)
 {
     /* If `self` is NULL */

@@ -111,24 +111,6 @@ ON_KEY_X_FUNCTION(4)
 
 
 /*----------------------------------------------------------------------------*/
-/* Internal callbacks */
-static kb_Error
-pin_row_on_cycle_begin(kb_rpi2_Pin *const pin)
-{
-    return kb_rpi2_Pin_set_low(pin);
-}
-
-
-/*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-/* Internal callbacks */
-static kb_Error
-pin_row_on_cycle_end(kb_rpi2_Pin *const pin)
-{
-    return kb_rpi2_Pin_set_high(pin);
-}
-
-
-/*----------------------------------------------------------------------------*/
 kb_Error
 kb_rpi2_sensors_FourKeys_new(kb_rpi2_sensors_FourKeys **const self,
                              kb_rpi2_Event             *const event,
@@ -214,8 +196,8 @@ kb_rpi2_sensors_FourKeys_ini(kb_rpi2_sensors_FourKeys *const self,
     /* Set pin callbacks */
     kb_rpi2_Pin *pin;
     kb_rpi2_Sensor_get_pin((kb_rpi2_Sensor *const)self, PIN_ROW, &pin);
-    kb_rpi2_Pin_bind_on_cycle_begin(pin, pin_row_on_cycle_begin);
-    kb_rpi2_Pin_bind_on_cycle_end(pin, pin_row_on_cycle_end);
+    kb_rpi2_Pin_bind_on_cycle_begin(pin, kb_rpi2_Pin_set_low);
+    kb_rpi2_Pin_bind_on_cycle_end(pin, kb_rpi2_Pin_set_high);
 
     /* Set static values */
     self->on_key_1 = NULL;

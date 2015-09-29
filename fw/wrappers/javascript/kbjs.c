@@ -49,6 +49,8 @@
 /*  func  : kbjs_register_StepMotor */
 #include "include/sensors/photo_resistors.h"
 /*  func  : kbjs_register_PhotoResistor */
+#include "include/sensors/rotary_encoders.h"
+/*  func  : kbjs_register_RotaryEncoder */
 
 
 /*----------------------------------------------------------------------------*/
@@ -140,6 +142,7 @@ main(int argc,
     kbjs_register_RGBLED(context);
     kbjs_register_StepMotor(context);
     kbjs_register_PhotoResistor(context);
+    kbjs_register_RotaryEncoder(context);
 
     /* Evaluate passed script */
     if (duk_peval_file(context, argv[1]))
