@@ -6,6 +6,8 @@
 #include <stdlib.h>
 /*  func  : malloc
             free */
+#include <stdbool.h>
+/*  type  : bool */
 
 /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 /* Include jemalloc headers */
@@ -458,6 +460,38 @@ kb_rpi2_Pin_listen(kb_rpi2_Pin *const self)
         case kb_rpi2_Pin_UNSET:
             return kb_FAIL;
     }
+
+    /* If everything went fine */
+    return kb_OKAY;
+}
+
+
+/*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+kb_Error
+kb_rpi2_Pin_is_high(kb_rpi2_Pin *const  self,
+                    bool               *state)
+{
+    /* If `self` is NULL */
+    if (!self)
+        return kb_SELF_IS_NULL;
+
+    *state = (bool)(self->state == kb_rpi2_Pin_HIGH);
+
+    /* If everything went fine */
+    return kb_OKAY;
+}
+
+
+/*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+kb_Error
+kb_rpi2_Pin_is_low(kb_rpi2_Pin *const  self,
+                   bool               *state)
+{
+    /* If `self` is NULL */
+    if (!self)
+        return kb_SELF_IS_NULL;
+
+    *state = (bool)(self->state == kb_rpi2_Pin_LOW);
 
     /* If everything went fine */
     return kb_OKAY;

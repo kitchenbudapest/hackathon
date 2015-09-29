@@ -32,6 +32,8 @@
 /*  macro : KB_RPI2_SENSORS_PHOTO_RESISTOR_MEMBERS */
 #include <kb/rpi2/sensors/rotary_encoders.h>
 /*  macro : KB_RPI2_SENSORS_ROTARY_ENCODER_MEMBERS */
+#include <kb/rpi2/sensors/motion_sensors.h>
+/*  macro : KB_RPI2_SENSORS_MOTION_SENSOR_MEMBERS */
 
 
 /*----------------------------------------------------------------------------*/
@@ -114,6 +116,13 @@ typedef struct
     KB_RPI2_SENSORS_ROTARY_ENCODER_MEMBERS()
     KBJS_TYPES_MEMBERS()
 } kbjs_RotaryEncoder;
+
+/*----------------------------------------------------------------------------*/
+typedef struct
+{
+    KB_RPI2_SENSORS_MOTION_SENSOR_MEMBERS()
+    KBJS_TYPES_MEMBERS()
+} kbjs_MotionSensor;
 
 
 #undef KBJS_TYPES_MEMBERS

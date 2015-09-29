@@ -96,6 +96,29 @@ kb_rpi2_Pin_reset(kb_rpi2_Pin *const self);
 kb_Error
 kb_rpi2_Pin_listen(kb_rpi2_Pin *const self);
 /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+/* Returns:
+    kb_OKAY:
+        if no error occured
+    kb_SELF_IS_NULL:
+        if first argument is a NULL pointer */
+kb_Error
+kb_rpi2_Pin_is_high(kb_rpi2_Pin *const  self,
+                    bool               *state);
+/*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+/* Returns:
+    kb_OKAY:
+        if no error occured
+    kb_SELF_IS_NULL:
+        if first argument is a NULL pointer */
+kb_Error
+kb_rpi2_Pin_is_low(kb_rpi2_Pin *const  self,
+                   bool               *state);
+/*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+/* Returns:
+    kb_OKAY:
+        if no error occured
+    kb_SELF_IS_NULL:
+        if first argument is a NULL pointer */
 kb_Error
 kb_rpi2_Pin_unset(kb_rpi2_Pin *const self);
 /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */

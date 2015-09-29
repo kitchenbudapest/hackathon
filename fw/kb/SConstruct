@@ -82,7 +82,8 @@ def kb():
                   join('src', 'rpi2', 'sensors', 'rgb_leds.c'),
                   join('src', 'rpi2', 'sensors', 'step_motors.c'),
                   join('src', 'rpi2', 'sensors', 'photo_resistors.c'),
-                  join('src', 'rpi2', 'sensors', 'rotary_encoders.c'),]
+                  join('src', 'rpi2', 'sensors', 'rotary_encoders.c'),
+                  join('src', 'rpi2', 'sensors', 'motion_sensors.c'),]
 
     # C pre-processor path (include)
     CPPPATH = [join(INPUT_DIR, 'include')]

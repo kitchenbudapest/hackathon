@@ -123,7 +123,8 @@ def wrapper():
                   join('src', 'sensors', 'rgb_leds.c'),
                   join('src', 'sensors', 'step_motors.c'),
                   join('src', 'sensors', 'photo_resistors.c'),
-                  join('src', 'sensors', 'rotary_encoders.c'),]
+                  join('src', 'sensors', 'rotary_encoders.c'),
+                  join('src', 'sensors', 'motion_sensors.c'),]
 
     # C pre-processor path (include)
     CPPPATH = ['.',

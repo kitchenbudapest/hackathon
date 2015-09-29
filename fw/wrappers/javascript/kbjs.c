@@ -51,6 +51,8 @@
 /*  func  : kbjs_register_PhotoResistor */
 #include "include/sensors/rotary_encoders.h"
 /*  func  : kbjs_register_RotaryEncoder */
+#include "include/sensors/motion_sensors.h"
+/*  func  : kbjs_register_MotionSensor */
 
 
 /*----------------------------------------------------------------------------*/
@@ -143,6 +145,7 @@ main(int argc,
     kbjs_register_StepMotor(context);
     kbjs_register_PhotoResistor(context);
     kbjs_register_RotaryEncoder(context);
+    kbjs_register_MotionSensor(context);
 
     /* Evaluate passed script */
     if (duk_peval_file(context, argv[1]))
