@@ -252,11 +252,11 @@
 
 
 /*----------------------------------------------------------------------------*/
-/* Create static function: <bool> kbjs_C_NAME_C_METH() */
-#define KBJS_SENSORS_COMMON_BOOL_RETURNED_SIMPLE_METHODS_WRAPPER(C_NAME,       \
-                                                                 C_METH,       \
-                                                                 JS_NAME,      \
-                                                                 JS_METH)      \
+/* Create static function: <Number> kbjs_C_NAME_C_METH() */
+#define KBJS_SENSORS_COMMON_NUMBER_RETURNED_SIMPLE_METHODS_WRAPPER(C_NAME,     \
+                                                                   C_METH,     \
+                                                                   JS_NAME,    \
+                                                                   JS_METH)    \
     static duk_ret_t                                                           \
     kbjs_##C_NAME##_##C_METH(duk_context *context)                             \
     {                                                                          \
@@ -271,7 +271,7 @@
         kbjs_##C_NAME *kb_sensor = duk_get_pointer(context, (duk_idx_t)-1);    \
                                                                                \
         /* Delete kibu Context instance */                                     \
-        bool     value;                                                        \
+        double value;                                                          \
         kb_Error kb_error;                                                     \
         if ((kb_error = kb_rpi2_sensors_##C_NAME##_##C_METH(                   \
                 (kb_rpi2_sensors_##C_NAME *const)kb_sensor, &value)))          \
@@ -284,7 +284,7 @@
         /* STACK: [...] */                                                     \
         duk_pop_2(context);                                                    \
         /* STACK: [..., bool] */                                               \
-        duk_push_boolean(context, (duk_bool_t)value);                          \
+        duk_push_number(context, (duk_double_t)value);                         \
         return (duk_ret_t)1;                                                   \
     }
 

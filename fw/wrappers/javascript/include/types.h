@@ -34,6 +34,10 @@
 /*  macro : KB_RPI2_SENSORS_ROTARY_ENCODER_MEMBERS */
 #include <kb/rpi2/sensors/motion_sensors.h>
 /*  macro : KB_RPI2_SENSORS_MOTION_SENSOR_MEMBERS */
+#include <kb/rpi2/sensors/ultrasonic_sensors.h>
+/*  macro : KB_RPI2_SENSORS_ULTRASONIC_SENSOR_MEMBERS */
+#include <kb/rpi2/sensors/hall_effects.h>
+/*  macro : KB_RPI2_SENSORS_HALL_EFFECT_MEMBERS */
 
 
 /*----------------------------------------------------------------------------*/
@@ -123,6 +127,20 @@ typedef struct
     KB_RPI2_SENSORS_MOTION_SENSOR_MEMBERS()
     KBJS_TYPES_MEMBERS()
 } kbjs_MotionSensor;
+
+/*----------------------------------------------------------------------------*/
+typedef struct
+{
+    KB_RPI2_SENSORS_ULTRASONIC_SENSOR_MEMBERS()
+    KBJS_TYPES_MEMBERS()
+} kbjs_UltrasonicSensor;
+
+/*----------------------------------------------------------------------------*/
+typedef struct
+{
+    KB_RPI2_SENSORS_HALL_EFFECT_MEMBERS()
+    KBJS_TYPES_MEMBERS()
+} kbjs_HallEffect;
 
 
 #undef KBJS_TYPES_MEMBERS

@@ -7,7 +7,7 @@
 
     var context = new kb.rpi2.Context(),
         event   = new kb.rpi2.Event(context),
-        motion  = new kb.rpi2.sensors.MotionSensor(event, kb.rpi2.PIN3);
+        motion  = new kb.rpi2.sensors.MotionSensor(event, kb.rpi2.PIN11);
 
     motion.onMotion = function ()
     {

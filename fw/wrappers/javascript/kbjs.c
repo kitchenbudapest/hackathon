@@ -53,10 +53,15 @@
 /*  func  : kbjs_register_RotaryEncoder */
 #include "include/sensors/motion_sensors.h"
 /*  func  : kbjs_register_MotionSensor */
+#include "include/sensors/ultrasonic_sensors.h"
+/*  func  : kbjs_register_UltrasonicSensor */
+#include "include/sensors/hall_effects.h"
+/*  func  : kbjs_register_HallEffect */
 
 
 /*----------------------------------------------------------------------------*/
 static duk_context *context = NULL;
+
 
 /*----------------------------------------------------------------------------*/
 static void
@@ -100,7 +105,6 @@ main(int argc,
     }
 
     /* Create duktape heap */
-    duk_context *context;
     if (!(context = duk_create_heap_default()))
     {
         fputs("kbjs: Internal allocation failed, during "
@@ -146,6 +150,8 @@ main(int argc,
     kbjs_register_PhotoResistor(context);
     kbjs_register_RotaryEncoder(context);
     kbjs_register_MotionSensor(context);
+    kbjs_register_UltrasonicSensor(context);
+    kbjs_register_HallEffect(context);
 
     /* Evaluate passed script */
     if (duk_peval_file(context, argv[1]))

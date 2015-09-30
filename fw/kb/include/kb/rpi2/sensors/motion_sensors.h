@@ -49,28 +49,34 @@ kb_rpi2_sensors_MotionSensor_fin(kb_rpi2_sensors_MotionSensor *const self);
 /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 kb_Error
 kb_rpi2_sensors_MotionSensor_del(kb_rpi2_sensors_MotionSensor **const self);
+
+
 /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-kb_Error
-kb_rpi2_sensors_MotionSensor_bind_on_motion(
-    kb_rpi2_sensors_MotionSensor *const self,
-    kb_Error (*on_motion)(kb_rpi2_sensors_MotionSensor *const,
-                          kb_rpi2_Event       *const,
-                          kb_rpi2_Context     *const));
+#define KBJS_RPI2_SENSORS_MOTION_SENSOR_ON_STATE_BIND_FUNCTION(STATE)          \
+    kb_Error                                                                   \
+    kb_rpi2_sensors_MotionSensor_bind_on_##STATE(                              \
+        kb_rpi2_sensors_MotionSensor *const  self,                             \
+        kb_Error (*on_##STATE)(kb_rpi2_sensors_MotionSensor *const,            \
+                               kb_rpi2_Event                *const,            \
+                               kb_rpi2_Context              *const));
 /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-kb_Error
-kb_rpi2_sensors_MotionSensor_unbind_on_motion(
-    kb_rpi2_sensors_MotionSensor *const self);
+/* Create binding functions */
+KBJS_RPI2_SENSORS_MOTION_SENSOR_ON_STATE_BIND_FUNCTION(motion)
+KBJS_RPI2_SENSORS_MOTION_SENSOR_ON_STATE_BIND_FUNCTION(still)
+#undef KBJS_RPI2_SENSORS_MOTION_SENSOR_ON_STATE_BIND_FUNCTION
+
+
 /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-kb_Error
-kb_rpi2_sensors_MotionSensor_bind_on_still(
-    kb_rpi2_sensors_MotionSensor *const self,
-    kb_Error (*on_still)(kb_rpi2_sensors_MotionSensor *const,
-                         kb_rpi2_Event       *const,
-                         kb_rpi2_Context     *const));
+#define KBJS_RPI2_SENSORS_MOTION_SENSOR_ON_STATE_UNBIND_FUNCTION(STATE)        \
+    kb_Error                                                                   \
+    kb_rpi2_sensors_MotionSensor_unbind_on_##STATE(                            \
+        kb_rpi2_sensors_MotionSensor *const self);
 /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-kb_Error
-kb_rpi2_sensors_MotionSensor_unbind_on_still(
-    kb_rpi2_sensors_MotionSensor *const self);
+/* Create binding functions */
+KBJS_RPI2_SENSORS_MOTION_SENSOR_ON_STATE_UNBIND_FUNCTION(motion)
+KBJS_RPI2_SENSORS_MOTION_SENSOR_ON_STATE_UNBIND_FUNCTION(still)
+#undef KBJS_RPI2_SENSORS_MOTION_SENSOR_ON_STATE_UNBIND_FUNCTION
+
 
 
 #endif /* KB_RPI2_SENSORS_MOTION_SENSORS_H_2366513841514091 */
