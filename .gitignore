@@ -2,6 +2,8 @@
 *.pyo
 *.o
 *.html
+*.so
+*.os
 
 .sconsign.dblite
 
@@ -12,3 +14,5 @@ duktape-*
 __pycache__
 
 README.html
+
+/fw/wrappers/python/kb
