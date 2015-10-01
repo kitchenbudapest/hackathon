@@ -19,7 +19,6 @@
 /*----------------------------------------------------------------------------*/
 #define KB_RPI2_SENSORS_ROTARY_ENCODER_MEMBERS()                               \
     KB_RPI2_SENSOR_MEMBERS()                                                   \
-    kb_rpi2_PinState prev_state;                                               \
     kb_Error (*on_click)(                                                      \
         struct kb_rpi2_sensors_rotary_encoder *const,                          \
         kb_rpi2_Event                         *const,                          \

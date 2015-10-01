@@ -56,9 +56,8 @@ kbpy_rpi2_PyContext_init(PyObject *self,
                          PyObject *kwargs)
 {
     /* If any arguments passed */
-    if ((PyObject_Length(args) + PyObject_Length(kwargs)) > 1)
+    if ((PyObject_Length(args) > (Py_ssize_t)1) || kwargs)
     {
-            Py_INCREF(PyExc_TypeError);
             PyErr_SetString(PyExc_TypeError,
                             "__init__() takes 1 positional argument but more "
                             "were given");
@@ -69,7 +68,6 @@ kbpy_rpi2_PyContext_init(PyObject *self,
     kbpy_rpi2_Context *kb_context;
     if (!(kb_context = malloc(sizeof(kbpy_rpi2_Context))))
     {
-        Py_INCREF(kbpy_rpi2_INTERNAL_ERROR);
         PyErr_SetString(kbpy_rpi2_INTERNAL_ERROR, kb_Error_str(kb_ALLOC_FAIL));
         return kbpy_FAIL;
     }
@@ -83,7 +81,6 @@ kbpy_rpi2_PyContext_init(PyObject *self,
 
         default:
             free(kb_context);
-            Py_INCREF(kbpy_rpi2_INTERNAL_ERROR);
             PyErr_SetString(kbpy_rpi2_INTERNAL_ERROR, kb_Error_str(error));
             return kbpy_FAIL;
     }
@@ -145,24 +142,28 @@ kbpy_rpi2_PyContext_call(PyObject *self,
                                      "O:__call__",
                                      kwlist,
                                      &callback))
+    {
+        PyErr_SetString(PyExc_AttributeError,
+                        "The argument of '" OBJECT_NAME "' should be a single "
+                        "object");
         return (PyObject *)NULL;
+    }
 
     /* Try to get name attribute of the given object */
     if (!(name = PyObject_GetAttrString(callback, "__name__")))
     {
-        Py_INCREF(PyExc_AttributeError);
         PyErr_SetString(PyExc_AttributeError,
                         "The attributes of '" OBJECT_NAME "' object should "
-                        "have '__name__' attributes");
+                        "have a '__name__' attribute");
         return (PyObject *)NULL;
     }
 
     /* Try to store the given object to instance */
     if (PyObject_SetAttr(self, name, callback))
-        /*
-         * TODO: Set a new exception here, or not?
-         */
+    {
+        PyErr_SetString(PyExc_AttributeError, "Cannot set attribute");
         return (PyObject *)NULL;
+    }
 
     /* If everything went fine */
     Py_INCREF(callback);
@@ -170,31 +171,27 @@ kbpy_rpi2_PyContext_call(PyObject *self,
 }
 
 
+// if (PyObject_IsTrue(
+//              )
+//          return kb_FAIL;
 /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 #define CALLBACK_SETTER_GETTER_WRAPPER(C_NAME, PY_NAME)                        \
     static kb_Error                                                            \
     kbpy_rpi2_PyContext_##C_NAME(kb_rpi2_Context *const context,               \
                                  kb_rpi2_Event   *const event)                 \
     {                                                                          \
-        PyObject *args,                                                        \
-                 *kwargs;                                                      \
+        PyObject *args;                                                        \
                                                                                \
         /* Build arguments for the callback function */                        \
-        args   = PyTuple_New((Py_ssize_t)0);                                   \
-        kwargs = Py_BuildValue("{s:O,s:O}",                                    \
-                               "context",                                      \
-                               ((kbpy_rpi2_Context *const)context)->py_context,\
-                               "event",                                        \
-                               ((kbpy_rpi2_Event   *const)event)->py_event);   \
-        Py_INCREF(args);                                                       \
+        args = Py_BuildValue("(OO)",                                           \
+                             ((kbpy_rpi2_Context *const)context)->py_context,  \
+                             ((kbpy_rpi2_Event   *const)event)->py_event);     \
                                                                                \
+        Py_INCREF(((kbpy_rpi2_Context *const)context)->py_context->C_NAME);    \
         /* Invoke callback function and check its return value */              \
-        if (PyObject_IsTrue(                                                   \
-                PyObject_Call(                                                 \
-                    ((kbpy_rpi2_Context *const)context)->py_context->C_NAME,   \
-                    args,                                                      \
-                    kwargs)))                                                  \
-            return kb_FAIL;                                                    \
+        PyObject_CallObject(                                                   \
+            ((kbpy_rpi2_Context *const)context)->py_context->C_NAME,           \
+            args);                                                             \
                                                                                \
         /* If everything went fine */                                          \
         return kb_OKAY;                                                        \
@@ -318,7 +315,6 @@ static PyGetSetDef kbpy_rpi2_PyContext_getters_setters[] =
                                                                                \
             /* If there was a problem */                                       \
             default:                                                           \
-                Py_INCREF(kbpy_rpi2_INTERNAL_ERROR);                           \
                 PyErr_SetString(kbpy_rpi2_INTERNAL_ERROR, kb_Error_str(error));\
                 return (PyObject *)NULL;                                       \
         }                                                                      \

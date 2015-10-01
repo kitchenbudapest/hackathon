@@ -74,7 +74,7 @@ def wrapper():
     TARGET     = join('kbpy', 'kb', 'rpi2')
     SOURCE     = ['kbpy.c',
                   join('src', 'errors.c'),
-                  # join('src', 'pin_ids.c'),
+                  join('src', 'pin_ids.c'),
                   join('src', 'contexts.c'),
                   join('src', 'events.c'),]
                   # join('src', 'sensors', 'leds.c'),

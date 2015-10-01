@@ -22,6 +22,8 @@
 /* Include kbpy headers */
 #include "include/errors.h"
 /*  value : kbpy_rpi2_INTERNAL_ERROR */
+#include "include/pin_ids.h"
+/*  value  : kbpy_rpi2_PyPinIds_register */
 #include "include/contexts.h"
 /*  value : kbpy_rpi2_PyContextType */
 #include "include/events.h"
@@ -74,6 +76,10 @@ PyInit_rpi2(void)
     if (PyType_Ready(&kbpy_rpi2_PyContextType))
         goto Type_Ready_Error;
 
+    /* Add PinId enums */
+    if (kbpy_rpi2_PyPinIds_register(module))
+        goto Register_Object_Error;
+
     /* Add Context class-object to the module */
     Py_INCREF((PyObject *)&kbpy_rpi2_PyContextType);
     if (PyModule_AddObject(module,
@@ -102,8 +108,9 @@ PyInit_rpi2(void)
     return module;
 
     /* If there was any problem */
-    Add_Object_Error:
     Type_Ready_Error:
+    Add_Object_Error:
+    Register_Object_Error:
         Py_XDECREF(module);
     Create_Error:
         return NULL;

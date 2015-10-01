@@ -26,6 +26,7 @@
 #include <kb/errors.h>
 /*  type  : kb_Error
     const : kb_OKAY
+            kb_ALLOC_FAIL
     func  : kb_Error_str */
 #include <kb/rpi2/events.h>
 /*  type  : kb_rpi2_Event
@@ -38,7 +39,6 @@
 #include "include/errors.h"
 /*  const : kbpy_OKAY
             kbpy_FAIL
-            kb_ALLOC_FAIL
     value : kbpy_rpi2_INTERNAL_ERROR */
 #include "include/types.h"
 /*  type  : kbpy_rpi2_Event
@@ -74,7 +74,6 @@ kbpy_rpi2_PyEvent_init(PyObject *self,
     /* If the given object is not a Context one */
     if (!PyObject_IsInstance(py_context, (PyObject *)&kbpy_rpi2_PyContextType))
     {
-        Py_INCREF(PyExc_TypeError);
         PyErr_SetString(PyExc_TypeError,
                         "'" OBJECT_NAME ".__init__' first argument should be a "
                         "kb.rpi2.Context");
@@ -85,7 +84,6 @@ kbpy_rpi2_PyEvent_init(PyObject *self,
     kbpy_rpi2_Event *kb_event;
     if (!(kb_event = malloc(sizeof(kbpy_rpi2_Event))))
     {
-        Py_INCREF(kbpy_rpi2_INTERNAL_ERROR);
         PyErr_SetString(kbpy_rpi2_INTERNAL_ERROR, kb_Error_str(kb_ALLOC_FAIL));
         return kbpy_FAIL;
     }
@@ -102,7 +100,6 @@ kbpy_rpi2_PyEvent_init(PyObject *self,
 
         default:
             free(kb_event);
-            Py_INCREF(kbpy_rpi2_INTERNAL_ERROR);
             PyErr_SetString(kbpy_rpi2_INTERNAL_ERROR, kb_Error_str(error));
             return kbpy_FAIL;
     }
@@ -155,7 +152,6 @@ kbpy_rpi2_PyEvent_activate(PyObject *self,
 
         /* If there was a problem */
         default:
-            Py_INCREF(kbpy_rpi2_INTERNAL_ERROR);
             PyErr_SetString(kbpy_rpi2_INTERNAL_ERROR, kb_Error_str(error));
             return (PyObject *)NULL;
     }

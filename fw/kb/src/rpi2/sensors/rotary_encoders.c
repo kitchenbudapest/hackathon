@@ -137,9 +137,6 @@ RotaryEncoder_on_rotate(kb_rpi2_Pin     *const pin_clock,
                     context);
     }
 
-    /* Update stored value */
-    ((kb_rpi2_sensors_RotaryEncoder *const)sensor)->prev_state = pin_clock->state;
-
     /* Propagate return signal */
     return error;
 }
