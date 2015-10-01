@@ -8,11 +8,8 @@ PIR sensors allow you to sense motion, almost always used to detect whether a hu
 + Sensitivity range: up to 20 feet (6 meters) 110 degrees x 70 degrees detection range
 + Power supply: 3.3V - 5V input voltage
 
-![alt text](img/pir1.jpg)
+![alt text](img/hcsr501.jpg)
 
-#### Jumper settings:
-
-![alt text](img/pir6.jpg)
 
 When connecting up the PIR sensor as above, the DO (Digital OUT) does not stay on HIGH level when moving in front of it but actually turns HIGH and LOW every second or so. That is called "non-retriggering".
 
