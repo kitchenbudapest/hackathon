@@ -57,6 +57,8 @@
 /*  func  : kbjs_register_UltrasonicSensor */
 #include "include/sensors/hall_effects.h"
 /*  func  : kbjs_register_HallEffect */
+#include "include/sensors/buttons.h"
+/*  func  : kbjs_register_Button */
 
 
 /*----------------------------------------------------------------------------*/
@@ -169,6 +171,7 @@ main(int argc,
     kbjs_register_MotionSensor(context);
     kbjs_register_UltrasonicSensor(context);
     kbjs_register_HallEffect(context);
+    kbjs_register_Button(context);
 
     /* Evaluate passed script */
     if (duk_peval_file(context, argv[1]))

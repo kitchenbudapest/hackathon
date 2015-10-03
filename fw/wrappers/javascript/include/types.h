@@ -38,6 +38,8 @@
 /*  macro : KB_RPI2_SENSORS_ULTRASONIC_SENSOR_MEMBERS */
 #include <kb/rpi2/sensors/hall_effects.h>
 /*  macro : KB_RPI2_SENSORS_HALL_EFFECT_MEMBERS */
+#include <kb/rpi2/sensors/buttons.h>
+/*  macro : KB_RPI2_SENSORS_BUTTONS_MEMBERS */
 
 
 /*----------------------------------------------------------------------------*/
@@ -141,6 +143,13 @@ typedef struct
     KB_RPI2_SENSORS_HALL_EFFECT_MEMBERS()
     KBJS_TYPES_MEMBERS()
 } kbjs_HallEffect;
+
+/*----------------------------------------------------------------------------*/
+typedef struct
+{
+    KB_RPI2_SENSORS_BUTTON_MEMBERS()
+    KBJS_TYPES_MEMBERS()
+} kbjs_Button;
 
 
 #undef KBJS_TYPES_MEMBERS
