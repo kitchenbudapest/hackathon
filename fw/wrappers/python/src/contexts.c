@@ -171,28 +171,27 @@ kbpy_rpi2_PyContext_call(PyObject *self,
 }
 
 
-// if (PyObject_IsTrue(
-//              )
-//          return kb_FAIL;
 /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 #define CALLBACK_SETTER_GETTER_WRAPPER(C_NAME, PY_NAME)                        \
     static kb_Error                                                            \
     kbpy_rpi2_PyContext_##C_NAME(kb_rpi2_Context *const context,               \
                                  kb_rpi2_Event   *const event)                 \
     {                                                                          \
-        PyObject *args;                                                        \
+        PyObject *args,                                                        \
+                 *result;                                                      \
                                                                                \
         /* Build arguments for the callback function */                        \
         args = Py_BuildValue("(OO)",                                           \
                              ((kbpy_rpi2_Context *const)context)->py_context,  \
                              ((kbpy_rpi2_Event   *const)event)->py_event);     \
                                                                                \
-        Py_INCREF(((kbpy_rpi2_Context *const)context)->py_context->C_NAME);    \
         /* Invoke callback function and check its return value */              \
-        PyObject_CallObject(                                                   \
-            ((kbpy_rpi2_Context *const)context)->py_context->C_NAME,           \
-            args);                                                             \
-                                                                               \
+        result =                                                               \
+            PyObject_CallObject(                                               \
+                ((kbpy_rpi2_Context *const)context)->py_context->C_NAME,       \
+                args);                                                         \
+        if (PyObject_IsTrue(result))                                           \
+            return kb_FAIL;                                                    \
         /* If everything went fine */                                          \
         return kb_OKAY;                                                        \
     }                                                                          \
@@ -206,7 +205,6 @@ kbpy_rpi2_PyContext_call(PyObject *self,
         /* If instance does not have an `C_NAME` callback */                   \
         if (!((kbpy_rpi2_PyContext *const)self)->C_NAME)                       \
         {                                                                      \
-            Py_INCREF(PyExc_AttributeError);                                   \
             PyErr_SetString(PyExc_AttributeError,                              \
                             "'" OBJECT_NAME "' object has no attribute "       \
                             "'" PY_NAME "'");                                  \
@@ -371,7 +369,7 @@ PyTypeObject kbpy_rpi2_PyContextType =
     .tp_print          = 0,
     .tp_getattr        = 0,
     .tp_setattr        = 0,
-    .tp_reserved       = 0,
+    .tp_as_async       = 0, // tp_reserved in python3.4
     .tp_repr           = 0,
     .tp_as_number      = 0,
     .tp_as_sequence    = 0,

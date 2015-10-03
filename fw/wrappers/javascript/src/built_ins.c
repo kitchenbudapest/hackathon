@@ -80,7 +80,7 @@ kbjs_sleep(duk_context *context)
 
 /*----------------------------------------------------------------------------*/
 void
-kbjs_register_built_ins(duk_context *context)
+kbjs_register_built_ins(duk_context  *context)
 {
     /* STACK: [..., global] */
     duk_push_global_object(context);

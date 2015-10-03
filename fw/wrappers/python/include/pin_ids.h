@@ -12,9 +12,22 @@
 #include <Python.h>
 /*  type  : PyObject */
 
+/*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+/* Include kibu headers */
+#include <kb/rpi2/enums.h>
+/*  const : kb_rpi2_PINS_COUNT */
+
 
 /*----------------------------------------------------------------------------*/
-int
-kbpy_rpi2_PyPinIds_register(PyObject *module);
+typedef struct
+{
+    kb_rpi2_PinId  id;
+    const char    *name;
+} kbpy_rpi2_PyPinId;
+
+
+/*----------------------------------------------------------------------------*/
+const kbpy_rpi2_PyPinId kbpy_rpi2_PY_PIN_IDS[kb_rpi2_PINS_COUNT];
+
 
 #endif /* KBPY_RPI2_PIN_IDS_H_9242966325654632 */

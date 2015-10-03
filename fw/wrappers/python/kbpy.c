@@ -19,11 +19,17 @@
             PyType_Ready */
 
 /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+/* Include kibu headers */
+#include <kb/rpi2/enums.h>
+/*  const : kb_rpi2_PIN1
+            kb_rpi2_PINS_COUNT */
+
+/*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 /* Include kbpy headers */
 #include "include/errors.h"
 /*  value : kbpy_rpi2_INTERNAL_ERROR */
 #include "include/pin_ids.h"
-/*  value  : kbpy_rpi2_PyPinIds_register */
+/*  value : kbpy_rpi2_PY_PIN_IDS */
 #include "include/contexts.h"
 /*  value : kbpy_rpi2_PyContextType */
 #include "include/events.h"
@@ -44,10 +50,13 @@ static struct PyModuleDef kbpy_module =
     .m_doc      = kbpy_module_doc,
     .m_size     = 1, /* module can be reinitialized */
     .m_methods  = NULL,
-    .m_reload   = NULL,
-    .m_traverse = NULL,
-    .m_clear    = NULL,
-    .m_free     = NULL,
+
+    // .m_slots    = NULL, // py3.5
+    // .m_reload   = NULL, // py3.4
+
+    // .m_traverse = NULL,
+    // .m_clear    = NULL,
+    // .m_free     = NULL,
 };
 
 
@@ -77,8 +86,29 @@ PyInit_rpi2(void)
         goto Type_Ready_Error;
 
     /* Add PinId enums */
-    if (kbpy_rpi2_PyPinIds_register(module))
-        goto Register_Object_Error;
+    PyObject *pin;
+    for (int i=kb_rpi2_PIN1; i<kb_rpi2_PINS_COUNT; i++)
+    {
+        /* Create new Capsule object */
+        if (!(pin = PyCapsule_New((void *)&(kbpy_rpi2_PY_PIN_IDS[i].id),
+                                  kbpy_rpi2_PY_PIN_IDS[i].name,
+                                  NULL)))
+        {
+            PyErr_SetString(kbpy_rpi2_INTERNAL_ERROR,
+                            "Could not create kb.rpi2.PINx object");
+            goto Register_Object_Error;
+        }
+
+        /* Add new Capsule to module */
+        if (PyModule_AddObject(module,
+                               kbpy_rpi2_PY_PIN_IDS[i].name + sizeof("kb.rpi2"),
+                               pin))
+        {
+            PyErr_SetString(kbpy_rpi2_INTERNAL_ERROR,
+                            "Could not add kb.rpi2.PINx to module");
+            goto Register_Object_Error;
+        }
+    }
 
     /* Add Context class-object to the module */
     Py_INCREF((PyObject *)&kbpy_rpi2_PyContextType);

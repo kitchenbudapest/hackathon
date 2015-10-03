@@ -22,6 +22,7 @@ def on_cycle_begin(*args, **kwargs):
 @context
 def on_cycle_end(*args, **kwargs):
     print('Inside: on_cycle_end')
+    return 'hello'
 
 @context
 def on_stop(*args, **kwargs):

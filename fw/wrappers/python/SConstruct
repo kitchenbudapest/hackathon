@@ -90,7 +90,7 @@ def wrapper():
     # C pre-processor path (include)
     CPPPATH = ['.',
                '/usr/include',
-               '/usr/include/python3.4m',
+               '/usr/include/python3.5m',
                '/usr/local/include']
     # Library path
     LIBPATH = ['.',

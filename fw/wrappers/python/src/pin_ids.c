@@ -16,8 +16,7 @@
 /* Include kibu headers */
 #include <kb/rpi2/enums.h>
 /*  type  : kb_rpi2_PinId
-    const : kb_rpi2_PINx
-            kb_rpi2_PINS_COUNT */
+    const : kb_rpi2_PINx */
 
 /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 /* Include kbpy headers */
@@ -25,18 +24,12 @@
 /*  const : kbpy_OKAY
             kbpy_FAIL
     value : kbpy_rpi2_INTERNAL_ERROR */
+#include "include/pin_ids.h"
+/*  type  : kbpy_rpi2_PyPinId */
 
 
 /*----------------------------------------------------------------------------*/
-typedef struct
-{
-    kb_rpi2_PinId  id;
-    const char    *name;
-} PyPinId;
-
-
-/*----------------------------------------------------------------------------*/
-static const PyPinId PY_PIN_IDS[] =
+const kbpy_rpi2_PyPinId kbpy_rpi2_PY_PIN_IDS[] =
 {
     [kb_rpi2_PIN1]  = {kb_rpi2_PIN1,  "kb.rpi2.PIN1"},
     [kb_rpi2_PIN2]  = {kb_rpi2_PIN2,  "kb.rpi2.PIN2"},
@@ -82,36 +75,3 @@ static const PyPinId PY_PIN_IDS[] =
     [kb_rpi2_PIN39] = {kb_rpi2_PIN39, "kb.rpi2.PIN39"},
     [kb_rpi2_PIN40] = {kb_rpi2_PIN40, "kb.rpi2.PIN40"},
 };
-
-
-/*----------------------------------------------------------------------------*/
-int
-kbpy_rpi2_PyPinIds_register(PyObject *module)
-{
-    PyObject *pin;
-    for (int i=kb_rpi2_PIN1; i<kb_rpi2_PINS_COUNT; i++)
-    {
-        /* Create new Capsule object */
-        if (!(pin = PyCapsule_New((void *)&(PY_PIN_IDS[i].id),
-                                  PY_PIN_IDS[i].name,
-                                  NULL)))
-        {
-            PyErr_SetString(kbpy_rpi2_INTERNAL_ERROR,
-                            "Could not create kb.rpi2.PINx object");
-            return kbpy_FAIL;
-        }
-
-        /* Add new Capsule to module */
-        if (PyModule_AddObject(module,
-                               PY_PIN_IDS[i].name + sizeof("kb.rpi2"),
-                               pin))
-        {
-            PyErr_SetString(kbpy_rpi2_INTERNAL_ERROR,
-                            "Could not add kb.rpi2.PINx to module");
-            return kbpy_FAIL;
-        }
-    }
-
-    /* If everything went fine */
-    return kbpy_OKAY;
-}

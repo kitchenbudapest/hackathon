@@ -115,9 +115,26 @@ main(int argc,
     /* Create built-ins */
     kbjs_register_built_ins(context);
 
-    /* Create modul objects */
     /* STACK: [global] */
     duk_push_global_object(context);
+
+        /* Store passed arguments */
+    /* STACK: [..., global, "ARGV"] */
+    duk_push_string(context, "ARGV");
+    /* STACK: [..., global, "ARGV", []] */
+    duk_push_array(context);
+
+    for (int i=0; i<argc; i++)
+    {
+        /* STACK: [..., global, "ARGV", [], "arg"] */
+        duk_push_string(context, argv[i]);
+        /* STACK: [..., global, "ARGV", ["arg"]] */
+        duk_put_prop_index(context, (duk_idx_t)-2, i);
+    }
+    /* STACK: [..., global] */
+    duk_put_prop(context, (duk_idx_t)-3);
+
+    /* Create modul objects */
     /* STACK: [global, "kb"] */
     duk_push_string(context, "kb");
     /* STACK: [global, "kb", {}] */
