@@ -65,27 +65,18 @@ def path_prefixer(folder, files):
 
 
 
-# Target: building javascript wrapper
+# Target: building python wrapper around kb.rpi2 module
 #------------------------------------------------------------------------------#
-def wrapper():
+def wrapper_rpi2():
     # Output and inputs
     INPUT_DIR  = '.'
     OUTPUT_DIR = join('build', 'kbpy')
-    TARGET     = join('kbpy', 'kb', 'rpi2')
-    SOURCE     = ['kbpy.c',
+    TARGET     = join('kbpy', 'kb', 'rpi2', 'rpi2')
+    SOURCE     = ['kbpy_rpi2.c',
                   join('src', 'errors.c'),
                   join('src', 'pin_ids.c'),
                   join('src', 'contexts.c'),
-                  join('src', 'events.c'),]
-                  # join('src', 'sensors', 'leds.c'),
-                  # join('src', 'sensors', 'four_keys.c'),
-                  # join('src', 'sensors', 'rgb_leds.c'),
-                  # join('src', 'sensors', 'step_motors.c'),
-                  # join('src', 'sensors', 'photo_resistors.c'),
-                  # join('src', 'sensors', 'rotary_encoders.c'),
-                  # join('src', 'sensors', 'motion_sensors.c'),
-                  # join('src', 'sensors', 'ultrasonic_sensors.c'),
-                  # join('src', 'sensors', 'hall_effects.c'),]
+                  join('src', 'events.c')]
 
     # C pre-processor path (include)
     CPPPATH = ['.',
@@ -119,15 +110,74 @@ def wrapper():
     # Build (and set it as the defaulkt target
     build = environment.SharedLibrary(target = TARGET,
                                       source = path_prefixer(OUTPUT_DIR,
-                                                             SOURCE),
-                                      SHLIBPREFIX = '')
+                                                             SOURCE))
 
     # Name this build
-    environment.Alias('kbpy', build)
-    Default(build)
+    environment.Alias('kbpy_rpi2', build)
+    return build
+
+
+# Target: building python wrapper around kb.rpi2.sensors module
+#------------------------------------------------------------------------------#
+def wrapper_sensors():
+    # Output and inputs
+    INPUT_DIR  = '.'
+    OUTPUT_DIR = join('build', 'kbpy')
+    TARGET     = join('kbpy', 'kb', 'rpi2', 'sensors', 'sensors')
+    SOURCE     = ['kbpy_sensors.c',
+                  join('src', 'sensors', 'leds.c'),]
+                  # join('src', 'sensors', 'four_keys.c'),
+                  # join('src', 'sensors', 'rgb_leds.c'),
+                  # join('src', 'sensors', 'step_motors.c'),
+                  # join('src', 'sensors', 'photo_resistors.c'),
+                  # join('src', 'sensors', 'rotary_encoders.c'),
+                  # join('src', 'sensors', 'motion_sensors.c'),
+                  # join('src', 'sensors', 'ultrasonic_sensors.c'),
+                  # join('src', 'sensors', 'hall_effects.c'),]
+
+    # C pre-processor path (include)
+    CPPPATH = ['.',
+               '/usr/include',
+               '/usr/include/python3.5m',
+               '/usr/local/include']
+    # Library path
+    LIBPATH = ['.',
+               'kbpy/kb/rpi2',
+               '/usr/lib',
+               '/usr/local/lib']
+    # Libraries
+    LIBS    = ['jemalloc',
+               'kb',
+               'm',
+               'rpi2']
+
+    # If this is not a desktop build
+    if not ARGUMENTS.get('desktop', False):
+        LIBS.append('bcm2835')
+
+    # Create environment
+    environment = Environment(CC      = CC,
+                              CCFLAGS = CCFLAGS,
+                              CPPPATH = CPPPATH,
+                              LIBPATH = LIBPATH,
+                              LIBS    = LIBS)
+
+    # Specify output directory
+    environment.VariantDir(variant_dir = OUTPUT_DIR,
+                           src_dir     = INPUT_DIR)
+
+    # Build (and set it as the defaulkt target
+    build = environment.SharedLibrary(target = TARGET,
+                                      source = path_prefixer(OUTPUT_DIR,
+                                                             SOURCE))
+
+    # Name this build
+    environment.Alias('kbpy_sensors', build)
+    return build
 
 
 
 #------------------------------------------------------------------------------#
 # Create build options
-wrapper()
+Depends(wrapper_sensors(),
+        wrapper_rpi2())

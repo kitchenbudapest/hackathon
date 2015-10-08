@@ -42,6 +42,72 @@
 
 
 /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+#define KBPY_RPI2_SENSORS_COMMON_INIT_IS_EVENT(EVENT)                          \
+    if (!PyObject_IsInstance(EVENT, (PyObject *)&kbpy_rpi2_PyEventType))       \
+    {                                                                          \
+        PyErr_SetString(PyExc_TypeError,                                       \
+                        "First argument of '" OBJECT_NAME ".__init__' "        \
+                        "should be a kb.rpi2.Event");                          \
+        return kbpy_FAIL;                                                      \
+    }
+
+
+/*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+#define KBPY_RPI2_SENSORS_COMMON_INIT_IS_CAPSULE(CAPSULE,                      \
+                                                 TARGET)                       \
+    if (!(TARGET = PyCapsule_GetContext(CAPSULE)))                             \
+    {                                                                          \
+        PyErr_SetString(PyExc_TypeError,                                       \
+                        "Second argument of '" OBJECT_NAME ".__init__' should" \
+                        "be a kb.rpi2.PINx");                                  \
+        return kbpy_FAIL;                                                      \
+    }
+
+
+/*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+#define KBPY_RPI2_SENSORS_COMMON_INIT_IS_PIN_ID(PIN_ID)                        \
+    bool not_found;                                                            \
+    not_found = true;                                                          \
+    for (int i=kb_rpi2_PIN1; i<kb_rpi2_PINS_COUNT; i++)                        \
+        if (&(kbpy_rpi2_PY_PIN_IDS[i].id) == PIN_ID)                           \
+        {                                                                      \
+            not_found = false;                                                 \
+            break;                                                             \
+        }                                                                      \
+    /* If object is not a PIN enum */                                          \
+    if (not_found)                                                             \
+    {                                                                          \
+        PyErr_SetString(PyExc_TypeError,                                       \
+                        "Second aargument of '" OBJECT_NAME ".__init__' should"\
+                        "be a kb.rpi2.PINx");                                  \
+        return kbpy_FAIL;                                                      \
+    }
+
+
+/*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+#define KBPY_RPI2_SENSORS_COMMON_INIT_ALLOC(C_NAME)                            \
+    kbpy_rpi2_sensors_##C_NAME *kb_sensor;                                     \
+    if (!(kb_sensor = malloc(sizeof(kbpy_rpi2_sensors_Py##C_NAME))))           \
+    {                                                                          \
+        PyErr_SetString(kbpy_rpi2_INTERNAL_ERROR, kb_Error_str(kb_ALLOC_FAIL));\
+        return kbpy_FAIL;                                                      \
+    }
+
+
+/*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+#define KBPY_RPI2_SENSORS_COMMON_INIT_MUTUAL_REF(C_NAME)                       \
+    /* Store the C reference */                                                \
+    ((kbpy_rpi2_sensors_Py##C_NAME *const)self)->kb_sensor = kb_sensor;        \
+    /* Store the python reference */                                           \
+    kb_sensor->py_sensor = (kbpy_rpi2_sensors_Py##C_NAME *const)self;
+
+
+/*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+#define KBPY_RPI2_SENSORS_COMMON_INIT_CALLBACK(C_NAME, C_FUNC)                 \
+    ((kbpy_rpi2_sensors_Py##C_NAME *const)self)->C_FUNC = NULL;
+
+
+/*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 /* Has to be the second argument of DEALLOC macro */
 #define KBPY_RPI2_SENSORS_XDECREF_CALLBACK_MEMBER(C_NAME, C_FUNC)              \
     Py_XDECREF(((kbpy_rpi2_sensors_Py##C_NAME *const)self)->C_FUNC)
@@ -117,9 +183,10 @@
 #define KBPY_RPI2_SENSORS_COMMON_CALLBACK_SETTER_GETTER_WRAPPER(C_NAME,        \
                                                                 C_FUNC)        \
     static kb_Error                                                            \
-    kbpy_rpi2_sensors_Py##C_NAME##_##C_FUNC(kb_rpi2_Sensor  *const sensor,     \
-                                            kb_rpi2_Event   *const event,      \
-                                            kb_rpi2_Context *const context)    \
+    kbpy_rpi2_sensors_Py##C_NAME##_##C_FUNC(                                   \
+        kb_rpi2_sensors_##C_NAME *const sensor,                                \
+        kb_rpi2_Event            *const event,                                 \
+        kb_rpi2_Context          *const context)                               \
     {                                                                          \
         PyObject *args,                                                        \
                  *result;                                                      \
@@ -134,7 +201,7 @@
         /* Invoke callback function and check its return value */              \
         result =                                                               \
             PyObject_CallObject(                                               \
-                ((kbpy_rpi2_sensors_#C_NAME *const)sensor)->py_sensor->C_FUNC, \
+                ((kbpy_rpi2_sensors_##C_NAME *const)sensor)->py_sensor->C_FUNC,\
                 args);                                                         \
         if (PyObject_IsTrue(result))                                           \
             return kb_FAIL;                                                    \
@@ -174,7 +241,7 @@
             Py_INCREF(PyExc_TypeError);                                        \
             PyErr_SetString(PyExc_TypeError,                                   \
                             "'" OBJECT_NAME "."                                \
-                            PY_NAME "' has to be callable");                   \
+                            #C_FUNC "' has to be callable");                   \
             return kbpy_FAIL;                                                  \
         }                                                                      \
         /* If the given object is a function-like one */                       \
@@ -210,7 +277,7 @@
 #define KBPY_RPI2_SENSORS_COMMON_SIMPLE_METHOD(C_NAME,                         \
                                                C_FUNC)                         \
     static PyObject*                                                           \
-    kbpy_rpi2_sensors_Py##C_NAME##_##C_NAME(PyObject *self,                    \
+    kbpy_rpi2_sensors_Py##C_NAME##_##C_FUNC(PyObject *self,                    \
                                             PyObject *args)                    \
     {                                                                          \
         Py_XDECREF(args);                                                      \
@@ -218,8 +285,8 @@
         /* Call the original C function */                                     \
         kb_Error error;                                                        \
         switch (                                                               \
-            (error = kb_rpi2_sensors_Py##C_NAME##_##C_FUNC(                    \
-                (kb_rpi2_Context *const)(                                      \
+            (error = kb_rpi2_sensors_##C_NAME##_##C_FUNC(                      \
+                (kb_rpi2_sensors_##C_NAME *const)(                             \
                     (kbpy_rpi2_sensors_Py##C_NAME *const)self)->kb_sensor)))   \
         {                                                                      \
             /* If everything went fine */                                      \
@@ -252,7 +319,7 @@
     extern PyTypeObject kbpy_rpi2_sensors_Py##C_NAME##Type;
 #define KBPY_RPI2_SENSORS_COMMON_PY_TYPE_C(C_NAME,                             \
                                            METHODS)                            \
-    PyDoc_STRVAR(kbpy_rpi2_sensors_Py##C_NAME##_doc, NULL);                    \
+    PyDoc_STRVAR(kbpy_rpi2_sensors_Py##C_NAME##_doc, "");                      \
     PyTypeObject kbpy_rpi2_sensors_Py##C_NAME##Type =                          \
     {                                                                          \
         PyObject_HEAD_INIT(NULL)                                               \

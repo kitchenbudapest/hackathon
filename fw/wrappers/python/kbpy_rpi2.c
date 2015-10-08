@@ -37,17 +37,14 @@
 
 
 /*----------------------------------------------------------------------------*/
-PyDoc_STRVAR(kbpy_module_doc,
-             "kbpy is a python wrapper implemented via the Python C API around "
-             "the libkb library. libkb is a very high level, context based, "
-             "event driven framework to work with SBC's GPIO pins connected "
-             "sensors.");
+PyDoc_STRVAR(module_rpi2_doc,
+             "kb.rpi2 module includes the Raspberry Pi 2 specific objects.");
 
-static struct PyModuleDef kbpy_module =
+static struct PyModuleDef module_rpi2 =
 {
     PyModuleDef_HEAD_INIT,
     .m_name     = "rpi2",
-    .m_doc      = kbpy_module_doc,
+    .m_doc      = module_rpi2_doc,
     .m_size     = 1, /* module can be reinitialized */
     .m_methods  = NULL,
 
@@ -62,12 +59,12 @@ static struct PyModuleDef kbpy_module =
 
 /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 PyMODINIT_FUNC
-PyInit_rpi2(void)
+PyInit_librpi2(void)
 {
     PyObject *module;
 
     /* Create python module */
-    if (!(module = PyModule_Create(&kbpy_module)))
+    if (!(module = PyModule_Create(&module_rpi2)))
         goto Create_Error;
 
     /* Create exceptions */
@@ -80,10 +77,6 @@ PyInit_rpi2(void)
                            "InternalError",
                            kbpy_rpi2_INTERNAL_ERROR))
         goto Add_Object_Error;
-
-    /* Finalize Context class */
-    if (PyType_Ready(&kbpy_rpi2_PyContextType))
-        goto Type_Ready_Error;
 
     /* Add PinId enums */
     PyObject *pin;
@@ -109,6 +102,10 @@ PyInit_rpi2(void)
             goto Register_Object_Error;
         }
     }
+
+    /* Finalize Context class */
+    if (PyType_Ready(&kbpy_rpi2_PyContextType))
+        goto Type_Ready_Error;
 
     /* Add Context class-object to the module */
     Py_INCREF((PyObject *)&kbpy_rpi2_PyContextType);
